@@ -1,0 +1,140 @@
+.admin-header {
+  height: 60px;
+  background-color: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end; /* Căn phải toàn bộ nội dung */
+  align-items: center;
+  padding: 0 24px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+  .right-section {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .icon-button {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: #f3f4f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #4b5563;
+      border: none;
+    }
+
+    .admin-dropdown {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 8px 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+
+      &:hover .dropdown-menu {
+        display: block; /* Hiển thị dropdown khi hover */
+      }
+
+      .dropdown-menu {
+        display: none; /* Ẩn dropdown mặc định */
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background-color: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        min-width: 200px;
+        z-index: 100;
+
+        .dropdown-item {
+          padding: 10px 16px;
+          font-size: 0.85rem;
+
+          &:hover {
+            background-color: #f3f4f6;
+          }
+
+          &:not(:last-child) {
+            border-bottom: 1px solid #e5e7eb;
+          }
+        }
+      }
+    }
+  }
+}
+.notification-dropdown {
+  position: absolute;
+  top: 45px;
+  right: 80px;
+  width: 320px;
+  background: white;
+  box-shadow: 0 0 10px rgba(0,0,0,0.15);
+  border-radius: 6px;
+  padding: 10px;
+
+  h4 {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  .notification-list {
+    max-height: 250px;
+    overflow-y: auto;
+
+    li {
+      font-size: 14px;
+      padding: 6px 0;
+      border-bottom: 1px solid #eee;
+
+      &.unread {
+        font-weight: bold;
+      }
+
+      .time {
+        display: block;
+        font-size: 11px;
+        color: #888;
+      }
+    }
+  }
+
+  .notification-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+
+    button {
+      font-size: 13px;
+      background: none;
+      border: none;
+      color: #1a73e8;
+      cursor: pointer;
+    }
+
+    .view-all {
+      font-weight: 600;
+    }
+  }
+}
+
+.notification-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  background-color: red;
+  border-radius: 50%;
+}
+
+.notification-list li.unread {
+  font-weight: bold;
+  background-color: #eef6ff;
+}
+

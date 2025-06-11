@@ -1,0 +1,156 @@
+@use "../variables" as *;
+
+.header {
+  background: linear-gradient(90deg, $primary-color, $second-color);
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  font-family: $font-family-primary;
+  box-shadow: $box-shadow;
+}
+
+.promo-bar-wrapper {
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  position: relative;
+  z-index: 1100;
+  padding: 8px 0;
+  padding-left: 55px;
+}
+
+.promo-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: transparent;
+  color: $text-color !important;
+  font-weight: map-get($font-weight, md);
+  border-radius: 4px;
+  flex-wrap: wrap;           
+  min-width: 0;           
+  user-select: none;
+  transition: background-color 0.3s ease;
+  justify-content: flex-start;
+}
+
+.promo-icon {
+  font-size: 18px;
+  flex-shrink: 0;   
+}
+
+.promo-text {
+  font-size: 15px;
+
+  overflow-wrap: anywhere;
+  flex: 1 1 auto;            
+}
+
+.main-nav-container {
+  padding: $padding-sm $padding-md;
+  width: 100%;
+  background: transparent;
+  color: white;
+  user-select: none;
+}
+
+.logo-img {
+  height: 40px;
+  object-fit: contain;
+}
+
+.nav-menu {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.nav-item {
+  position: relative;
+  color: white;
+  font-weight: map-get($font-weight, sm);
+  text-decoration: none;
+  padding: $padding-xs $padding-sm;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 3px;
+    background: white;
+    width: 0;
+    transition: width 0.3s ease;
+  }
+
+  &:hover {
+    color: white;
+
+    &::after {
+      width: calc(100% - 24px);
+    }
+  }
+}
+
+.login-col {
+  text-align: right;
+}
+
+.login-btn button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 36px;
+  padding: 6px 40px;
+  border: none;
+  @include border-radius(medium);
+  font-weight: bold;
+  background: darken($primary-color, 10%);
+  color: white;
+  cursor: pointer;
+  overflow: hidden;
+  transition: background-color 0.3s ease;
+
+  .button-text {
+    position: absolute;
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .button-arrow {
+    position: absolute;
+    width: 100px;
+    height: 36px;
+    opacity: 0;
+    top: 50%;
+    transform-origin: center;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  &:hover {
+    .button-text {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+
+    .button-arrow {
+      background: white;
+      opacity: 1;
+      transform: translateY(-50%) translateX(0);
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .promo-text {
+    font-size: 13px;
+  }
+}

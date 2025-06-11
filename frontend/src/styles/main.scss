@@ -1,0 +1,15 @@
+// SETUP
+@use "variables" as *;
+@use "setup.scss";
+
+// COMPONENTS
+@use "./components/component";
+
+// LAYOUTS
+@use "./layouts/layout";
+
+// PAGES
+@use "./pages/page";
+
+// LIBARY
+@use "./libary/libary";
