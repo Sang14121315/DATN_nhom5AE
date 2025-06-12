@@ -1,0 +1,72 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #d5d5d5;
+  padding: 10px 20px;
+  font-family: sans-serif;
+
+  &__logo {
+    font-size: 20px;
+    font-weight: bold;
+    color: #000;
+  }
+
+  &__search {
+    flex: 1;
+    display: flex;
+    margin: 0 20px;
+    background-color: #333;
+    border-radius: 8px;
+    overflow: hidden;
+
+    input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      outline: none;
+      background-color: transparent;
+      color: white;
+    }
+
+    button {
+      background-color: transparent;
+      border: none;
+      color: white;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+
+    .icon {
+      font-size: 22px;
+    }
+
+    .header__account {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .text {
+        display: flex;
+        flex-direction: column;
+        font-size: 12px;
+        color: #000;
+      }
+    }
+
+    .header__cart {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      color: #000;
+    }
+  }
+}
