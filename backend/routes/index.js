@@ -22,9 +22,9 @@ router.post('/register', userController.register);
 router.post('/login', userController.login);
 
 // Products
-router.get('/products', auth, productController.getProducts);
+router.get('/products',  productController.getProducts);
 router.post('/products', auth, upload.single('image'), productController.createProduct);
-router.get('/products/:id', auth, productController.getProductById);
+router.get('/products/:id', productController.getProductById);
 router.put('/products/:id', auth, upload.single('image'), productController.updateProduct);
 router.delete('/products/:id', auth, productController.deleteProduct);
 
