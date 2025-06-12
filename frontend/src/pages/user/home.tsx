@@ -1,94 +1,90 @@
-import React from 'react';
-import { FaChevronDown } from 'react-icons/fa';
-import "../../styles/pages/user/home.scss";
 
-const categories = ["CPU", "Mainboard", "Ram", "VGA Mới", "SSD/HDD", "Tản nhiệt", "Nguồn (PSU)", "Vỏ Case"];
-const suppliers = ["Intel", "AMD"];
-const priceRanges = [
-  "Dưới 5.000.000đ",
-  "5.000.000đ - 10.000.000đ",
-  "10.000.000đ - 15.000.000đ",
-  "15.000.000đ - 20.000.000đ",
-  "Trên 20.000.000đ",
+import "../../styles/pages/user/home.scss";
+import { FaCartPlus } from "react-icons/fa";
+
+const categories = [
+  "CPU", "Mainboard", "RAM", "VGA Mới", "SSD/HDD", "Tản nhiệt", "Nguồn",
+  "Vỏ Case", "Cân nặng", "Chuột", "Bàn Phím", "Cục sạc", "Pin dự phòng", "Tai nghe", "Dây sạc"
 ];
 
-const products = new Array(8).fill({
-  brand: "INTEL",
-  name: "CPU INTEL CORE i5-10400f - TRAY NEW",
-  price: "1,980,000đ",
-  oldPrice: "2,990,000đ",
+const products = new Array(6).fill({
+  brand: "NVIDIA",
+  name: "CPU INTEL CORE I5-10400F - TRAY NEW",
+  price: "1,580,000đ",
+  oldPrice: "2,690,000đ",
   discount: "34%",
-  image: "/cpu.png"
+  image: "../../src/assets/home/pc.jpg"
 });
 
-const Home: React.FC = () => {
+const HomePage = () => {
   return (
-    <div className="homepage-container">
-      {/* Sidebar */}
-      <aside className="sidebar">
-        <div>
-          <div className="section-header">
-            <span>Danh mục sản phẩm</span>
-            <FaChevronDown />
-          </div>
+    <div className="homepage">
+      <div className="main-banner">
+        <aside className="sidebar">
+          <h3>DANH MỤC SẢN PHẨM</h3>
           <ul>
-            {categories.map((item, idx) => (
-              <li key={idx}>{item}</li>
+            {categories.map((cat, idx) => (
+              <li key={idx}>{cat}</li>
             ))}
           </ul>
+        </aside>
+
+        <div className="banner-images">
+          <img src="../../src/assets/home/banner.jpg" alt="Main Banner" />
         </div>
+      </div>
 
-        <div>
-          <div className="section-header">
-            <span>Nhà cung cấp</span>
-            <FaChevronDown />
-          </div>
-          {suppliers.map((s, i) => (
-            <div key={i} className="checkbox-row">
-              <input type="checkbox" />
-              <span>{s}</span>
-            </div>
-          ))}
-        </div>
-
-        <div>
-          <div className="section-header">
-            <span>Lọc giá</span>
-            <FaChevronDown />
-          </div>
-          {priceRanges.map((p, i) => (
-            <div key={i} className="checkbox-row">
-              <input type="checkbox" />
-              <span>{p}</span>
-            </div>
-          ))}
-        </div>
-      </aside>
-
-      {/* Main content */}
-      <main className="main">
-        <img src="/intel-banner.jpg" alt="banner" className="banner" />
-
-        <h2 className="section-title">
-          CPU <span>81 sản phẩm</span>
-        </h2>
-
+      <div className="section">
+        <h3>Sản phẩm hot</h3>
         <div className="product-grid">
-          {products.map((prod, i) => (
-            <div key={i} className="product-card">
-              <img src={prod.image} alt={prod.name} />
-              <div className="brand">{prod.brand}</div>
-              <div className="name">{prod.name}</div>
-              <div className="price">{prod.price}</div>
-              <div className="old-price">{prod.oldPrice}</div>
-              <div className="discount">-{prod.discount}</div>
-              <button className="add-to-cart">Thêm vào giỏ</button>
-            </div>
+          {products.map((item, idx) => (
+            <ProductCard key={idx} product={item} />
           ))}
         </div>
-      </main>
+      </div>
+
+      <div className="section">
+        <h3>Sản phẩm bán chạy</h3>
+        <div className="product-grid">
+          {products.map((item, idx) => (
+            <ProductCard key={idx} product={item} />
+          ))}
+        </div>
+      </div>
+
+      <div className="section high-end">
+        <div className="left-ad">
+          <img src="../../src/assets/home/bannerphu.jpg" alt="Khủng long" />
+          <button className="btn-hotline">XEM NGAY</button>
+        </div>
+        <div className="right-list">
+          <div className="filter-btns">
+            <button>Từ 10 đến 20 Triệu</button>
+            <button>Trên 20 Triệu</button>
+          </div>
+          <div className="product-grid">
+            {products.map((item, idx) => (
+              <ProductCard key={idx} product={item} />
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default Home;
+const ProductCard = ({ product }: any) => {
+  return (
+    <div className="product-card">
+      <img src={product.image} alt={product.name} />
+      <div className="brand">{product.brand}</div>
+      <div className="name">{product.name}</div>
+      <div className="price">{product.price}</div>
+      <div className="old-price">{product.oldPrice}</div>
+      <div className="discount">{product.discount}</div>
+      <button className="add-cart"><FaCartPlus /> THÊM VÀO GIỎ</button>
+    </div>
+  );
+};
+
+export default HomePage;
