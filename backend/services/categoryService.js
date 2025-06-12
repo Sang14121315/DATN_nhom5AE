@@ -2,11 +2,11 @@ const Category = require('../models/Category');
 
 class CategoryService {
   static async getAll(filters = {}) {
-    return await Category.find(filters);
+    return await Category.find(filters).populate('parent', 'name');
   }
 
   static async getById(id) {
-    const category = await Category.findById(id);
+    const category = await Category.findById(id).populate('parent', 'name');
     if (!category) throw new Error('Category not found');
     return category;
   }
