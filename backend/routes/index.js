@@ -50,6 +50,13 @@ router.post('/brands', auth, upload.single('logo'), brandController.createBrand)
 router.put('/brands/:id', auth, upload.single('logo'), brandController.updateBrand);
 router.delete('/brands/:id', auth, brandController.deleteBrand);
 
+//ProductType
+router.get('/product-types', auth, productTypeController.getProductTypes);
+router.get('/product-types/:id', auth, productTypeController.getProductTypeById);
+router.post('/product-types', auth, productTypeController.createProductType);
+router.put('/product-types/:id', auth, productTypeController.updateProductType);
+router.delete('/product-types/:id', auth, productTypeController.deleteProductType);
+
 // Coupons
 router.get('/coupons', auth, couponController.getCoupons);
 router.get('/coupons/:id', auth, couponController.getCouponById);
