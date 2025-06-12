@@ -7,6 +7,7 @@ import DashboardPage from "@/pages/admin/Dashboard";
 import AuthLayout from "@/layouts/auth.layout";
 import ProductlistPage from "@/pages/user/productList";
 import ProductdetailPage from "@/pages/user/productDetail";
+import HomePage from "@/pages/user/home";
 // Các page giả định
 const MainRouter = () => {
   return (
@@ -19,6 +20,7 @@ const MainRouter = () => {
 
       {/* user layout */}
       <Route path="/" element={< AuthLayout />}>
+      <Route path="home" element={ <HomePage />}/>
       <Route path="productlist" element={<ProductlistPage />} />
       <Route path="productdetail" element={<ProductdetailPage />} />
       </Route>
