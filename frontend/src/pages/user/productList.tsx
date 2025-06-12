@@ -1,8 +1,23 @@
 import React, { useState } from 'react';
 import { FaShoppingCart } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { staticProducts } from '@/data/products';
+import productsData from '@/data/laptop.products.json';
 import '@/styles/pages/user/productList.scss';
+
+interface Product {
+  _id: string;
+  slug: string;
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  img_url: string;
+  category_id: string;
+  created_at: string;
+  updated_at: string;
+  sale: boolean;
+  hot: boolean;
+}
 
 const ProductListPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -11,6 +26,7 @@ const ProductListPage: React.FC = () => {
   const [selectedPrice, setSelectedPrice] = useState<string | null>(null);
   const navigate = useNavigate();
 
+  const allProducts: Product[] = productsData;
 
   const formatCurrency = (amount: number): string =>
     new Intl.NumberFormat('vi-VN', {
@@ -18,9 +34,9 @@ const ProductListPage: React.FC = () => {
       currency: 'VND',
     }).format(amount);
 
-  const filteredProducts = staticProducts.filter((product) => {
+  const filteredProducts = allProducts.filter((product) => {
     const matchSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchCategory = selectedCategory === 'all' || product.category === selectedCategory;
+    const matchCategory = selectedCategory === 'all' || product.category_id === selectedCategory;
     return matchSearch && matchCategory;
   });
 
@@ -78,22 +94,14 @@ const ProductListPage: React.FC = () => {
             
             <h2>CPU</h2>
             
-            {/* <div className="sort-box">
-              <FaFilter />
-              <select>
-                <option>Sắp xếp</option>
-                <option>Giá thấp đến cao</option>
-                <option>Giá cao đến thấp</option>
-              </select>
-            </div> */}
           </div>
 
 
           <div className="product-grid">
             {filteredProducts.map((product) => (
-              <div className="product-card" key={product.id}>
-                <img src={product.imageUrl} alt={product.name} />
-                <p className="product-brand">INTEL</p>
+              <div className="product-card" key={product._id}>
+                <img src={product.img_url} alt={product.name} />
+                <p className="product-brand">{product.slug}</p>
                 <h4 className="product-name">{product.name}</h4>
                 {/* <p className="product-description">{product.shortDescription}</p> */}
                 <div className="price-block">
