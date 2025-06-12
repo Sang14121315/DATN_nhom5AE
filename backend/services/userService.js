@@ -4,11 +4,11 @@ const jwt = require('jsonwebtoken');
 
 class UserService {
   static async getAll(filters = {}) {
-    return await User.find(filters);
+    return await User.find(filters).select('-password');
   }
 
   static async getById(id) {
-    const user = await User.findById(id);
+    const user = await User.findById(id).select('-password');
     if (!user) throw new Error('User not found');
     return user;
   }
@@ -25,11 +25,23 @@ class UserService {
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    return await User.create({ name, email, password: hashedPassword, phone, address, role });
+
+    const newUser = await User.create({
+      name, email, password: hashedPassword, phone, address, role
+    });
+
+    const userObj = newUser.toObject();
+    delete userObj.password;
+    return userObj;
   }
 
   static async update(id, data) {
-    const user = await User.findByIdAndUpdate(id, data, { new: true });
+    if (data.password) {
+      const salt = await bcrypt.genSalt(10);
+      data.password = await bcrypt.hash(data.password, salt);
+    }
+
+    const user = await User.findByIdAndUpdate(id, data, { new: true }).select('-password');
     if (!user) throw new Error('User not found');
     return user;
   }
@@ -41,6 +53,8 @@ class UserService {
   }
 
   static async login(email, password) {
+    if (!process.env.JWT_SECRET) throw new Error('Missing JWT_SECRET');
+
     const user = await User.findOne({ email });
     if (!user) throw new Error('Invalid credentials');
 

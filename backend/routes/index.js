@@ -8,6 +8,7 @@ const couponController = require('../controllers/couponController');
 const orderController = require('../controllers/orderController');
 const notificationController = require('../controllers/notificationController');
 const homeController = require('../controllers/homeController');
+const productTypeController = require('../controllers/productTypeController');
 const auth = require('../middleware/auth');
 const upload = require('../middleware/upload');
 
@@ -27,6 +28,13 @@ router.post('/products', auth, upload.single('image'), productController.createP
 router.get('/products/:id', productController.getProductById);
 router.put('/products/:id', auth, upload.single('image'), productController.updateProduct);
 router.delete('/products/:id', auth, productController.deleteProduct);
+
+
+router.get('/product-types', auth, productTypeController.getProductTypes);
+router.get('/product-types/:id', auth, productTypeController.getProductTypeById);
+router.post('/product-types', auth, productTypeController.createProductType);
+router.put('/product-types/:id', auth, productTypeController.updateProductType);
+router.delete('/product-types/:id', auth, productTypeController.deleteProductType);
 
 // Categories
 router.get('/categories', auth, categoryController.getCategories);
