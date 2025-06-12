@@ -141,7 +141,7 @@ const ProductDetail: React.FC = () => {
 
 
       <div className="related-products">
-  <h2>Sản phẩm liên quan</h2>
+  <h2>Sản phẩm đã xem</h2>
   <div className="product-grid">
     {relatedProducts.slice(0, 6).map((product) => (
       <div className="product-card" key={product._id}>
