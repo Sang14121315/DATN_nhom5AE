@@ -4,7 +4,8 @@ const Joi = require('joi');
 const categorySchema = Joi.object({
   slug: Joi.string().required(),
   name: Joi.string().required(),
-  description: Joi.string().allow('')
+  description: Joi.string().allow(''),
+  parent: Joi.string().allow(null, '') 
 });
 
 exports.getCategories = async (req, res) => {
