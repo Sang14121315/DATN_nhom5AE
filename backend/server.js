@@ -1,4 +1,3 @@
-// backend/server.js
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
@@ -13,7 +12,7 @@ connectDB();
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'Uploads')));
 
 // Routes
 app.use('/api', require('./routes/index'));
@@ -31,7 +30,7 @@ const server = app.listen(PORT, () =>
 // Socket.io setup
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:5173', // chỉnh theo frontend nếu khác
+    origin: 'http://localhost:5173',
     methods: ['GET', 'POST']
   }
 });
@@ -40,8 +39,13 @@ const io = new Server(server, {
 io.on('connection', (socket) => {
   socket.on('join', (userId) => {
     socket.join(userId);
+    console.log(`User ${userId} joined`);
+  });
+
+  socket.on('send-message', (message) => {
+    io.to(message.receiver_id).emit('new-message', message);
   });
 });
 
-// Make io accessible in controllers via req.app.get('io')
+// Make io accessible in controllers
 app.set('io', io);

@@ -4,9 +4,10 @@ const Joi = require('joi');
 const notificationSchema = Joi.object({
   user_id: Joi.string().required(),
   content: Joi.string().required(),
-  type: Joi.string().optional(),
+  type: Joi.string().valid('order_placed', 'order_cancelled', 'user_feedback', 'other').required(),
   related_id: Joi.string().optional(),
-  related_model: Joi.string().optional(),
+  related_model: Joi.string().valid('Order', 'User', 'Message').optional(),
+  related_action: Joi.string().valid('view_order', 'chat_with_admin', 'none').optional(),
   read: Joi.boolean().optional()
 });
 
@@ -47,8 +48,15 @@ const createNotification = async (req, res, next) => {
     const { error } = notificationSchema.validate(req.body);
     if (error) return res.status(400).json({ message: error.details[0].message });
 
-    const { user_id, content, type, related_id, related_model } = req.body;
-    const notification = await NotificationService.create({ user_id, content, type, related_id, related_model });
+    const { user_id, content, type, related_id, related_model, related_action } = req.body;
+    const notification = await NotificationService.create({
+      user_id,
+      content,
+      type,
+      related_id,
+      related_model,
+      related_action: related_action || 'none'
+    });
 
     const io = req.app.get('io');
     if (io) {

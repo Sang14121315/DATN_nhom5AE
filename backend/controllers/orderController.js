@@ -1,4 +1,5 @@
 const OrderService = require('../services/orderService');
+const OrderDetailService = require('../services/orderDetailService');
 const Joi = require('joi');
 
 const orderSchema = Joi.object({
@@ -28,7 +29,8 @@ exports.getOrders = async (req, res) => {
 exports.getOrderById = async (req, res) => {
   try {
     const order = await OrderService.getById(req.params.id);
-    res.json(order);
+    const orderDetails = await OrderDetailService.getByOrderId(req.params.id);
+    res.json({ order, orderDetails });
   } catch (error) {
     res.status(500).json({ message: error.message || 'Error fetching order' });
   }
@@ -51,8 +53,26 @@ exports.updateOrder = async (req, res) => {
     const { error } = orderSchema.validate(req.body);
     if (error) return res.status(400).json({ message: error.details[0].message });
 
-    const order = await OrderService.update(req.params.id, req.body);
-    res.json(order);
+    const order = await OrderService.getById(req.params.id);
+    if (order.user_id.toString() !== req.user.id && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Unauthorized to update this order' });
+    }
+
+    // Check if order can be cancelled (pending and within 24 hours)
+    if (req.body.status === 'cancelled') {
+      const createdAt = new Date(order.created_at);
+      const now = new Date();
+      const hoursDiff = (now - createdAt) / (1000 * 60 * 60);
+      if (order.status !== 'pending') {
+        return res.status(400).json({ message: 'Only pending orders can be cancelled' });
+      }
+      if (hoursDiff > 24) {
+        return res.status(400).json({ message: 'Order cannot be cancelled after 24 hours' });
+      }
+    }
+
+    const updatedOrder = await OrderService.update(req.params.id, req.body);
+    res.json(updatedOrder);
   } catch (error) {
     res.status(500).json({ message: error.message || 'Error updating order' });
   }
