@@ -9,6 +9,10 @@ import ProductlistPage from "@/pages/user/productList";
 import ProductdetailPage from "@/pages/user/productDetail";
 import HomePage from "@/pages/user/home";
 
+import LoginPage from "@/pages/user/login";
+import RegisterPage from "@/pages/user/register";
+import ForgotPasswordPage from "@/pages/user/forgotPassword";
+
 // Các page giả định
 const MainRouter = () => {
   return (
@@ -24,6 +28,9 @@ const MainRouter = () => {
       <Route path="home" element={ <HomePage />}/>
       <Route path="productlist" element={<ProductlistPage />} />
       <Route path="productdetail" element={<ProductdetailPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
       </Route>
       
