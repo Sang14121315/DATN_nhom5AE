@@ -7,7 +7,8 @@ const messageSchema = Joi.object({
   content: Joi.string().required().min(1)
 });
 
-exports.getConversation = async (req, res) => {
+// Lấy đoạn hội thoại giữa người gửi và người nhận
+const getConversation = async (req, res) => {
   try {
     const { receiver_id } = req.query;
     if (!receiver_id) {
@@ -20,7 +21,8 @@ exports.getConversation = async (req, res) => {
   }
 };
 
-exports.sendMessage = async (req, res) => {
+// Gửi tin nhắn mới
+const sendMessage = async (req, res) => {
   try {
     const { error } = messageSchema.validate(req.body);
     if (error) return res.status(400).json({ message: error.details[0].message });
@@ -30,7 +32,7 @@ exports.sendMessage = async (req, res) => {
       sender_id: req.user.id,
       receiver_id: req.body.receiver_id,
       content: req.body.content,
-      sender_id: { ...sender.toObject(), name: sender.name } // Include sender name for notification
+      sender_id: { ...sender.toObject(), name: sender.name } // Gửi kèm tên để dùng cho notification
     };
 
     const message = await MessageService.create(messageData);
@@ -54,7 +56,8 @@ exports.sendMessage = async (req, res) => {
   }
 };
 
-exports.getAdmins = async (req, res) => {
+// Lấy danh sách admin
+const getAdmins = async (req, res) => {
   try {
     const admins = await UserService.getAll({ role: 'admin' });
     res.json(admins.map(admin => ({
@@ -67,6 +70,7 @@ exports.getAdmins = async (req, res) => {
   }
 };
 
+// ✅ Export rõ ràng cuối file
 module.exports = {
   getConversation,
   sendMessage,

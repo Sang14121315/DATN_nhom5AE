@@ -9,6 +9,7 @@ const upload = require('../middleware/upload');
 const adminAuth = require('../middleware/adminAuth');
 const notificationController = require('../controllers/notificationController');
 const messageController = require('../controllers/messageController');
+const couponController = require('../controllers/couponController');
 
 // Admin routes
 router.get('/users', adminAuth, userController.getUsers);
@@ -27,6 +28,13 @@ router.get('/notifications/:id', auth, adminAuth, notificationController.getNoti
 router.post('/notifications', auth, adminAuth, notificationController.createNotification);
 router.put('/notifications/:id', auth, adminAuth, notificationController.updateNotification);
 router.delete('/notifications/:id', auth, adminAuth, notificationController.deleteNotification);
+
+// Admin Coupons
+router.get('/coupons', auth, adminAuth, couponController.getCoupons);
+router.get('/coupons/:id', auth, adminAuth, couponController.getCouponById);
+router.post('/coupons', auth, adminAuth, couponController.createCoupon);
+router.put('/coupons/:id', auth, adminAuth, couponController.updateCoupon);
+router.delete('/coupons/:id', auth, adminAuth, couponController.deleteCoupon);
 
 // Admin routes: Chat Management
 router.get('/messages', auth, adminAuth, messageController.getConversation); // Lấy lịch sử chat với người dùng

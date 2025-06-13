@@ -1,22 +1,22 @@
-const CouponService = require('../services/couponService');
+const CouponService = require('../services/CouponService');
 const Joi = require('joi');
 
 const couponSchema = Joi.object({
   code: Joi.string().required(),
-  discount_type: Joi.string().valid('fixed', 'percentage').required(),
+  discount_type: Joi.string().valid('percentage', 'fixed').required(),
   discount_value: Joi.number().required(),
-  max_uses: Joi.number(),
+  min_order_value: Joi.number().default(0),
   start_date: Joi.date().required(),
   end_date: Joi.date().required(),
-  status: Joi.string().valid('active', 'expired', 'used')
+  max_uses: Joi.number().default(Infinity),
+  is_active: Joi.boolean().default(true)
 });
 
-exports.getCoupons = async (req, res) => {
+const getCoupons = async (req, res) => {
   try {
-    const { code, status } = req.query;
+    const { is_active } = req.query;
     const filters = {};
-    if (code) filters.code = new RegExp(code, 'i');
-    if (status) filters.status = status;
+    if (is_active !== undefined) filters.is_active = is_active === 'true';
 
     const coupons = await CouponService.getAll(filters);
     res.json(coupons);
@@ -25,16 +25,19 @@ exports.getCoupons = async (req, res) => {
   }
 };
 
-exports.getCouponById = async (req, res) => {
+const getCouponById = async (req, res) => {
   try {
     const coupon = await CouponService.getById(req.params.id);
+    if (!coupon) {
+      return res.status(404).json({ message: 'Coupon not found' });
+    }
     res.json(coupon);
   } catch (error) {
     res.status(500).json({ message: error.message || 'Error fetching coupon' });
   }
 };
 
-exports.createCoupon = async (req, res) => {
+const createCoupon = async (req, res) => {
   try {
     const { error } = couponSchema.validate(req.body);
     if (error) return res.status(400).json({ message: error.details[0].message });
@@ -46,23 +49,37 @@ exports.createCoupon = async (req, res) => {
   }
 };
 
-exports.updateCoupon = async (req, res) => {
+const updateCoupon = async (req, res) => {
   try {
     const { error } = couponSchema.validate(req.body);
     if (error) return res.status(400).json({ message: error.details[0].message });
 
     const coupon = await CouponService.update(req.params.id, req.body);
+    if (!coupon) {
+      return res.status(404).json({ message: 'Coupon not found' });
+    }
     res.json(coupon);
   } catch (error) {
     res.status(500).json({ message: error.message || 'Error updating coupon' });
   }
 };
 
-exports.deleteCoupon = async (req, res) => {
+const deleteCoupon = async (req, res) => {
   try {
-    await CouponService.delete(req.params.id);
+    const coupon = await CouponService.delete(req.params.id);
+    if (!coupon) {
+      return res.status(404).json({ message: 'Coupon not found' });
+    }
     res.json({ message: 'Coupon deleted' });
   } catch (error) {
     res.status(500).json({ message: error.message || 'Error deleting coupon' });
   }
+};
+
+module.exports = {
+  getCoupons,
+  getCouponById,
+  createCoupon,
+  updateCoupon,
+  deleteCoupon
 };

@@ -24,13 +24,13 @@ router.post('/register', userController.register);
 router.post('/login', userController.login);
 
 // Products
-router.get('/products',  productController.getProducts);
+router.get('/products', productController.getProducts);
 router.post('/products', auth, upload.single('image'), productController.createProduct);
 router.get('/products/:id', productController.getProductById);
 router.put('/products/:id', auth, upload.single('image'), productController.updateProduct);
 router.delete('/products/:id', auth, productController.deleteProduct);
 
-
+// Product Types
 router.get('/product-types', auth, productTypeController.getProductTypes);
 router.get('/product-types/:id', auth, productTypeController.getProductTypeById);
 router.post('/product-types', auth, productTypeController.createProductType);
@@ -51,19 +51,9 @@ router.post('/brands', auth, upload.single('logo'), brandController.createBrand)
 router.put('/brands/:id', auth, upload.single('logo'), brandController.updateBrand);
 router.delete('/brands/:id', auth, brandController.deleteBrand);
 
-//ProductType
-router.get('/product-types', auth, productTypeController.getProductTypes);
-router.get('/product-types/:id', auth, productTypeController.getProductTypeById);
-router.post('/product-types', auth, productTypeController.createProductType);
-router.put('/product-types/:id', auth, productTypeController.updateProductType);
-router.delete('/product-types/:id', auth, productTypeController.deleteProductType);
-
 // Coupons
 router.get('/coupons', auth, couponController.getCoupons);
 router.get('/coupons/:id', auth, couponController.getCouponById);
-router.post('/coupons', auth, couponController.createCoupon);
-router.put('/coupons/:id', auth, couponController.updateCoupon);
-router.delete('/coupons/:id', auth, couponController.deleteCoupon);
 
 // Orders
 router.get('/orders', auth, orderController.getOrders);
