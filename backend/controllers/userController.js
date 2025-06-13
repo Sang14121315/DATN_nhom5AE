@@ -11,6 +11,20 @@ const userSchema = Joi.object({
   role: Joi.string().valid('user', 'admin').default('user')
 });
 
+const loginSchema = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().required()
+});
+
+const forgotPasswordSchema = Joi.object({
+  email: Joi.string().email().required()
+});
+
+const resetPasswordSchema = Joi.object({
+  token: Joi.string().required(),
+  password: Joi.string().min(6).required()
+});
+
 exports.register = async (req, res) => {
   try {
     const { error } = userSchema.validate(req.body);
@@ -18,8 +32,7 @@ exports.register = async (req, res) => {
 
     const user = await UserService.create(req.body);
     const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-    res.status(201).json({ user, token });
+    res.status(201).json({ user: { id: user._id, name: user.name, email: user.email, role: user.role }, token });
   } catch (error) {
     res.status(500).json({ message: error.message || 'Error registering user' });
   }
@@ -27,18 +40,41 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
+    const { error } = loginSchema.validate(req.body);
+    if (error) return res.status(400).json({ message: error.details[0].message });
+
     const { email, password } = req.body;
     const token = await UserService.login(email, password);
     const user = await UserService.getByEmail(email);
-    const userData = {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role
-    };
-    res.json({ user: userData, token });
+    res.json({ user: { id: user._id, name: user.name, email: user.email, role: user.role }, token });
   } catch (error) {
     res.status(500).json({ message: error.message || 'Error logging in' });
+  }
+};
+
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { error } = forgotPasswordSchema.validate(req.body);
+    if (error) return res.status(400).json({ message: error.details[0].message });
+
+    const { email } = req.body;
+    await UserService.forgotPassword(email);
+    res.json({ message: 'Đường dẫn đặt lại mật khẩu đã được gửi đến email của bạn' });
+  } catch (error) {
+    res.status(500).json({ message: error.message || 'Error sending reset link' });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  try {
+    const { error } = resetPasswordSchema.validate(req.body);
+    if (error) return res.status(400).json({ message: error.details[0].message });
+
+    const { token, password } = req.body;
+    await UserService.resetPassword(token, password);
+    res.json({ message: 'Mật khẩu đã được đặt lại thành công' });
+  } catch (error) {
+    res.status(500).json({ message: error.message || 'Error resetting password' });
   }
 };
 
