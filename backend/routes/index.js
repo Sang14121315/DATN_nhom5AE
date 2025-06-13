@@ -9,6 +9,7 @@ const orderController = require('../controllers/orderController');
 const notificationController = require('../controllers/notificationController');
 const messageController = require('../controllers/messageController');
 const homeController = require('../controllers/homeController');
+const contactController = require('../controllers/contactController');
 const productTypeController = require('../controllers/productTypeController');
 const auth = require('../middleware/auth');
 const upload = require('../middleware/upload');
@@ -18,6 +19,9 @@ router.get('/home', homeController.getHomeData);
 
 // Search
 router.get('/search', auth, productController.searchProducts);
+
+// Contact
+router.post('/contact', contactController.createContact);
 
 // Auth
 router.post('/register', userController.register);
