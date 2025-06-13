@@ -8,6 +8,7 @@ const auth = require('../middleware/auth');
 const upload = require('../middleware/upload');
 const adminAuth = require('../middleware/adminAuth');
 const notificationController = require('../controllers/notificationController');
+const messageController = require('../controllers/messageController');
 
 // Admin routes
 router.get('/users', adminAuth, userController.getUsers);
@@ -20,11 +21,17 @@ router.post('/products/manage', adminAuth, upload.single('image'), productContro
 router.get('/orders/manage', adminAuth, orderController.getOrders);
 router.put('/orders/:id/status', adminAuth, orderController.updateOrder);
 
-router.get('/notifications', notificationController.getNotifications);
-router.get('/notifications/:id', adminAuth, notificationController.getNotificationById);
-router.post('/notifications', adminAuth, notificationController.createNotification);
-router.put('/notifications/:id', adminAuth, notificationController.updateNotification);
-router.delete('/notifications/:id', adminAuth, notificationController.deleteNotification)
+// Admin routes: Notification Management
+router.get('/notifications', auth, adminAuth, notificationController.getNotifications);
+router.get('/notifications/:id', auth, adminAuth, notificationController.getNotificationById);
+router.post('/notifications', auth, adminAuth, notificationController.createNotification);
+router.put('/notifications/:id', auth, adminAuth, notificationController.updateNotification);
+router.delete('/notifications/:id', auth, adminAuth, notificationController.deleteNotification);
+
+// Admin routes: Chat Management
+router.get('/messages', auth, adminAuth, messageController.getConversation); // Lấy lịch sử chat với người dùng
+router.post('/messages', auth, adminAuth, messageController.sendMessage); // Gửi tin nhắn đến người dùng
+router.get('/users-for-chat', auth, adminAuth, userController.getUsers); // Lấy danh sách người dùng để chat
 
 // Dashboard
 router.get('/dashboard',  adminController.getDashboardData);

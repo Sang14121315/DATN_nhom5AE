@@ -7,6 +7,7 @@ const brandController = require('../controllers/brandController');
 const couponController = require('../controllers/couponController');
 const orderController = require('../controllers/orderController');
 const notificationController = require('../controllers/notificationController');
+const messageController = require('../controllers/messageController');
 const homeController = require('../controllers/homeController');
 const auth = require('../middleware/auth');
 const upload = require('../middleware/upload');
@@ -69,5 +70,10 @@ router.get('/notifications/:id', auth, notificationController.getNotificationByI
 router.post('/notifications', auth, notificationController.createNotification);
 router.put('/notifications/:id', auth, notificationController.updateNotification);
 router.delete('/notifications/:id', auth, notificationController.deleteNotification);
+
+// Messages
+router.get('/messages', auth, messageController.getConversation);
+router.post('/messages', auth, messageController.sendMessage);
+router.get('/admins', auth, messageController.getAdmins);
 
 module.exports = router;
