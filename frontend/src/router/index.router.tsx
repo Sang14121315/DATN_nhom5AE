@@ -1,7 +1,7 @@
+// import user 
 import { Routes, Route } from "react-router-dom";
 import AdminLayout from "@/layouts/admin.layout";
 import DashboardPage from "@/pages/admin/Dashboard";
-// import AuthLayout from "@/layouts/auth.layout";
 
 // import user 
 import AuthLayout from "@/layouts/auth.layout";
