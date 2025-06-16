@@ -1,6 +1,9 @@
+// import user 
 import { Routes, Route } from "react-router-dom";
 import AdminLayout from "@/layouts/admin.layout";
 import DashboardPage from "@/pages/admin/Dashboard";
+
+// import user 
 import AuthLayout from "@/layouts/auth.layout";
 import ProductlistPage from "@/pages/user/productList";
 import ProductdetailPage from "@/pages/user/productDetail";
@@ -22,21 +25,20 @@ const MainRouter = () => {
       </Route>
 
  
-      {/* User layout */}
+      {/* User layout
       <Route element={<AuthLayout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="productlist" element={<ProductlistPage />} />
         <Route path="productdetail" element={<ProductdetailPage />} />
-
+      </Route> */}
       {/* user layout */}
       <Route path="/" element={< AuthLayout />}>
-      <Route path="home" element={ <HomePage />}/>
-      <Route path="productlist" element={<ProductlistPage />} />
-      <Route path="productdetail" element={<ProductdetailPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-
+        <Route path="home" element={ <HomePage />}/>
+        <Route path="productlist" element={<ProductlistPage />} />
+        <Route path="productdetail" element={<ProductdetailPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       </Route>
     </Routes>
   );

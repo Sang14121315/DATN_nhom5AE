@@ -35,7 +35,7 @@ router.put('/products/:id', auth, upload.single('image'), productController.upda
 router.delete('/products/:id', auth, productController.deleteProduct);
 
 // Product Types
-router.get('/product-types', auth, productTypeController.getProductTypes);
+router.get('/product-types',auth, productTypeController.getProductTypes);
 router.get('/product-types/:id', auth, productTypeController.getProductTypeById);
 router.post('/product-types', auth, productTypeController.createProductType);
 router.put('/product-types/:id', auth, productTypeController.updateProductType);
@@ -49,7 +49,7 @@ router.put('/categories/:id', auth, categoryController.updateCategory);
 router.delete('/categories/:id', auth, categoryController.deleteCategory);
 
 // Brands
-router.get('/brands', auth, brandController.getBrands);
+router.get('/brands',auth, brandController.getBrands);
 router.get('/brands/:id', auth, brandController.getBrandById);
 router.post('/brands', auth, upload.single('logo'), brandController.createBrand);
 router.put('/brands/:id', auth, upload.single('logo'), brandController.updateBrand);
