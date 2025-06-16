@@ -2,55 +2,73 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { FaShoppingCart } from 'react-icons/fa';
 import '@/styles/pages/user/productList.scss';
-
-interface Product {
-  _id: string;
-  slug: string;
-  name: string;
-  description: string;
-  price: number;
-  stock: number;
-  img_url: string;
-  category_id: string;
-  brand_id: string;
-  product_type_id: string;
-  sale: boolean;
-  hot: boolean;
-  created_at: string;
-  updated_at: string;
-}
+import { Product, fetchFilteredProducts } from '../../api/user/productAPI';
+import { Brand, fetchAllBrands } from '../../api/user/brandAPI';
+import { Category, fetchAllCategories } from '../../api/user/categoryAPI';
 
 const ProductListPage: React.FC = () => {
-  const { productTypeId } = useParams();
+  const { productTypeId } = useParams(); // có thể dùng sau
   const [products, setProducts] = useState<Product[]>([]);
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedBrand, setSelectedBrand] = useState<string>('all');
+  const [selectedPrice, setSelectedPrice] = useState<string>('all');
+
+  // Load danh mục và thương hiệu
+  useEffect(() => {
+    const loadInitialData = async () => {
+      try {
+        const [brandData, categoryData] = await Promise.all([
+          fetchAllBrands(),
+          fetchAllCategories(),
+        ]);
+        setBrands(brandData);
+        setCategories(categoryData);
+      } catch (error) {
+        console.error('Lỗi khi tải danh mục hoặc thương hiệu:', error);
+      }
+    };
+
+    loadInitialData();
+  }, []);
+
+  // Load sản phẩm khi chọn lọc
+  useEffect(() => {
+  const fetchProducts = async () => {
+    try {
+      const filters: {
+        category_id?: string;
+        brand_id?: string;
+        minPrice?: number;
+        maxPrice?: number;
+      } = {};
+
+      if (selectedCategory !== 'all') filters.category_id = selectedCategory;
+      if (selectedBrand !== 'all') filters.brand_id = selectedBrand;
+
+      if (selectedPrice !== 'all') {
+        const [min, max] = selectedPrice.split('-').map(Number);
+        filters.minPrice = min;
+        filters.maxPrice = max;
+      }
+
+      const productData = await fetchFilteredProducts(filters);
+      setProducts(productData);
+    } catch (error) {
+      console.error('Lỗi khi tải sản phẩm:', error);
+    }
+  };
+
+  fetchProducts();
+}, [selectedCategory, selectedBrand, selectedPrice]);
+
 
   const formatCurrency = (amount: number): string =>
     new Intl.NumberFormat('vi-VN', {
       style: 'currency',
       currency: 'VND',
     }).format(amount);
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const url = new URL('http://localhost:3000/api/products'); // Đổi lại nếu khác
-
-        if (productTypeId) url.searchParams.append('product_type_id', productTypeId);
-        if (selectedCategory !== 'all') url.searchParams.append('category_id', selectedCategory);
-        if (selectedBrand !== 'all') url.searchParams.append('brand_id', selectedBrand);
-
-        const response = await fetch(url.toString());
-        const data = await response.json();
-        setProducts(data);
-      } catch (error) {
-        console.error('Lỗi khi lấy sản phẩm:', error);
-      }
-    };
-
-    fetchProducts();
-  }, [productTypeId, selectedCategory, selectedBrand]);
 
   return (
     <div className="product-page-container">
@@ -61,9 +79,15 @@ const ProductListPage: React.FC = () => {
             <h3>Danh mục sản phẩm</h3>
             <ul>
               <li onClick={() => setSelectedCategory('all')}>Tất cả</li>
-              <li onClick={() => setSelectedCategory('665f3e62e5c5bfb7427d4b20')}>Intel</li>
-              <li onClick={() => setSelectedCategory('665f3e62e5c5bfb7427d4b21')}>AMD</li>
-              {/* Thay ID thật ở đây nếu có */}
+              {categories.map((category) => (
+                <li
+                  key={category._id}
+                  onClick={() => setSelectedCategory(category._id)}
+                  className={selectedCategory === category._id ? 'active' : ''}
+                >
+                  {category.name}
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -79,33 +103,85 @@ const ProductListPage: React.FC = () => {
               />
               Tất cả
             </label>
-            <label>
-              <input
-                type="radio"
-                name="brand"
-                value="6660b7bfe0d81b30849f3344"
-                onChange={() => setSelectedBrand('6660b7bfe0d81b30849f3344')}
-              />
-              Intel
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="brand"
-                value="6660b7cfe0d81b30849f3345"
-                onChange={() => setSelectedBrand('6660b7cfe0d81b30849f3345')}
-              />
-              AMD
-            </label>
+            {brands.map((brand) => (
+              <label key={brand._id}>
+                <input
+                  type="radio"
+                  name="brand"
+                  value={brand._id}
+                  checked={selectedBrand === brand._id}
+                  onChange={() => setSelectedBrand(brand._id)}
+                />
+                {brand.name}
+              </label>
+            ))}
           </div>
 
-          {/* Lọc giá – để sau */}
           <div className="sidebar-section">
             <h3>Lọc giá</h3>
-            <label><input type="radio" name="price" disabled /> Dưới 5 triệu</label>
-            <label><input type="radio" name="price" disabled /> 5 - 10 triệu</label>
-            <label><input type="radio" name="price" disabled /> 10 - 20 triệu</label>
-            <label><input type="radio" name="price" disabled /> Trên 20 triệu</label>
+            <label>
+              <input
+                type="radio"
+                name="price"
+                value="all"
+                checked={selectedPrice === 'all'}
+                onChange={() => setSelectedPrice('all')}
+              /> Tất cả
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="price"
+                value="0-10000"
+                checked={selectedPrice === '0-10000'}
+                onChange={() => setSelectedPrice('0-10000')}
+              /> Dưới 10.000đ
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="price"
+                value="10000-30000"
+                checked={selectedPrice === '10000-30000'}
+                onChange={() => setSelectedPrice('10000-30000')}
+              /> 10k – 30k
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="price"
+                value="30000-50000"
+                checked={selectedPrice === '30000-50000'}
+                onChange={() => setSelectedPrice('30000-50000')}
+              /> 30k – 50k
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="price"
+                value="50000-100000"
+                checked={selectedPrice === '50000-100000'}
+                onChange={() => setSelectedPrice('50000-100000')}
+              /> 50k – 100k
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="price"
+                value="100000-200000"
+                checked={selectedPrice === '100000-200000'}
+                onChange={() => setSelectedPrice('100000-200000')}
+              /> 100k – 200k
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="price"
+                value="200000-999999999"
+                checked={selectedPrice === '200000-999999999'}
+                onChange={() => setSelectedPrice('200000-999999999')}
+              /> Trên 200k
+            </label>
           </div>
         </aside>
 
@@ -116,23 +192,33 @@ const ProductListPage: React.FC = () => {
           </div>
 
           <div className="product-header">
-            <h2>Sản phẩm</h2>
+            <h2>
+              {
+                selectedCategory === 'all'
+                  ? 'Sản phẩm'
+                  : categories.find((c) => c._id === selectedCategory)?.name || 'Sản phẩm'
+              }
+            </h2>
           </div>
 
           <div className="product-grid">
-            {products.map((product) => (
-              <div className="product-card" key={product._id}>
-                <img src={product.img_url} alt={product.name} />
-                <p className="product-brand">{product.slug}</p>
-                <h4 className="product-name">{product.name}</h4>
-                <div className="price-block">
-                  <span className="discount">{formatCurrency(product.price)}</span>
+            {products.length > 0 ? (
+              products.map((product) => (
+                <div className="product-card" key={product._id}>
+                  <img src={product.img_url} alt={product.name} />
+                  <p className="product-brand">{product.slug}</p>
+                  <h4 className="product-name">{product.name}</h4>
+                  <div className="price-block">
+                    <span className="discount">{formatCurrency(product.price)}</span>
+                  </div>
+                  <button className="add-to-cart">
+                    <FaShoppingCart /> Thêm vào giỏ
+                  </button>
                 </div>
-                <button className="add-to-cart">
-                  <FaShoppingCart /> Thêm vào giỏ
-                </button>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p>Không có sản phẩm phù hợp.</p>
+            )}
           </div>
         </main>
       </div>
