@@ -1,78 +1,99 @@
-import React, { useState } from 'react';
-
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { FaShoppingCart, FaFacebook, FaFacebookMessenger, FaPinterest } from 'react-icons/fa';
 import { AiFillTwitterCircle } from "react-icons/ai";
-import productsData from '@/data/laptop.products.json';
+import { Product, fetchFilteredProducts, fetchProductById } from '../../api/user/productAPI';
 import '@/styles/pages/user/productDetail.scss';
 
 const ProductDetail: React.FC = () => {
+  const { id } = useParams();
+  const [product, setProduct] = useState<Product | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [quantity, setQuantity] = useState(1);
+
   const formatCurrency = (amount: number): string =>
     new Intl.NumberFormat('vi-VN', {
       style: 'currency',
       currency: 'VND',
     }).format(amount);
-  const [quantity, setQuantity] = useState(1);
 
-  // TODO: Sau này lấy productId từ route param
-  const currentProduct = productsData[0];
-  const relatedProducts = productsData.filter(
-    (product) => product.category_id === currentProduct.category_id && product._id !== currentProduct._id
-  );
+  useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const data = await fetchProductById(id as string);
+      setProduct(data);
+
+      if (data?.category_id && typeof data.category_id === 'object') {
+  const categoryId = data.category_id._id || data.category_id;
+  const allInSameCategory = await fetchFilteredProducts({ category_id: categoryId });
+
+  const related = allInSameCategory.filter(p => String(p._id) !== String(data._id));
+  setRelatedProducts(related);
+}
+
+    } catch (error) {
+      console.error('Lỗi khi lấy sản phẩm:', error);
+    }
+  };
+
+  fetchData();
+}, [id]);
+
+
+  if (!product) return <div>Đang tải sản phẩm...</div>;
 
   return (
     <div className="product-detail-container">
       <div className="product-container">
         <div className="image-section">
-          {currentProduct.sale && <span className="discount-badge">-34% OFF</span>}
-          <img
-            className="product-image"
-            src={currentProduct.img_url}
-            alt={currentProduct.name}
-          />
+          {product.sale && <span className="discount-badge">-34% OFF</span>}
+          <img className="product-image" src={product.img_url} alt={product.name} />
         </div>
 
         <div className="info-section">
-          <h1 className="product-name">{currentProduct.name}</h1>
+          <h1 className="product-name">{product.name}</h1>
 
           <div className="rating-brand">
             <div className="brand">
-              Thương hiệu: <strong>{currentProduct.slug}</strong>
+              Thương hiệu: <strong>
+                {typeof product.brand_id === 'object' ? product.brand_id.name : product.brand_id}
+              </strong>
             </div>
-            <div className="availability">Tình trạng: <strong>{currentProduct.stock > 0 ? 'Còn hàng' : 'Hết hàng'}</strong></div>
+            <div className="availability">
+              Tình trạng: <strong>{product.stock > 0 ? 'Còn hàng' : 'Hết hàng'}</strong>
+            </div>
           </div>
 
           <div className="price-section">
-            {currentProduct.sale ? (
+            {product.sale ? (
               <>
-                <div className="discount-price">{formatCurrency(currentProduct.price * 0.66)}</div>
-                <div className="original-price">{formatCurrency(currentProduct.price)}</div>
+                <div className="discount-price">{formatCurrency(product.price * 0.66)}</div>
+                <div className="original-price">{formatCurrency(product.price)}</div>
                 <div className="discount-percent">-34%</div>
               </>
             ) : (
-              <div className="discount-price">{formatCurrency(currentProduct.price)}</div>
+              <div className="discount-price">{formatCurrency(product.price)}</div>
             )}
           </div>
 
           <div className="quantity-section">
-  <label htmlFor="quantity">Số lượng:</label>
-  <div className="quantity-input">
-    <button onClick={() => setQuantity(prev => Math.max(1, prev - 1))}>-</button>
-    <input
-      type="number"
-      value={quantity}
-      min={1}
-      onChange={(e) => {
-        const val = parseInt(e.target.value);
-        if (!isNaN(val) && val >= 1) {
-          setQuantity(val);
-        }
-      }}
-    />
-    <button onClick={() => setQuantity(prev => prev + 1)}>+</button>
-  </div>
-</div>
-
-
+            <label htmlFor="quantity">Số lượng:</label>
+            <div className="quantity-input">
+              <button onClick={() => setQuantity(prev => Math.max(1, prev - 1))}>-</button>
+              <input
+                type="number"
+                value={quantity}
+                min={1}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value);
+                  if (!isNaN(val) && val >= 1) {
+                    setQuantity(val);
+                  }
+                }}
+              />
+              <button onClick={() => setQuantity(prev => prev + 1)}>+</button>
+            </div>
+          </div>
 
           <div className="cta">
             <button className="add-to-cart">THÊM VÀO GIỎ</button>
@@ -104,69 +125,46 @@ const ProductDetail: React.FC = () => {
               <p>Đổi trả trong 7 ngày</p>
             </div>
           </div>
-          <img src="./public/assets/banner_sale_productList.png" alt="Sale Banner" className="side-banner" />
+          <img src="/assets/banner_sale_productList.png" alt="Sale Banner" className="side-banner" />
         </div>
       </div>
 
       <div className="description-box">
         <h3>MÔ TẢ SẢN PHẨM</h3>
-        <p>{currentProduct.description}</p>
+        <p>{product.description}</p>
       </div>
 
       <div className="related-products">
-  <h2>Sản phẩm liên quan</h2>
-  <div className="product-grid">
-    {relatedProducts.slice(0, 6).map((product) => (
-      <div className="product-card" key={product._id}>
-        <img src={product.img_url} alt={product.name} />
-        <p className="product-brand">{product.slug}</p>
-        <h4 className="product-name">{product.name}</h4>
-        <div className="price-block">
-          {product.sale ? (
-            <>
-              <span className="discount">{formatCurrency(product.price * 0.66)}</span>
-              <span className="original">{formatCurrency(product.price)}</span>
-            </>
-          ) : (
-            <span className="discount">{formatCurrency(product.price)}</span>
-          )}
-        </div>
-        <button className="add-to-cart" >
-          <FaShoppingCart /> Thêm vào giỏ
-        </button>
+      <h2>Sản phẩm liên quan</h2>
+      <div className="product-grid">
+        {relatedProducts.slice(0, 6).map((rp) => (
+          <div
+            className="product-card"
+            key={rp._id}
+            onClick={() => window.location.href = `/product/${rp._id}`}
+            style={{ cursor: 'pointer' }}
+          >
+            <img src={rp.img_url} alt={rp.name} />
+            <p className="product-brand">{rp.slug}</p>
+            <h4 className="product-name">{rp.name}</h4>
+            <div className="price-block">
+              {rp.sale ? (
+                <>
+                  <span className="discount">{formatCurrency(rp.price * 0.66)}</span>
+                  <span className="original">{formatCurrency(rp.price)}</span>
+                </>
+              ) : (
+                <span className="discount">{formatCurrency(rp.price)}</span>
+              )}
+            </div>
+            <button className="add-to-cart">
+              <FaShoppingCart /> Thêm vào giỏ
+            </button>
+          </div>
+        ))}
       </div>
-    ))}
-  </div>
-</div>
-
-
-      <div className="related-products">
-  <h2>Sản phẩm đã xem</h2>
-  <div className="product-grid">
-    {relatedProducts.slice(0, 6).map((product) => (
-      <div className="product-card" key={product._id}>
-        <img src={product.img_url} alt={product.name} />
-        <p className="product-brand">{product.slug}</p>
-        <h4 className="product-name">{product.name}</h4>
-        <div className="price-block">
-          {product.sale ? (
-            <>
-              <span className="discount">{formatCurrency(product.price * 0.66)}</span>
-              <span className="original">{formatCurrency(product.price)}</span>
-            </>
-          ) : (
-            <span className="discount">{formatCurrency(product.price)}</span>
-          )}
-        </div>
-        <button className="add-to-cart">
-          <FaShoppingCart /> Thêm vào giỏ
-        </button>
-      </div>
-    ))}
-  </div>
-</div>
-
     </div>
+  </div>
   );
 };
 

@@ -51,7 +51,7 @@
         display: flex;
         gap: 20px;
 
-        .brand,
+        .product-brand,
         .availability {
           font-size: 14px;
         }
@@ -227,12 +227,12 @@
           object-fit: contain;
         }
 
-        .brand {
+        .product-brand {
           font-size: 12px;
           color: #555;
         }
 
-        .name {
+        .product-name {
           font-size: 14px;
           font-weight: bold;
           text-align: center;
