@@ -115,9 +115,7 @@ const ProductListPage: React.FC = () => {
                     <span className="discount">{formatCurrency(product.price)}</span>
                   )}
                 </div>
-                <button className="add-to-cart">
-                  <FaShoppingCart /> Thêm vào giỏ
-                </button>
+              <button onClick={() => addToCart(p.id)}>Thêm vào giỏ</button>
               </div>
             ))}
           </div>
