@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaCartPlus } from "react-icons/fa";
 import { useCart } from "@/context/CartContext";
-import { getProducts } from "@/api/productAPI";
+import { Product, fetchAllProducts } from "@/api/user/productAPI";
 import "@/styles/pages/user/home.scss";
 
 const categories = [
@@ -9,14 +9,12 @@ const categories = [
   "Vỏ Case", "Chuột", "Bàn Phím", "Sạc", "Pin dự phòng", "Tai nghe", "Cáp sạc"
 ];
 
-const HomePage = () => {
-  const [products, setProducts] = useState([]);
+const HomePage: React.FC = () => {
+  const [products, setProducts] = useState<Product[]>([]);
   const { addToCart } = useCart();
 
   useEffect(() => {
-    getProducts().then((data) => {
-      setProducts(data);
-    });
+    fetchAllProducts().then(setProducts).catch(console.error);
   }, []);
 
   return (
@@ -32,7 +30,7 @@ const HomePage = () => {
         </aside>
 
         <div className="banner-images">
-          <img src="src\assets\home\banner.jpg" alt="Main Banner" />
+          <img src="/assets/home/banner.jpg" alt="Main Banner" />
         </div>
       </div>
 
@@ -47,7 +45,7 @@ const HomePage = () => {
       <div className="section">
         <h3>Sản phẩm hot</h3>
         <div className="product-grid">
-          {products.map((product: any) => (
+          {products.filter(p => p.hot).map((product) => (
             <ProductCard key={product._id} product={product} addToCart={addToCart} />
           ))}
         </div>
@@ -56,18 +54,30 @@ const HomePage = () => {
   );
 };
 
-const ProductCard = ({ product, addToCart }: any) => (
-  <div className="product-card upgraded">
-    <img src={product.img_url} alt={product.name} />
-    <div className="product-info">
-      <div className="brand">{product.brand}</div>
-      <div className="name">{product.name}</div>
-      <div className="price">{product.price.toLocaleString()}₫</div>
+interface ProductCardProps {
+  product: Product;
+  addToCart: (item: Product & { quantity: number }) => void;
+}
+
+const ProductCard: React.FC<ProductCardProps> = ({ product, addToCart }) => {
+  const formatCurrency = (amount: number): string =>
+    new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+
+  return (
+    <div className="product-card upgraded">
+      <img src={product.img_url} alt={product.name} />
+      <div className="product-info">
+        <div className="brand">
+          {typeof product.brand_id === "object" ? product.brand_id.name : product.brand_id}
+        </div>
+        <div className="name">{product.name}</div>
+        <div className="price">{formatCurrency(product.price)}</div>
+      </div>
+      <button className="add-cart" onClick={() => addToCart({ ...product, quantity: 1 })}>
+        <FaCartPlus /> THÊM VÀO GIỎ
+      </button>
     </div>
-    <button className="add-cart" onClick={() => addToCart({ ...product, quantity: 1 })}>
-      <FaCartPlus /> THÊM VÀO GIỎ
-    </button>
-  </div>
-);
+  );
+};
 
 export default HomePage;
