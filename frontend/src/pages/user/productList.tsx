@@ -2,9 +2,27 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation  } from 'react-router-dom';
 import { FaShoppingCart } from 'react-icons/fa';
 import '@/styles/pages/user/productList.scss';
+
+import { useCart } from "@/context/CartContext"; 
+interface Product {
+  _id: string;
+  slug: string;
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  img_url: string;
+  category_id: string;
+  created_at: string;
+  updated_at: string;
+  sale: boolean;
+  hot: boolean;
+}
+
 import { Product, fetchFilteredProducts } from '../../api/user/productAPI';
 import { Brand, fetchAllBrands } from '../../api/user/brandAPI';
 import { Category, fetchAllCategories } from '../../api/user/categoryAPI';
+
 
 const ProductListPage: React.FC = () => {
   // const { productTypeId } = useParams(); // có thể dùng sau
@@ -83,6 +101,11 @@ useEffect(() => {
   setFiltersInitialized(true); // <-- báo hiệu đã xong
 }, []);
 
+
+
+  const { addToCart } = useCart(); // ✅ Lấy hàm thêm vào giỏ từ context
+
+  const allProducts: Product[] = productsData;
 
 
   const formatCurrency = (amount: number): string =>
@@ -209,6 +232,38 @@ useEffect(() => {
         {/* Content */}
         <main className="product-content">
           <div className="product-banner">
+
+            <img src="./public/assets/banner_productList.png" alt="Banner" />
+          </div>
+
+          <div className="product-header">
+            <h2>CPU</h2>
+          </div>
+
+          <div className="product-grid">
+            {filteredProducts.map((product) => (
+              <div className="product-card" key={product._id}>
+                <img src={product.img_url} alt={product.name} />
+                <p className="product-brand">{product.slug}</p>
+                <h4 className="product-name">{product.name}</h4>
+                <span className="discount">{formatCurrency(product.price)}</span>
+                <button
+                  className="add-to-cart"
+                  onClick={() =>
+                    addToCart({
+                      _id: product._id,
+                      name: product.name,
+                      price: product.price,
+                      quantity: 1,
+                      img_url: product.img_url,
+                    })
+                  }
+                >
+                  <FaShoppingCart /> Thêm vào giỏ
+                </button>
+              </div>
+            ))}
+
             <img src="/assets/banner_productList.png" alt="Banner" />
           </div>
 
@@ -257,6 +312,7 @@ useEffect(() => {
             ) : (
               <p>Không có sản phẩm phù hợp.</p>
             )}
+
           </div>
         </main>
       </div>
