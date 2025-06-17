@@ -1,88 +1,85 @@
+'use client';
 
-import "../../styles/pages/user/home.scss";
-import { FaCartPlus } from "react-icons/fa";
+import React, { useEffect, useState } from 'react';
+import '@/styles/pages/user/productList.scss'; // dùng chung stylesheet nếu cần
 
-const categories = [
-  "CPU", "Mainboard", "RAM", "VGA Mới", "SSD/HDD", "Tản nhiệt", "Nguồn",
-  "Vỏ Case", "Cân nặng", "Chuột", "Bàn Phím", "Cục sạc", "Pin dự phòng", "Tai nghe", "Dây sạc"
-];
+import { ProductType, fetchAllProductTypes } from '../../api/user/productTypeAPI';
+import { Category, fetchAllCategories } from '../../api/user/categoryAPI';
 
-const products = new Array(6).fill({
-  brand: "NVIDIA",
-  name: "CPU INTEL CORE I5-10400F - TRAY NEW",
-  price: "1,580,000đ",
-  oldPrice: "2,690,000đ",
-  discount: "34%",
-  image: "../../src/assets/home/pc.jpg"
-});
+const HomePage: React.FC = () => {
+  const [productTypes, setProductTypes] = useState<ProductType[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
-const HomePage = () => {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [types, cats] = await Promise.all([
+          fetchAllProductTypes(),
+          fetchAllCategories(),
+        ]);
+        setProductTypes(types);
+        setCategories(cats);
+      } catch (error) {
+        console.error('Lỗi khi tải dữ liệu:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
-    <div className="homepage">
-      <div className="main-banner">
+    <div className="product-page-container">
+      <div className="product-layout">
+        {/* Sidebar bên trái */}
         <aside className="sidebar">
-          <h3>DANH MỤC SẢN PHẨM</h3>
-          <ul>
-            {categories.map((cat, idx) => (
-              <li key={idx}>{cat}</li>
-            ))}
-          </ul>
+          <div className="sidebar-section">
+            <h3>DANH MỤC SẢN PHẨM</h3>
+            <ul>
+              {categories.map((cate) => (
+                <li key={cate._id}>{cate.name}</li>
+              ))}
+            </ul>
+          </div>
         </aside>
 
-        <div className="banner-images">
-          <img src="../../src/assets/home/banner.jpg" alt="Main Banner" />
-        </div>
-      </div>
-
-      <div className="section">
-        <h3>Sản phẩm hot</h3>
-        <div className="product-grid">
-          {products.map((item, idx) => (
-            <ProductCard key={idx} product={item} />
-          ))}
-        </div>
-      </div>
-
-      <div className="section">
-        <h3>Sản phẩm bán chạy</h3>
-        <div className="product-grid">
-          {products.map((item, idx) => (
-            <ProductCard key={idx} product={item} />
-          ))}
-        </div>
-      </div>
-
-      <div className="section high-end">
-        <div className="left-ad">
-          <img src="../../src/assets/home/bannerphu.jpg" alt="Khủng long" />
-          <button className="btn-hotline">XEM NGAY</button>
-        </div>
-        <div className="right-list">
-          <div className="filter-btns">
-            <button>Từ 10 đến 20 Triệu</button>
-            <button>Trên 20 Triệu</button>
+        {/* Nội dung chính bên phải */}
+        <main className="product-content">
+          {/* Banner */}
+          <div className="product-banner">
+            <img src="/images/323.webp" alt="Banner chính" />
           </div>
-          <div className="product-grid">
-            {products.map((item, idx) => (
-              <ProductCard key={idx} product={item} />
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
 
-const ProductCard = ({ product }: any) => {
-  return (
-    <div className="product-card">
-      <img src={product.image} alt={product.name} />
-      <div className="brand">{product.brand}</div>
-      <div className="name">{product.name}</div>
-      <div className="price">{product.price}</div>
-      <div className="old-price">{product.oldPrice}</div>
-      <div className="discount">{product.discount}</div>
-      <button className="add-cart"><FaCartPlus /> THÊM VÀO GIỎ</button>
+          {/* Ảnh dưới banner */}
+          <div className="home-bottom-images">
+            <img src="/images/323.webp" alt="Ảnh 1" />
+            <img src="/images/323.webp" alt="Ảnh 2" />
+            <img src="/images/323.webp" alt="Ảnh 3" />
+            <img src="/images/323.webp" alt="Ảnh 4" />
+          </div>
+
+          {/* Các khối sản phẩm nổi bật */}
+          <section className="home__section">
+            <h2>Sản phẩm nổi bật</h2>
+            <div className="home__grid">
+              {/* TODO: render sản phẩm nổi bật */}
+            </div>
+          </section>
+
+          <section className="home__section">
+            <h2>Workstation PC</h2>
+            <div className="home__grid">
+              {/* TODO: render PC */}
+            </div>
+          </section>
+
+          <section className="home__section">
+            <h2>Gaming Gear</h2>
+            <div className="home__grid">
+              {/* TODO: render Gaming Gear */}
+            </div>
+          </section>
+        </main>
+      </div>
     </div>
   );
 };
