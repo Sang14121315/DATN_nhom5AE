@@ -6,7 +6,7 @@ export interface Product {
   discountPrice?: number;
   rating: number;
   imageUrl: string;
-//   shortDescription: string;
+  // shortDescription: string;
   isNew: boolean;
 }
 

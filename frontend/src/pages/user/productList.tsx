@@ -3,6 +3,7 @@ import { FaShoppingCart } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import productsData from '@/data/laptop.products.json';
 import '@/styles/pages/user/productList.scss';
+import { useCart } from "@/context/CartContext"; // ✅ Sử dụng context giỏ hàng
 
 interface Product {
   _id: string;
@@ -25,6 +26,8 @@ const ProductListPage: React.FC = () => {
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const [selectedPrice, setSelectedPrice] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  const { addToCart } = useCart(); // ✅ Lấy hàm thêm vào giỏ từ context
 
   const allProducts: Product[] = productsData;
 
@@ -87,15 +90,13 @@ const ProductListPage: React.FC = () => {
 
         {/* Product grid */}
         <main className="product-content">
-            <div className="product-banner">
-        <img src="./public/assets/banner_productList.png" alt="Banner" />
-      </div>
-          <div className="product-header">
-            
-            <h2>CPU</h2>
-            
+          <div className="product-banner">
+            <img src="./public/assets/banner_productList.png" alt="Banner" />
           </div>
 
+          <div className="product-header">
+            <h2>CPU</h2>
+          </div>
 
           <div className="product-grid">
             {filteredProducts.map((product) => (
@@ -103,19 +104,21 @@ const ProductListPage: React.FC = () => {
                 <img src={product.img_url} alt={product.name} />
                 <p className="product-brand">{product.slug}</p>
                 <h4 className="product-name">{product.name}</h4>
-                {/* <p className="product-description">{product.shortDescription}</p> */}
-                <div className="price-block">
-                  {product.discountPrice && (
-                    <>
-                      <span className="discount">{formatCurrency(product.discountPrice)}</span>
-                      <span className="original">{formatCurrency(product.price)}</span>
-                    </>
-                  )}
-                  {!product.discountPrice && (
-                    <span className="discount">{formatCurrency(product.price)}</span>
-                  )}
-                </div>
-              <button onClick={() => addToCart(p.id)}>Thêm vào giỏ</button>
+                <span className="discount">{formatCurrency(product.price)}</span>
+                <button
+                  className="add-to-cart"
+                  onClick={() =>
+                    addToCart({
+                      _id: product._id,
+                      name: product.name,
+                      price: product.price,
+                      quantity: 1,
+                      img_url: product.img_url,
+                    })
+                  }
+                >
+                  <FaShoppingCart /> Thêm vào giỏ
+                </button>
               </div>
             ))}
           </div>
