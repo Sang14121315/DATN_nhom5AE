@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate, useLocation  } from 'react-router-dom';
 import { FaShoppingCart } from 'react-icons/fa';
 import '@/styles/pages/user/productList.scss';
 import { Product, fetchFilteredProducts } from '../../api/user/productAPI';
@@ -7,13 +7,15 @@ import { Brand, fetchAllBrands } from '../../api/user/brandAPI';
 import { Category, fetchAllCategories } from '../../api/user/categoryAPI';
 
 const ProductListPage: React.FC = () => {
-  const { productTypeId } = useParams(); // có thể dùng sau
+  // const { productTypeId } = useParams(); // có thể dùng sau
   const [products, setProducts] = useState<Product[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedBrand, setSelectedBrand] = useState<string>('all');
   const [selectedPrice, setSelectedPrice] = useState<string>('all');
+  const navigate = useNavigate();
+  const [filtersInitialized, setFiltersInitialized] = useState(false);
 
   // Load danh mục và thương hiệu
   useEffect(() => {
@@ -35,6 +37,8 @@ const ProductListPage: React.FC = () => {
 
   // Load sản phẩm khi chọn lọc
   useEffect(() => {
+  if (!filtersInitialized) return; // Đợi filter khôi phục xong
+
   const fetchProducts = async () => {
     try {
       const filters: {
@@ -61,7 +65,24 @@ const ProductListPage: React.FC = () => {
   };
 
   fetchProducts();
-}, [selectedCategory, selectedBrand, selectedPrice]);
+}, [selectedCategory, selectedBrand, selectedPrice, filtersInitialized]);
+
+useEffect(() => {
+  const saved = sessionStorage.getItem('productFilters');
+  if (saved) {
+    const parsed = JSON.parse(saved);
+    setSelectedCategory(parsed.category || 'all');
+    setSelectedBrand(parsed.brand || 'all');
+    setSelectedPrice(parsed.price || 'all');
+
+    setTimeout(() => {
+      window.scrollTo(0, parsed.scroll || 0);
+    }, 50);
+  }
+
+  setFiltersInitialized(true); // <-- báo hiệu đã xong
+}, []);
+
 
 
   const formatCurrency = (amount: number): string =>
@@ -205,7 +226,24 @@ const ProductListPage: React.FC = () => {
             {products.length > 0 ? (
               products.map((product) => (
                 <div className="product-card" key={product._id}>
-                  <img src={product.img_url} alt={product.name} />
+                  {/* Bọc riêng ảnh trong click */}
+                  <img
+  src={product.img_url}
+  alt={product.name}
+  style={{ cursor: 'pointer' }}
+  onClick={() => {
+    // Lưu filter + scroll vào sessionStorage
+    sessionStorage.setItem('productFilters', JSON.stringify({
+      category: selectedCategory,
+      brand: selectedBrand,
+      price: selectedPrice,
+      scroll: window.scrollY,
+    }));
+
+    navigate(`/product/${product._id}`);
+  }}
+/>
+
                   <p className="product-brand">{product.slug}</p>
                   <h4 className="product-name">{product.name}</h4>
                   <div className="price-block">

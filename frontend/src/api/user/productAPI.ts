@@ -26,7 +26,13 @@ export const fetchAllProducts = async (): Promise<Product[]> => {
   return response.data;
 };
 
-// src/api/user/productAPI.ts
+// Lấy chi tiết sản phẩm theo ID
+export const fetchProductById = async (id: string): Promise<Product> => {
+  const response = await axios.get(`http://localhost:5000/api/products/${id}`);
+  return response.data;
+};
+
+// Lọc sản phẩm theo brand, price
 export const fetchFilteredProducts = async (filters: {
   category_id?: string;
   brand_id?: string;
