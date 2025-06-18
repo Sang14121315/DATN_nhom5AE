@@ -122,12 +122,11 @@
           color: red;
           cursor: pointer;
 
-            &:hover{
-                color: white;
-                background: red;
-            }
+          &:hover {
+            color: white;
+            background: red;
+          }
         }
-       
 
         .buy-now {
           padding: 10px 20px;
@@ -204,6 +203,23 @@
       font-size: 18px;
       font-weight: bold;
       margin-bottom: 16px;
+    }
+    .price-block {
+      display: flex;
+      flex-direction: column; // chuyển từ ngang sang dọc
+      align-items: flex-start;
+
+      .discount {
+        color: #d70018; // màu đỏ tươi cho giá sau giảm
+        font-weight: bold;
+      }
+
+      .original {
+        color: #888; // giá gốc - xám
+        text-decoration: line-through;
+        font-size: 0.9em;
+        margin-top: 4px;
+      }
     }
 
     .product-grid {

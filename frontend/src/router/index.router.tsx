@@ -26,7 +26,7 @@ const MainRouter = () => {
         <Route index element={<HomePage />} />
         <Route path="home" element={<HomePage />} />
         <Route path="productlist" element={<ProductlistPage />} />
-        <Route path="productdetail" element={<ProductdetailPage />} />
+        <Route path="product/:id" element={<ProductdetailPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
         <Route path="forgot-password" element={<ForgotPasswordPage />} />
