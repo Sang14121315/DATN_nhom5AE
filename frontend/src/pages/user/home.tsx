@@ -30,7 +30,7 @@ const HomePage: React.FC = () => {
         </aside>
 
         <div className="banner-images">
-          <img src="/assets/home/banner.jpg" alt="Main Banner" />
+          <img src="../../../assets/home/banner.jpg" alt="Main Banner" />
         </div>
       </div>
 
