@@ -1,18 +1,25 @@
-// import Footer from "@/components/user/Footer";
-// import Header from "@/components/user/Header";
-import React from "react";
+import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Footer from "@/components/user/Footer";
 import Header from "@/components/user/Header";
+import CartSidebar from "@/components/user/CartSidebar";
+import { FaShoppingCart } from "react-icons/fa";
+
 const AuthLayout: React.FC = () => {
+  const [isCartOpen, setCartOpen] = useState(false);
+
   return (
     <div className="user-layout">
-        <main className="user-content">
+      <Header />
+    
+      {/* Cart Sidebar */}
+      <CartSidebar isOpen={isCartOpen} onClose={() => setCartOpen(false)} />
 
-        {<Header />}
-            <Outlet /> 
-        { <Footer/>}
-        </main>
+      <main className="user-content">
+        <Outlet />
+      </main>
+
+      <Footer />
     </div>
   );
 };
