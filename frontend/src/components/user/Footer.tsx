@@ -41,6 +41,7 @@ const Footer: React.FC = () => {
             <ul>
               <li>Ngân hàng Vietcombank</li>
               <li>Ngân hàng MB Bank</li>
+              <li>Ngân hàng TP Bank</li>
               <li>Phương thức thanh toán</li>
             </ul>
           </div>
