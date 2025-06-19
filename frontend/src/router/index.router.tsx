@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import AdminLayout from "@/layouts/admin.layout";
 import DashboardPage from "@/pages/admin/Dashboard";
 
-// import user 
+// import user
 import AuthLayout from "@/layouts/auth.layout";
 import ProductlistPage from "@/pages/user/productList";
 import ProductdetailPage from "@/pages/user/productDetail";
@@ -26,7 +26,7 @@ const MainRouter = () => {
         <Route index element={<HomePage />} />
         <Route path="home" element={<HomePage />} />
         <Route path="productlist" element={<ProductlistPage />} />
-        <Route path="productdetail" element={<ProductdetailPage />} />
+        <Route path="product/:id" element={<ProductdetailPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
         <Route path="forgot-password" element={<ForgotPasswordPage />} />

@@ -10,7 +10,7 @@ export interface Brand {
   updated_at?: string;
 }
 
-// API: Lấy danh sách tất cả thương hiệu
+// Lấy danh sách tất cả thương hiệu
 export const fetchAllBrands = async (): Promise<Brand[]> => {
   const response = await axios.get('http://localhost:5000/api/brands');
   return response.data;
