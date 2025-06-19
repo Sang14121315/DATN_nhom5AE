@@ -4,8 +4,10 @@ import '@/styles/pages/user/forgotPassword.scss';
 
 const ForgotPasswordPage: React.FC = () => {
   const [email, setEmail] = useState('');
+  const [otp, setOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showOtpInput, setShowOtpInput] = useState(false);
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -16,21 +18,18 @@ const ForgotPasswordPage: React.FC = () => {
 
   const handleSendCode = async () => {
     if (!validateEmail(email)) {
-      setMessage('Vui lòng nhập địa chỉ email hợp lệ.');
+      setMessage('❌ Vui lòng nhập địa chỉ email hợp lệ.');
       return;
     }
 
     try {
       setSending(true);
       setMessage(null);
-
-      // Giả lập gọi API gửi mã
       await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // Sau khi gửi thành công
-      setMessage('📨 Mã xác thực đã được gửi đến email của bạn.');
+      setMessage(' Mã xác thực đã được gửi đến email của bạn.');
+      setShowOtpInput(true); // Hiện ô nhập mã sau khi gửi thành công
     } catch (error) {
-      setMessage('Đã xảy ra lỗi khi gửi mã. Vui lòng thử lại.');
+      setMessage('❌ Đã xảy ra lỗi khi gửi mã. Vui lòng thử lại.');
     } finally {
       setSending(false);
     }
@@ -39,13 +38,18 @@ const ForgotPasswordPage: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (newPassword !== confirmPassword) {
-      setMessage('Mật khẩu xác nhận không khớp.');
+    if (!otp) {
+      setMessage('❌ Vui lòng nhập mã xác thực.');
       return;
     }
 
-    // TODO: Gọi API đổi mật khẩu tại đây
-    console.log('Đổi mật khẩu cho:', email, newPassword);
+    if (newPassword !== confirmPassword) {
+      setMessage('❌ Mật khẩu xác nhận không khớp.');
+      return;
+    }
+
+    // TODO: Gọi API đổi mật khẩu tại đây (gửi email, otp, newPassword)
+    console.log('Đổi mật khẩu cho:', email, newPassword, 'OTP:', otp);
     setMessage('✅ Mật khẩu của bạn đã được đặt lại thành công!');
   };
 
@@ -81,8 +85,10 @@ const ForgotPasswordPage: React.FC = () => {
             <span className="active">Quên mật khẩu</span>
           </div>
 
-          <form className="forgot-password-form" onSubmit={handleSubmit}>
-            <div className="email-group">
+          <form onSubmit={handleSubmit}>
+            {message && <div className="error-message">{message}</div>}
+
+            <div className="form-group with-button">
               <input
                 type="email"
                 placeholder="Vui lòng nhập email của bạn"
@@ -100,29 +106,47 @@ const ForgotPasswordPage: React.FC = () => {
               </button>
             </div>
 
-            <input
-              type="password"
-              placeholder="Vui lòng nhập mật khẩu mới"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              required
-            />
+            {showOtpInput && (
+              <div className="form-group">
+                <input
+                  type="text"
+                  placeholder="Nhập mã xác thực"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  required
+                />
+              </div>
+            )}
 
-            <input
-              type="password"
-              placeholder="Vui lòng xác nhận mật khẩu"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
+            <div className="form-group">
+              <input
+                type="password"
+                placeholder="Vui lòng nhập mật khẩu mới"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+              />
+            </div>
 
-            {message && <div className="form-message">{message}</div>}
+            <div className="form-group">
+              <input
+                type="password"
+                placeholder="Xác nhận lại mật khẩu"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="recaptcha-note">
+              Trang này được bảo vệ bởi reCAPTCHA và tuân theo Chính sách quyền riêng tư cùng Điều khoản dịch vụ của Google.
+            </div>
 
             <button type="submit" className="submit-button">XÁC NHẬN</button>
 
-            <div className="auth-links">
-              <span>Bạn chưa có tài khoản? <Link to="/register">Đăng ký</Link></span>
-              <span>Đã có tài khoản? <Link to="/login">Đăng nhập</Link></span>
+            <div className="form-footer">
+              <p>Bạn chưa có tài khoản? <Link to="/register">Đăng ký</Link></p>
+              <p>Đã có tài khoản? <Link to="/login">Đăng nhập</Link></p>
             </div>
           </form>
         </div>

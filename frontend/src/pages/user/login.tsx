@@ -1,16 +1,25 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '@/styles/pages/user/login.scss';
+import { loginUser } from '@/api/user/userAPI';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Gọi API đăng nhập tại đây
-    console.log('Email:', email);
-    console.log('Password:', password);
+
+    try {
+      const res = await loginUser({ email, password });
+      localStorage.setItem('token', res.token);
+      localStorage.setItem('user', JSON.stringify(res.user));
+      navigate('/');
+    } catch (error: any) {
+      setErrorMsg(error.response?.data?.message || ' Đăng nhập thất bại!');
+    }
   };
 
   return (
@@ -32,7 +41,7 @@ const LoginPage: React.FC = () => {
         </ul>
       </aside>
 
-      {/* Main Login Content */}
+      {/* Nội dung chính */}
       <div className="main-auth-content">
         <div className="top-menu">
           <span>🛡️ Chất lượng đảm bảo</span>
@@ -48,6 +57,8 @@ const LoginPage: React.FC = () => {
           </div>
 
           <form onSubmit={handleLogin}>
+            {errorMsg && <p className="error-message">{errorMsg}</p>}
+
             <div className="form-group">
               <input
                 type="email"
