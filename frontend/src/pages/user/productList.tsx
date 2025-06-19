@@ -1,26 +1,38 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FaShoppingCart } from 'react-icons/fa';
-import '@/styles/pages/user/productList.scss';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { FaShoppingCart } from "react-icons/fa";
+import "@/styles/pages/user/productList.scss";
 
-import { useCart } from '@/context/CartContext';
-import { Product, fetchFilteredProducts } from '../../api/user/productAPI';
-import { Brand, fetchAllBrands } from '../../api/user/brandAPI';
-import { Category, fetchAllCategories } from '../../api/user/categoryAPI';
+import { useCart } from "@/context/CartContext";
+import { Product, fetchFilteredProducts } from "../../api/user/productAPI";
+import { Brand, fetchAllBrands } from "../../api/user/brandAPI";
+import { Category, fetchAllCategories } from "../../api/user/categoryAPI";
 
 const ProductListPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [selectedBrand, setSelectedBrand] = useState<string>('all');
-  const [selectedPrice, setSelectedPrice] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedBrand, setSelectedBrand] = useState("all");
+  const [selectedPrice, setSelectedPrice] = useState("all");
   const [filtersInitialized, setFiltersInitialized] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+
   const navigate = useNavigate();
+  const itemsPerPage = 12;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedProducts = products.slice(startIndex, startIndex + itemsPerPage);
+  const totalPages = Math.ceil(products.length / itemsPerPage);
   const { addToCart } = useCart();
 
+  const formatCurrency = (amount: number): string =>
+    new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
+
   useEffect(() => {
-    const loadInitialData = async () => {
+    const loadData = async () => {
       try {
         const [brandData, categoryData] = await Promise.all([
           fetchAllBrands(),
@@ -29,11 +41,23 @@ const ProductListPage: React.FC = () => {
         setBrands(brandData);
         setCategories(categoryData);
       } catch (error) {
-        console.error('Lỗi khi tải danh mục hoặc thương hiệu:', error);
+        console.error("Lỗi khi tải danh mục/thương hiệu:", error);
       }
     };
 
-    loadInitialData();
+    loadData();
+  }, []);
+
+  useEffect(() => {
+    const saved = sessionStorage.getItem("productFilters");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      setSelectedCategory(parsed.category || "all");
+      setSelectedBrand(parsed.brand || "all");
+      setSelectedPrice(parsed.price || "all");
+      setTimeout(() => window.scrollTo(0, parsed.scroll || 0), 50);
+    }
+    setFiltersInitialized(true);
   }, []);
 
   useEffect(() => {
@@ -48,46 +72,24 @@ const ProductListPage: React.FC = () => {
           maxPrice?: number;
         } = {};
 
-        if (selectedCategory !== 'all') filters.category_id = selectedCategory;
-        if (selectedBrand !== 'all') filters.brand_id = selectedBrand;
-
-        if (selectedPrice !== 'all') {
-          const [min, max] = selectedPrice.split('-').map(Number);
+        if (selectedCategory !== "all") filters.category_id = selectedCategory;
+        if (selectedBrand !== "all") filters.brand_id = selectedBrand;
+        if (selectedPrice !== "all") {
+          const [min, max] = selectedPrice.split("-").map(Number);
           filters.minPrice = min;
           filters.maxPrice = max;
         }
 
         const productData = await fetchFilteredProducts(filters);
         setProducts(productData);
+        setCurrentPage(1);
       } catch (error) {
-        console.error('Lỗi khi tải sản phẩm:', error);
+        console.error("Lỗi khi tải sản phẩm:", error);
       }
     };
 
     fetchProducts();
   }, [selectedCategory, selectedBrand, selectedPrice, filtersInitialized]);
-
-  useEffect(() => {
-    const saved = sessionStorage.getItem('productFilters');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      setSelectedCategory(parsed.category || 'all');
-      setSelectedBrand(parsed.brand || 'all');
-      setSelectedPrice(parsed.price || 'all');
-
-      setTimeout(() => {
-        window.scrollTo(0, parsed.scroll || 0);
-      }, 50);
-    }
-
-    setFiltersInitialized(true);
-  }, []);
-
-  const formatCurrency = (amount: number): string =>
-    new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND',
-    }).format(amount);
 
   return (
     <div className="product-page-container">
@@ -96,14 +98,14 @@ const ProductListPage: React.FC = () => {
           <div className="sidebar-section">
             <h3>Danh mục sản phẩm</h3>
             <ul>
-              <li onClick={() => setSelectedCategory('all')}>Tất cả</li>
-              {categories.map((category) => (
+              <li onClick={() => setSelectedCategory("all")}>Tất cả</li>
+              {categories.map((c) => (
                 <li
-                  key={category._id}
-                  onClick={() => setSelectedCategory(category._id)}
-                  className={selectedCategory === category._id ? 'active' : ''}
+                  key={c._id}
+                  onClick={() => setSelectedCategory(c._id)}
+                  className={selectedCategory === c._id ? "active" : ""}
                 >
-                  {category.name}
+                  {c.name}
                 </li>
               ))}
             </ul>
@@ -116,21 +118,21 @@ const ProductListPage: React.FC = () => {
                 type="radio"
                 name="brand"
                 value="all"
-                checked={selectedBrand === 'all'}
-                onChange={() => setSelectedBrand('all')}
+                checked={selectedBrand === "all"}
+                onChange={() => setSelectedBrand("all")}
               />
               Tất cả
             </label>
-            {brands.map((brand) => (
-              <label key={brand._id}>
+            {brands.map((b) => (
+              <label key={b._id}>
                 <input
                   type="radio"
                   name="brand"
-                  value={brand._id}
-                  checked={selectedBrand === brand._id}
-                  onChange={() => setSelectedBrand(brand._id)}
+                  value={b._id}
+                  checked={selectedBrand === b._id}
+                  onChange={() => setSelectedBrand(b._id)}
                 />
-                {brand.name}
+                {b.name}
               </label>
             ))}
           </div>
@@ -138,13 +140,13 @@ const ProductListPage: React.FC = () => {
           <div className="sidebar-section">
             <h3>Lọc giá</h3>
             {[
-              ['all', 'Tất cả'],
-              ['0-10000', 'Dưới 10.000đ'],
-              ['10000-30000', '10k – 30k'],
-              ['30000-50000', '30k – 50k'],
-              ['50000-100000', '50k – 100k'],
-              ['100000-200000', '100k – 200k'],
-              ['200000-999999999', 'Trên 200k'],
+              ["all", "Tất cả"],
+              ["0-10000", "Dưới 10.000đ"],
+              ["10000-30000", "10k – 30k"],
+              ["30000-50000", "30k – 50k"],
+              ["50000-100000", "50k – 100k"],
+              ["100000-200000", "100k – 200k"],
+              ["200000-999999999", "Trên 200k"],
             ].map(([value, label]) => (
               <label key={value}>
                 <input
@@ -153,7 +155,8 @@ const ProductListPage: React.FC = () => {
                   value={value}
                   checked={selectedPrice === value}
                   onChange={() => setSelectedPrice(value)}
-                /> {label}
+                />
+                {label}
               </label>
             ))}
           </div>
@@ -165,45 +168,72 @@ const ProductListPage: React.FC = () => {
           </div>
 
           <div className="product-header">
-            <h2>{
-              selectedCategory === 'all'
-                ? 'Sản phẩm'
-                : categories.find((c) => c._id === selectedCategory)?.name || 'Sản phẩm'
-            }</h2>
+            <h2>
+              {selectedCategory === "all"
+                ? "Sản phẩm"
+                : categories.find((c) => c._id === selectedCategory)?.name || "Sản phẩm"}
+            </h2>
           </div>
 
           <div className="product-grid">
             {products.length > 0 ? (
-              products.map((product) => (
+              paginatedProducts.map((product) => (
                 <div className="product-card" key={product._id}>
                   <img
                     src={product.img_url}
                     alt={product.name}
-                    style={{ cursor: 'pointer' }}
+                    style={{ cursor: "pointer" }}
                     onClick={() => {
-                      sessionStorage.setItem('productFilters', JSON.stringify({
-                        category: selectedCategory,
-                        brand: selectedBrand,
-                        price: selectedPrice,
-                        scroll: window.scrollY,
-                      }));
+                      sessionStorage.setItem(
+                        "productFilters",
+                        JSON.stringify({
+                          category: selectedCategory,
+                          brand: selectedBrand,
+                          price: selectedPrice,
+                          scroll: window.scrollY,
+                        })
+                      );
                       navigate(`/product/${product._id}`);
                     }}
                   />
-                  <p className="product-brand">{product.slug}</p>
+                  <p className="product-brand">
+                    {typeof product.brand_id === "object"
+                      ? product.brand_id.name
+                      : product.brand_id}
+                  </p>
                   <h4 className="product-name">{product.name}</h4>
+
                   <div className="price-block">
-                    <span className="discount">{formatCurrency(product.price)}</span>
+                    <div className="price-left">
+                      {product.sale ? (
+                        <>
+                          <div className="discount-price">
+                            {formatCurrency(product.price * 0.66)}
+                          </div>
+                          <div className="original-price">
+                            {formatCurrency(product.price)}
+                          </div>
+                        </>
+                      ) : (
+                        <div className="discount-price">
+                          {formatCurrency(product.price)}
+                        </div>
+                      )}
+                    </div>
+                    {product.sale && <div className="discount-percent">-34%</div>}
                   </div>
+
                   <button
                     className="add-to-cart"
-                    onClick={() => addToCart({
-                      _id: product._id,
-                      name: product.name,
-                      price: product.price,
-                      quantity: 1,
-                      img_url: product.img_url,
-                    })}
+                    onClick={() =>
+                      addToCart({
+                        _id: product._id,
+                        name: product.name,
+                        price: product.price,
+                        quantity: 1,
+                        img_url: product.img_url,
+                      })
+                    }
                   >
                     <FaShoppingCart /> Thêm vào giỏ
                   </button>
@@ -213,6 +243,34 @@ const ProductListPage: React.FC = () => {
               <p>Không có sản phẩm phù hợp.</p>
             )}
           </div>
+
+          {totalPages > 1 && (
+            <div className="pagination">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                &laquo; Trước
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button
+                  key={i}
+                  className={currentPage === i + 1 ? "active" : ""}
+                  onClick={() => setCurrentPage(i + 1)}
+                >
+                  {i + 1}
+                </button>
+              ))}
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={currentPage === totalPages}
+              >
+                Sau &raquo;
+              </button>
+            </div>
+          )}
         </main>
       </div>
     </div>

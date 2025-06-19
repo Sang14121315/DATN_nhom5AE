@@ -2,6 +2,7 @@
   import AdminLayout from "@/layouts/admin.layout";
   import DashboardPage from "@/pages/admin/Dashboard";
 
+
   // import user 
   import AuthLayout from "@/layouts/auth.layout";
   import ProductlistPage from "@/pages/user/productList";
@@ -20,7 +21,6 @@
         <Route path="/admin" element={<AdminLayout />}>
           <Route path="dashboard" element={<DashboardPage />} />
         </Route>
-
         {/* User layout */}
         <Route path="/" element={<AuthLayout />}>
           <Route index element={<HomePage />} />
@@ -37,5 +37,6 @@
       </Routes>
     );
   };
+
 
   export default MainRouter;
