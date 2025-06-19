@@ -1,6 +1,11 @@
 import axios from 'axios';
 
 // Định nghĩa kiểu dữ liệu sản phẩm
+export interface ObjectIdRef {
+  _id: string;
+  name?: string;
+}
+
 export interface Product {
   _id: string;
   slug: string;
@@ -8,14 +13,14 @@ export interface Product {
   description?: string;
   price: number;
   stock: number;
-  img_url?: string;
-  category_id: string;
+  img_url: string;
+  category_id: string | ObjectIdRef;
   sale?: boolean;
   view?: number;
   hot?: boolean;
-  coupons_id?: string;
-  brand_id: string;
-  product_type_id: string;
+  coupons_id?: string | ObjectIdRef;
+  brand_id: string | ObjectIdRef;
+  product_type_id: string | ObjectIdRef;
   created_at?: string;
   updated_at?: string;
 }
@@ -32,7 +37,7 @@ export const fetchProductById = async (id: string): Promise<Product> => {
   return response.data;
 };
 
-// Lọc sản phẩm theo brand, price
+// Lọc sản phẩm theo brand, price, category
 export const fetchFilteredProducts = async (filters: {
   category_id?: string;
   brand_id?: string;
@@ -49,7 +54,6 @@ export const fetchFilteredProducts = async (filters: {
   const response = await axios.get(`http://localhost:5000/api/products?${params.toString()}`);
   return response.data;
 };
-
 
 // Lấy sản phẩm theo product_type_id
 export const fetchProductsByType = async (productTypeId: string): Promise<Product[]> => {

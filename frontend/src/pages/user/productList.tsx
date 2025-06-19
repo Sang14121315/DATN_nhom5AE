@@ -1,33 +1,38 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { FaShoppingCart } from "react-icons/fa";
 import "@/styles/pages/user/productList.scss";
+
 import { useCart } from "@/context/CartContext";
 import { Product, fetchFilteredProducts } from "../../api/user/productAPI";
 import { Brand, fetchAllBrands } from "../../api/user/brandAPI";
 import { Category, fetchAllCategories } from "../../api/user/categoryAPI";
 
 const ProductListPage: React.FC = () => {
-  // const { productTypeId } = useParams(); // có thể dùng sau
   const [products, setProducts] = useState<Product[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [selectedBrand, setSelectedBrand] = useState<string>("all");
-  const [selectedPrice, setSelectedPrice] = useState<string>("all");
-  const navigate = useNavigate();
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedBrand, setSelectedBrand] = useState("all");
+  const [selectedPrice, setSelectedPrice] = useState("all");
   const [filtersInitialized, setFiltersInitialized] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+
+  const navigate = useNavigate();
   const itemsPerPage = 12;
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedProducts = products.slice(startIndex, endIndex);
-
+  const paginatedProducts = products.slice(startIndex, startIndex + itemsPerPage);
   const totalPages = Math.ceil(products.length / itemsPerPage);
+  const { addToCart } = useCart();
 
-  // Load danh mục và thương hiệu
+  const formatCurrency = (amount: number): string =>
+    new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
+
   useEffect(() => {
-    const loadInitialData = async () => {
+    const loadData = async () => {
       try {
         const [brandData, categoryData] = await Promise.all([
           fetchAllBrands(),
@@ -36,16 +41,27 @@ const ProductListPage: React.FC = () => {
         setBrands(brandData);
         setCategories(categoryData);
       } catch (error) {
-        console.error("Lỗi khi tải danh mục hoặc thương hiệu:", error);
+        console.error("Lỗi khi tải danh mục/thương hiệu:", error);
       }
     };
 
-    loadInitialData();
+    loadData();
   }, []);
 
-  // Load sản phẩm khi chọn lọc
   useEffect(() => {
-    if (!filtersInitialized) return; // Đợi filter khôi phục xong
+    const saved = sessionStorage.getItem("productFilters");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      setSelectedCategory(parsed.category || "all");
+      setSelectedBrand(parsed.brand || "all");
+      setSelectedPrice(parsed.price || "all");
+      setTimeout(() => window.scrollTo(0, parsed.scroll || 0), 50);
+    }
+    setFiltersInitialized(true);
+  }, []);
+
+  useEffect(() => {
+    if (!filtersInitialized) return;
 
     const fetchProducts = async () => {
       try {
@@ -58,7 +74,6 @@ const ProductListPage: React.FC = () => {
 
         if (selectedCategory !== "all") filters.category_id = selectedCategory;
         if (selectedBrand !== "all") filters.brand_id = selectedBrand;
-
         if (selectedPrice !== "all") {
           const [min, max] = selectedPrice.split("-").map(Number);
           filters.minPrice = min;
@@ -67,7 +82,6 @@ const ProductListPage: React.FC = () => {
 
         const productData = await fetchFilteredProducts(filters);
         setProducts(productData);
-
         setCurrentPage(1);
       } catch (error) {
         console.error("Lỗi khi tải sản phẩm:", error);
@@ -77,48 +91,21 @@ const ProductListPage: React.FC = () => {
     fetchProducts();
   }, [selectedCategory, selectedBrand, selectedPrice, filtersInitialized]);
 
-  useEffect(() => {
-    const saved = sessionStorage.getItem("productFilters");
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      setSelectedCategory(parsed.category || "all");
-      setSelectedBrand(parsed.brand || "all");
-      setSelectedPrice(parsed.price || "all");
-
-      setTimeout(() => {
-        window.scrollTo(0, parsed.scroll || 0);
-      }, 50);
-    }
-
-    setFiltersInitialized(true); // <-- báo hiệu đã xong
-  }, []);
-
-  const { addToCart } = useCart(); // ✅ Lấy hàm thêm vào giỏ từ context
-
-  // const allProducts: Product[] = productsData;
-
-  const formatCurrency = (amount: number): string =>
-    new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(amount);
-
   return (
     <div className="product-page-container">
       <div className="product-layout">
-        {/* Sidebar */}
         <aside className="sidebar">
           <div className="sidebar-section">
             <h3>Danh mục sản phẩm</h3>
             <ul>
               <li onClick={() => setSelectedCategory("all")}>Tất cả</li>
-              {categories.map((category) => (
+              {categories.map((c) => (
                 <li
-                  key={category._id}
-                  onClick={() => setSelectedCategory(category._id)}
-                  className={selectedCategory === category._id ? "active" : ""}
+                  key={c._id}
+                  onClick={() => setSelectedCategory(c._id)}
+                  className={selectedCategory === c._id ? "active" : ""}
                 >
-                  {category.name}
+                  {c.name}
                 </li>
               ))}
             </ul>
@@ -136,138 +123,55 @@ const ProductListPage: React.FC = () => {
               />
               Tất cả
             </label>
-            {brands.map((brand) => (
-              <label key={brand._id}>
+            {brands.map((b) => (
+              <label key={b._id}>
                 <input
                   type="radio"
                   name="brand"
-                  value={brand._id}
-                  checked={selectedBrand === brand._id}
-                  onChange={() => setSelectedBrand(brand._id)}
+                  value={b._id}
+                  checked={selectedBrand === b._id}
+                  onChange={() => setSelectedBrand(b._id)}
                 />
-                {brand.name}
+                {b.name}
               </label>
             ))}
           </div>
 
           <div className="sidebar-section">
             <h3>Lọc giá</h3>
-            <label>
-              <input
-                type="radio"
-                name="price"
-                value="all"
-                checked={selectedPrice === "all"}
-                onChange={() => setSelectedPrice("all")}
-              />{" "}
-              Tất cả
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="price"
-                value="0-10000"
-                checked={selectedPrice === "0-10000"}
-                onChange={() => setSelectedPrice("0-10000")}
-              />{" "}
-              Dưới 10.000đ
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="price"
-                value="10000-30000"
-                checked={selectedPrice === "10000-30000"}
-                onChange={() => setSelectedPrice("10000-30000")}
-              />{" "}
-              10k – 30k
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="price"
-                value="30000-50000"
-                checked={selectedPrice === "30000-50000"}
-                onChange={() => setSelectedPrice("30000-50000")}
-              />{" "}
-              30k – 50k
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="price"
-                value="50000-100000"
-                checked={selectedPrice === "50000-100000"}
-                onChange={() => setSelectedPrice("50000-100000")}
-              />{" "}
-              50k – 100k
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="price"
-                value="100000-200000"
-                checked={selectedPrice === "100000-200000"}
-                onChange={() => setSelectedPrice("100000-200000")}
-              />{" "}
-              100k – 200k
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="price"
-                value="200000-999999999"
-                checked={selectedPrice === "200000-999999999"}
-                onChange={() => setSelectedPrice("200000-999999999")}
-              />{" "}
-              Trên 200k
-            </label>
+            {[
+              ["all", "Tất cả"],
+              ["0-10000", "Dưới 10.000đ"],
+              ["10000-30000", "10k – 30k"],
+              ["30000-50000", "30k – 50k"],
+              ["50000-100000", "50k – 100k"],
+              ["100000-200000", "100k – 200k"],
+              ["200000-999999999", "Trên 200k"],
+            ].map(([value, label]) => (
+              <label key={value}>
+                <input
+                  type="radio"
+                  name="price"
+                  value={value}
+                  checked={selectedPrice === value}
+                  onChange={() => setSelectedPrice(value)}
+                />
+                {label}
+              </label>
+            ))}
           </div>
         </aside>
 
-        {/* Content */}
         <main className="product-content">
           <div className="product-banner">
-            <img src="./public/assets/banner_productList.png" alt="Banner" />
-          </div>
-
-          {/* <div className="product-header">
-            <h2>CPU</h2>
-          </div>
-
-          <div className="product-grid">
-            {products.map((product) => (
-              <div className="product-card" key={product._id}>
-                <img src={product.img_url} alt={product.name} />
-                <p className="product-brand">{product.slug}</p>
-                <h4 className="product-name">{product.name}</h4>
-                <span className="discount">{formatCurrency(product.price)}</span>
-                <button
-                  className="add-to-cart"
-                  onClick={() =>
-                    addToCart({
-                      _id: product._id,
-                      name: product.name,
-                      price: product.price,
-                      quantity: 1,
-                      img_url: product.img_url,
-                    })
-                  }
-                >
-                  <FaShoppingCart /> Thêm vào giỏ
-                </button>
-              </div>
-            ))}
-
             <img src="/assets/banner_productList.png" alt="Banner" />
-          </div> */}
+          </div>
 
           <div className="product-header">
             <h2>
               {selectedCategory === "all"
                 ? "Sản phẩm"
-                : categories.find((c) => c._id === selectedCategory)?.name ||
-                  "Sản phẩm"}
+                : categories.find((c) => c._id === selectedCategory)?.name || "Sản phẩm"}
             </h2>
           </div>
 
@@ -275,13 +179,11 @@ const ProductListPage: React.FC = () => {
             {products.length > 0 ? (
               paginatedProducts.map((product) => (
                 <div className="product-card" key={product._id}>
-                  {/* Bọc riêng ảnh trong click */}
                   <img
                     src={product.img_url}
                     alt={product.name}
                     style={{ cursor: "pointer" }}
                     onClick={() => {
-                      // Lưu filter + scroll vào sessionStorage
                       sessionStorage.setItem(
                         "productFilters",
                         JSON.stringify({
@@ -300,6 +202,7 @@ const ProductListPage: React.FC = () => {
                       : product.brand_id}
                   </p>
                   <h4 className="product-name">{product.name}</h4>
+
                   <div className="price-block">
                     <div className="price-left">
                       {product.sale ? (
@@ -317,10 +220,9 @@ const ProductListPage: React.FC = () => {
                         </div>
                       )}
                     </div>
-                    {product.sale && (
-                      <div className="discount-percent">-34%</div>
-                    )}
+                    {product.sale && <div className="discount-percent">-34%</div>}
                   </div>
+
                   <button
                     className="add-to-cart"
                     onClick={() =>
@@ -350,8 +252,7 @@ const ProductListPage: React.FC = () => {
               >
                 &laquo; Trước
               </button>
-
-              {[...Array(totalPages)].map((_, i) => (
+              {Array.from({ length: totalPages }, (_, i) => (
                 <button
                   key={i}
                   className={currentPage === i + 1 ? "active" : ""}
@@ -360,7 +261,6 @@ const ProductListPage: React.FC = () => {
                   {i + 1}
                 </button>
               ))}
-
               <button
                 onClick={() =>
                   setCurrentPage((prev) => Math.min(prev + 1, totalPages))
