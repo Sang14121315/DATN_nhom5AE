@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import AdminLayout from "@/layouts/admin.layout";
 import DashboardPage from "@/pages/admin/Dashboard";
 
-// import user 
+// import user
 import AuthLayout from "@/layouts/auth.layout";
 import ProductlistPage from "@/pages/user/productList";
 import ProductdetailPage from "@/pages/user/productDetail";

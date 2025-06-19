@@ -9,13 +9,13 @@ export interface Product {
   price: number;
   stock: number;
   img_url?: string;
-  category_id: string;       // ObjectId -> string
+  category_id: string;
   sale?: boolean;
   view?: number;
   hot?: boolean;
-  coupons_id?: string;       // ObjectId -> string
-  brand_id: string;          // ObjectId -> string
-  product_type_id: string;   // ObjectId -> string
+  coupons_id?: string;
+  brand_id: string;
+  product_type_id: string;
   created_at?: string;
   updated_at?: string;
 }

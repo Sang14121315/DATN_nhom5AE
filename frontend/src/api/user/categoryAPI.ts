@@ -11,7 +11,7 @@ export interface Category {
   updated_at?: string;
 }
 
-// API: Lấy danh sách tất cả danh mục
+// Lấy danh sách tất cả danh mục
 export const fetchAllCategories = async (): Promise<Category[]> => {
   const response = await axios.get('http://localhost:5000/api/categories');
   return response.data;
