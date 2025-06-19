@@ -1,0 +1,130 @@
+.contact-layout {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  padding: 40px 60px;
+  max-width: 1400px;
+  margin: 0 auto;
+  background-color: #fdfdfd;
+
+  .side-banner {
+    width: 180px;
+    img {
+      width: 100%;
+      display: block;
+    }
+  }
+
+  .sidebar {
+    width: 250px;
+    position: relative;
+
+    h4 {
+      font-weight: bold;
+      margin-bottom: 16px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .dropdown {
+      position: absolute;
+      left: 0;
+      width: 220px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 10px;
+      display: none;
+      z-index: 10;
+
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+          padding: 8px;
+          font-size: 14px;
+          color: #333;
+          cursor: pointer;
+
+          &:hover {
+            color: #ff9f0d;
+          }
+        }
+      }
+    }
+
+    &:hover .dropdown {
+      display: block;
+    }
+  }
+
+  .main-contact-content {
+    flex: 1;
+
+    .top-menu {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: #333;
+      span {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+    }
+
+    .contact-form {
+      background-color: rgba(0, 0, 0, 0.05);
+      padding: 40px;
+      border-radius: 8px;
+      width: 420px;
+      max-width: 90%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        &:focus {
+          outline: none;
+          border-color: #ff9f0d;
+        }
+      }
+
+      .row-input {
+        display: flex;
+        gap: 10px;
+
+        input {
+          flex: 1;
+        }
+      }
+
+      button {
+        background-color: #ff9f0d;
+        color: #fff;
+        border: none;
+        padding: 12px;
+        font-weight: bold;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.2s;
+
+        &:hover {
+          background-color: #e48a00;
+        }
+      }
+    }
+  }
+}

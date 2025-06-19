@@ -9,6 +9,8 @@ const RegisterPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -20,16 +22,9 @@ const RegisterPage: React.FC = () => {
     }
 
     try {
-      await registerUser({
-        name: fullName,
-        email,
-        password,
-      });
-
+      await registerUser({ name: fullName, email, password });
       setErrorMsg(' Đăng ký thành công! Đang chuyển đến trang đăng nhập...');
-      setTimeout(() => {
-        navigate('/login');
-      }, 1500);
+      setTimeout(() => navigate('/login'), 1500);
     } catch (error: any) {
       setErrorMsg(error.response?.data?.message || ' Đăng ký thất bại. Vui lòng thử lại!');
     }
@@ -37,7 +32,6 @@ const RegisterPage: React.FC = () => {
 
   return (
     <div className="login-layout">
-      {/* Sidebar danh mục */}
       <aside className="sidebar">
         <h4>📋 DANH MỤC SẢN PHẨM</h4>
         <ul>
@@ -54,7 +48,6 @@ const RegisterPage: React.FC = () => {
         </ul>
       </aside>
 
-      {/* Nội dung chính */}
       <div className="main-auth-content">
         <div className="top-menu">
           <span>🛡️ Chất lượng đảm bảo</span>
@@ -92,25 +85,42 @@ const RegisterPage: React.FC = () => {
               />
             </div>
 
-            <div className="form-group">
+            <div className="form-group password-group">
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 placeholder="Vui lòng nhập mật khẩu"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label="Toggle password visibility"
+              >
+                {showPassword ? '👁' : '👁‍🗨'}
+              </button>
             </div>
 
-            <div className="form-group">
+            <div className="form-group password-group">
               <input
-                type="password"
+                type={showConfirmPassword ? 'text' : 'password'}
                 placeholder="Xác nhận lại mật khẩu"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
               />
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                aria-label="Toggle confirm password visibility"
+              >
+                {showConfirmPassword ? '👁' : '👁‍🗨'}
+              </button>
             </div>
+
 
             <div className="recaptcha-note">
               Trang này được bảo vệ bởi reCAPTCHA và tuân theo Chính sách quyền riêng tư cùng Điều khoản dịch vụ của Google.
