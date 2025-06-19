@@ -1,23 +1,38 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import '@/styles/pages/user/login.scss';
+import { Link, useNavigate } from 'react-router-dom';
+import '@/styles/pages/user/register.scss';
+import { registerUser } from '@/api/user/userAPI';
 
 const RegisterPage: React.FC = () => {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      alert('Mật khẩu xác nhận không khớp!');
+      setErrorMsg(' Mật khẩu xác nhận không khớp!');
       return;
     }
 
-    // TODO: Gửi dữ liệu đăng ký đến server
-    console.log('Thông tin đăng ký:', { fullName, email, password });
+    try {
+      await registerUser({
+        name: fullName,
+        email,
+        password,
+      });
+
+      setErrorMsg(' Đăng ký thành công! Đang chuyển đến trang đăng nhập...');
+      setTimeout(() => {
+        navigate('/login');
+      }, 1500);
+    } catch (error: any) {
+      setErrorMsg(error.response?.data?.message || ' Đăng ký thất bại. Vui lòng thử lại!');
+    }
   };
 
   return (
@@ -55,6 +70,8 @@ const RegisterPage: React.FC = () => {
           </div>
 
           <form onSubmit={handleSubmit}>
+            {errorMsg && <p className="error-message">{errorMsg}</p>}
+
             <div className="form-group">
               <input
                 type="text"
@@ -96,7 +113,7 @@ const RegisterPage: React.FC = () => {
             </div>
 
             <div className="recaptcha-note">
-              This site is protected by reCAPTCHA and the Google Privacy Policy and Terms of Service apply.
+              Trang này được bảo vệ bởi reCAPTCHA và tuân theo Chính sách quyền riêng tư cùng Điều khoản dịch vụ của Google.
             </div>
 
             <button type="submit" className="submit-button">ĐĂNG KÝ</button>
