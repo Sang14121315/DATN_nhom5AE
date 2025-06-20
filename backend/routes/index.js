@@ -11,6 +11,7 @@ const messageController = require('../controllers/messageController');
 const homeController = require('../controllers/homeController');
 const contactController = require('../controllers/contactController');
 const productTypeController = require('../controllers/productTypeController');
+const cartController = require('../controllers/cartController');
 const auth = require('../middleware/auth');
 const upload = require('../middleware/upload');
 
@@ -29,6 +30,13 @@ router.post('/login', userController.login);
 router.post('/forgot-password', userController.forgotPassword);
 router.post('/reset-password', userController.resetPassword);
 
+// Cart
+router.post('/cart', auth, cartController.addItem);
+router.get('/cart', auth, cartController.getCart);
+router.put('/cart', auth, cartController.updateItem);
+router.delete('/cart', auth, cartController.removeItem);
+router.delete('/cart/clear', auth, cartController.clearCart);
+
 // Products
 router.get('/products', productController.getProducts);
 router.post('/products', auth, upload.single('image'), productController.createProduct);
@@ -37,22 +45,22 @@ router.put('/products/:id', auth, upload.single('image'), productController.upda
 router.delete('/products/:id', auth, productController.deleteProduct);
 
 // Product Types
-router.get('/product-types/:id', productTypeController.getProductTypeById);
 router.get('/product-types', productTypeController.getProductTypes);
+router.get('/product-types/:id', productTypeController.getProductTypeById);
 router.post('/product-types', auth, productTypeController.createProductType);
 router.put('/product-types/:id', auth, productTypeController.updateProductType);
 router.delete('/product-types/:id', auth, productTypeController.deleteProductType);
 
 // Categories
-router.get('/categories/:id', categoryController.getCategoryById);
 router.get('/categories', categoryController.getCategories);
+router.get('/categories/:id', categoryController.getCategoryById);
 router.post('/categories', auth, categoryController.createCategory);
 router.put('/categories/:id', auth, categoryController.updateCategory);
 router.delete('/categories/:id', auth, categoryController.deleteCategory);
 
 // Brands
-router.get('/brands/:id',  brandController.getBrandById);
 router.get('/brands', brandController.getBrands);
+router.get('/brands/:id', brandController.getBrandById);
 router.post('/brands', auth, upload.single('logo'), brandController.createBrand);
 router.put('/brands/:id', auth, upload.single('logo'), brandController.updateBrand);
 router.delete('/brands/:id', auth, brandController.deleteBrand);
