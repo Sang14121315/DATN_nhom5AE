@@ -1,45 +1,53 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import '@/styles/pages/user/login.scss';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import '@/styles/pages/user/register.scss'; // Dùng chung style với register
 import { loginUser } from '@/api/user/userAPI';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
       const res = await loginUser({ email, password });
       localStorage.setItem('token', res.token);
       localStorage.setItem('user', JSON.stringify(res.user));
       navigate('/');
     } catch (error: any) {
-      setErrorMsg(error.response?.data?.message || ' Đăng nhập thất bại!');
+      setErrorMsg(error.response?.data?.message || 'Đăng nhập thất bại!');
     }
   };
 
   return (
-    <div className="login-layout">
-      {/* Sidebar Danh mục sản phẩm */}
-      <aside className="sidebar">
+    <div className="register-layout">
+      {/* Banner trái */}
+      <div className="side-banner">
+        <img src="/assets/banner-left.png" alt="Banner trái" />
+      </div>
+
+      {/* Sidebar */}
+      <div className="sidebar">
         <h4>📋 DANH MỤC SẢN PHẨM</h4>
-        <ul>
-          <li>PC Gaming - Máy tính chơi game</li>
-          <li>PC Workstation</li>
-          <li>Tự Build Cấu Hình PC</li>
-          <li>PC VĂN PHÒNG</li>
-          <li>PC AMD GAMING</li>
-          <li>PC Core Ultra</li>
-          <li>PC GAMING ĐẸP – CAO CẤP</li>
-          <li>PC GIẢ LẬP - ẢO HÓA</li>
-          <li>PC MINI</li>
-          <li>PC Refurbished</li>
-        </ul>
-      </aside>
+        <div className="dropdown">
+          <ul>
+            <li>PC Gaming - Máy tính chơi game</li>
+            <li>PC Workstation</li>
+            <li>Tự Build Cấu Hình PC</li>
+            <li>PC VĂN PHÒNG</li>
+            <li>PC AMD GAMING</li>
+            <li>PC Core Ultra</li>
+            <li>PC GAMING ĐẸP – CAO CẤP</li>
+            <li>PC GIẢ LẬP - ẢO HÓA</li>
+            <li>PC MINI</li>
+            <li>PC Refurbished</li>
+          </ul>
+        </div>
+      </div>
 
       {/* Nội dung chính */}
       <div className="main-auth-content">
@@ -50,47 +58,59 @@ const LoginPage: React.FC = () => {
           <span>✉️ Liên hệ</span>
         </div>
 
-        <div className="auth-form-container">
+        <form className="auth-form-container" onSubmit={handleLogin}>
           <div className="auth-tabs">
-            <span className="active">Đăng nhập</span>
-            <span><Link to="/register">Đăng ký</Link></span>
+            <span className={location.pathname === '/login' ? 'active' : ''}>
+              <Link to="/login">Đăng nhập</Link>
+            </span>
+            <span className={location.pathname === '/register' ? 'active' : ''}>
+              <Link to="/register">Đăng ký</Link>
+            </span>
           </div>
 
-          <form onSubmit={handleLogin}>
-            {errorMsg && <p className="error-message">{errorMsg}</p>}
+          {errorMsg && <p className="error-message">{errorMsg}</p>}
 
-            <div className="form-group">
-              <input
-                type="email"
-                placeholder="Vui lòng nhập email của bạn"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
+          <input
+            type="email"
+            placeholder="Vui lòng nhập email của bạn"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
 
-            <div className="form-group">
-              <input
-                type="password"
-                placeholder="Vui lòng nhập mật khẩu"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
+          <div className="form-group password-group">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Vui lòng nhập mật khẩu"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <button
+              type="button"
+              className="toggle-password"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? 'ẩn' : 'hiện'}
+            </button>
+          </div>
 
-            <div className="recaptcha-note">
-              Trang này được bảo vệ bởi reCAPTCHA và tuân theo Chính sách quyền riêng tư cùng Điều khoản dịch vụ của Google.
-            </div>
+          <div className="recaptcha-note">
+            Trang này được bảo vệ bởi reCAPTCHA và tuân theo Chính sách quyền riêng tư cùng Điều khoản dịch vụ của Google.
+          </div>
 
-            <button type="submit" className="submit-button">ĐĂNG NHẬP</button>
-          </form>
+          <button type="submit">ĐĂNG NHẬP</button>
 
           <div className="form-footer">
             <p>Bạn chưa có tài khoản? <Link to="/register">Đăng ký</Link></p>
             <p>Bạn quên mật khẩu? <Link to="/forgot-password">Quên mật khẩu</Link></p>
           </div>
-        </div>
+        </form>
+      </div>
+
+      {/* Banner phải */}
+      <div className="side-banner">
+        <img src="/assets/banner-right.png" alt="Banner phải" />
       </div>
     </div>
   );

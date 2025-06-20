@@ -7,6 +7,8 @@ const ForgotPasswordPage: React.FC = () => {
   const [otp, setOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -25,9 +27,9 @@ const ForgotPasswordPage: React.FC = () => {
     try {
       setSending(true);
       setMessage(null);
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      setMessage(' Mã xác thực đã được gửi đến email của bạn.');
-      setShowOtpInput(true); // Hiện ô nhập mã sau khi gửi thành công
+      await new Promise((resolve) => setTimeout(resolve, 1500)); // Giả lập gửi email
+      setMessage('✅ Mã xác thực đã được gửi đến email của bạn.');
+      setShowOtpInput(true);
     } catch (error) {
       setMessage('❌ Đã xảy ra lỗi khi gửi mã. Vui lòng thử lại.');
     } finally {
@@ -48,29 +50,37 @@ const ForgotPasswordPage: React.FC = () => {
       return;
     }
 
-    // TODO: Gọi API đổi mật khẩu tại đây (gửi email, otp, newPassword)
-    console.log('Đổi mật khẩu cho:', email, newPassword, 'OTP:', otp);
+    // TODO: Gọi API đặt lại mật khẩu ở đây
     setMessage('✅ Mật khẩu của bạn đã được đặt lại thành công!');
   };
 
   return (
-    <div className="login-layout">
-      <aside className="sidebar">
-        <h4>📋 DANH MỤC SẢN PHẨM</h4>
-        <ul>
-          <li>PC Gaming - Máy tính chơi game</li>
-          <li>PC Workstation</li>
-          <li>Tự Build Cấu Hình PC</li>
-          <li>PC VĂN PHÒNG</li>
-          <li>PC AMD GAMING</li>
-          <li>PC Core Ultra</li>
-          <li>PC GAMING ĐẸP – CAO CẤP</li>
-          <li>PC GIẢ LẬP - ẢO HÓA</li>
-          <li>PC MINI</li>
-          <li>PC Refurbished</li>
-        </ul>
-      </aside>
+    <div className="register-layout">
+      {/* Banner trái */}
+      <div className="side-banner">
+        <img src="/assets/banner-left.png" alt="Banner trái" />
+      </div>
 
+      {/* Sidebar */}
+      <div className="sidebar">
+        <h4>📋 DANH MỤC SẢN PHẨM</h4>
+        <div className="dropdown">
+          <ul>
+            <li>PC Gaming - Máy tính chơi game</li>
+            <li>PC Workstation</li>
+            <li>Tự Build Cấu Hình PC</li>
+            <li>PC VĂN PHÒNG</li>
+            <li>PC AMD GAMING</li>
+            <li>PC Core Ultra</li>
+            <li>PC GAMING ĐẸP – CAO CẤP</li>
+            <li>PC GIẢ LẬP - ẢO HÓA</li>
+            <li>PC MINI</li>
+            <li>PC Refurbished</li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Nội dung chính */}
       <div className="main-auth-content">
         <div className="top-menu">
           <span>🛡️ Chất lượng đảm bảo</span>
@@ -79,77 +89,94 @@ const ForgotPasswordPage: React.FC = () => {
           <span>✉️ Liên hệ</span>
         </div>
 
-        <div className="auth-form-container">
+        <form className="auth-form-container" onSubmit={handleSubmit}>
           <div className="auth-tabs">
             <span><Link to="/login">Đăng nhập</Link></span>
             <span className="active">Quên mật khẩu</span>
           </div>
 
-          <form onSubmit={handleSubmit}>
-            {message && <div className="error-message">{message}</div>}
+          {message && <p className="error-message">{message}</p>}
 
-            <div className="form-group with-button">
+          <div className="form-group with-button">
+            <input
+              type="email"
+              placeholder="Vui lòng nhập email của bạn"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <button
+              type="button"
+              className="btn-send"
+              onClick={handleSendCode}
+              disabled={sending}
+            >
+              {sending ? 'Đang gửi...' : 'Gửi mã'}
+            </button>
+          </div>
+
+          {showOtpInput && (
+            <>
               <input
-                type="email"
-                placeholder="Vui lòng nhập email của bạn"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+                placeholder="Nhập mã xác thực"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
                 required
               />
-              <button
-                type="button"
-                className="btn-send"
-                onClick={handleSendCode}
-                disabled={sending}
-              >
-                {sending ? 'Đang gửi...' : 'Gửi mã'}
-              </button>
-            </div>
 
-            {showOtpInput && (
-              <div className="form-group">
+              <div className="form-group password-group">
                 <input
-                  type="text"
-                  placeholder="Nhập mã xác thực"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
+                  type={showNewPassword ? 'text' : 'password'}
+                  placeholder="Vui lòng nhập mật khẩu mới"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
                   required
                 />
+                <button
+                  type="button"
+                  className="toggle-password"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                >
+                  {showNewPassword ? 'ẩn' : 'hiện'}
+                </button>
               </div>
-            )}
 
-            <div className="form-group">
-              <input
-                type="password"
-                placeholder="Vui lòng nhập mật khẩu mới"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                required
-              />
-            </div>
+              <div className="form-group password-group">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  placeholder="Xác nhận lại mật khẩu"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  className="toggle-password"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? 'ẩn' : 'hiện'}
+                </button>
+              </div>
+            </>
+          )}
 
-            <div className="form-group">
-              <input
-                type="password"
-                placeholder="Xác nhận lại mật khẩu"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
-            </div>
+          <div className="recaptcha-note">
+            Trang này được bảo vệ bởi reCAPTCHA và tuân theo Chính sách quyền riêng tư cùng Điều khoản dịch vụ của Google.
+          </div>
 
-            <div className="recaptcha-note">
-              Trang này được bảo vệ bởi reCAPTCHA và tuân theo Chính sách quyền riêng tư cùng Điều khoản dịch vụ của Google.
-            </div>
+          <button type="submit">XÁC NHẬN</button>
 
-            <button type="submit" className="submit-button">XÁC NHẬN</button>
+          <div className="form-footer">
+            <p>Bạn chưa có tài khoản? <Link to="/register">Đăng ký</Link></p>
+            <p>Đã có tài khoản? <Link to="/login">Đăng nhập</Link></p>
+          </div>
+        </form>
+      </div>
 
-            <div className="form-footer">
-              <p>Bạn chưa có tài khoản? <Link to="/register">Đăng ký</Link></p>
-              <p>Đã có tài khoản? <Link to="/login">Đăng nhập</Link></p>
-            </div>
-          </form>
-        </div>
+      {/* Banner phải */}
+      <div className="side-banner">
+        <img src="/assets/banner-right.png" alt="Banner phải" />
       </div>
     </div>
   );
