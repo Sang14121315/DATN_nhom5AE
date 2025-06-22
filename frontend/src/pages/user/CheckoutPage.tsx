@@ -5,8 +5,63 @@ import "@/styles/pages/user/checkoutPage.scss";
 const CheckoutPage: React.FC = () => {
   const { cartItems } = useCart();
   const [paymentMethod, setPaymentMethod] = useState("cod");
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [showError, setShowError] = useState(false);
+
+
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    city: "",
+    district: "",
+    ward: "",
+    address: "",
+  });
+
+  const [formErrors, setFormErrors] = useState({
+    name: false,
+    phone: false,
+    city: false,
+    district: false,
+    ward: false,
+    address: false,
+  });
 
   const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormErrors((prev) => ({ ...prev, [name]: false }));
+  };
+
+  
+
+  const validateForm = () => {
+    const errors = {
+      name: !formData.name.trim(),
+      phone: !formData.phone.trim(),
+      city: !formData.city,
+      district: !formData.district,
+      ward: !formData.ward,
+      address: !formData.address.trim(),
+    };
+
+    setFormErrors(errors);
+    return !Object.values(errors).some(Boolean);
+  };
+
+  const handleSubmit = () => {
+  if (validateForm()) {
+    setShowSuccess(true);
+    setShowError(false); // ẩn lỗi nếu từng có
+  } else {
+    setShowError(true);
+    setShowSuccess(false); // ẩn thành công nếu từng có
+  }
+};
+
 
   return (
     <div className="checkout-page">
@@ -17,27 +72,62 @@ const CheckoutPage: React.FC = () => {
         <div className="checkout-section customer-info">
           <h3>Thông tin khách hàng</h3>
           <form>
-            <input type="text" placeholder="Họ và tên *" required />
-            <input type="tel" placeholder="Điện thoại *" required />
-            <input type="email" placeholder="Email" />
-            <select required>
+            <input
+              type="text"
+              name="name"
+              placeholder="Họ và tên *"
+              value={formData.name}
+              onChange={handleChange}
+            />
+            {formErrors.name && <p className="error">Phải nhập họ và tên</p>}
+
+            <input
+              type="tel"
+              name="phone"
+              placeholder="Điện thoại *"
+              value={formData.phone}
+              onChange={handleChange}
+            />
+            {formErrors.phone && <p className="error">Phải nhập số điện thoại</p>}
+
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={handleChange}
+            />
+
+            <select name="city" value={formData.city} onChange={handleChange}>
               <option value="">Tỉnh / Thành phố *</option>
-              <option>TP.HCM</option>
-              <option>Hà Nội</option>
-              <option>Đà Nẵng</option>
+              <option value="TP.HCM">TP.HCM</option>
+              <option value="Hà Nội">Hà Nội</option>
+              <option value="Đà Nẵng">Đà Nẵng</option>
             </select>
-            <select required>
+            {formErrors.city && <p className="error">Phải chọn tỉnh / thành phố</p>}
+
+            <select name="district" value={formData.district} onChange={handleChange}>
               <option value="">Quận / Huyện *</option>
-              <option>Quận 1</option>
-              <option>Quận 2</option>
-              <option>...</option>
+              <option value="Quận 1">Quận 1</option>
+              <option value="Quận 2">Quận 2</option>
             </select>
-            <select required>
+            {formErrors.district && <p className="error">Phải chọn quận / huyện</p>}
+
+            <select name="ward" value={formData.ward} onChange={handleChange}>
               <option value="">Phường / Xã *</option>
-              <option>Phường A</option>
-              <option>Phường B</option>
+              <option value="Phường A">Phường A</option>
+              <option value="Phường B">Phường B</option>
             </select>
-            <input type="text" placeholder="Địa chỉ *" required />
+            {formErrors.ward && <p className="error">Phải chọn phường / xã</p>}
+
+            <input
+              type="text"
+              name="address"
+              placeholder="Địa chỉ *"
+              value={formData.address}
+              onChange={handleChange}
+            />
+            {formErrors.address && <p className="error">Phải nhập địa chỉ</p>}
           </form>
         </div>
 
@@ -54,17 +144,6 @@ const CheckoutPage: React.FC = () => {
               onChange={() => setPaymentMethod("cod")}
             />
             <span>💵 Thanh toán khi nhận hàng / Chuyển phát nhanh - COD</span>
-          </label>
-
-          <label className={`payment-option ${paymentMethod === "store" ? "selected" : ""}`}>
-            <input
-              type="radio"
-              name="payment"
-              value="store"
-              checked={paymentMethod === "store"}
-              onChange={() => setPaymentMethod("store")}
-            />
-            <span>🏪 Thanh toán tại cửa hàng</span>
           </label>
 
           <label className={`payment-option ${paymentMethod === "bank" ? "selected" : ""}`}>
@@ -116,11 +195,37 @@ const CheckoutPage: React.FC = () => {
           <textarea placeholder="Ghi chú"></textarea>
 
           <div className="action-buttons">
-            <button className="continue-btn">Tiếp tục mua hàng</button>
-            <button className="confirm-btn">Xác nhận & Đặt hàng</button>
+           <button className="continue-btn" onClick={() => window.location.href = "/"}>Tiếp tục mua hàng</button>
+            <button className="confirm-btn" onClick={handleSubmit}>Xác nhận & Đặt hàng</button>
           </div>
         </div>
       </div>
+
+      {/* Thông báo đặt hàng thành công */}
+      {showSuccess && (
+        <div className="order-success-popup">
+          <div className="popup-content">
+            <h3> Đặt hàng thành công!</h3>
+            <p>Cảm ơn bạn đã mua hàng.</p>
+            <button onClick={() => window.location.href = "/"}>Xem Thêm </button>
+            <button onClick={() => window.location.href = "/orders"}>Theo dõi đơn hàng</button>
+            
+            <span className="close-btn" onClick={() => setShowSuccess(false)}>×</span>
+          </div>
+        </div>
+      )}
+
+      {showError && (
+  <div className="order-success-popup">
+    <div className="popup-content">
+      <h3 style={{ color: "#dc3545" }}>❌ Đặt hàng thất bại</h3>
+      <p>Vui lòng kiểm tra lại thông tin bạn đã nhập.</p>
+      <button onClick={() => setShowError(false)}>Thử lại</button>
+      <span className="close-btn" onClick={() => setShowError(false)}>×</span>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
