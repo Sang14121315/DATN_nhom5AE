@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import '@/styles/pages/user/productList.scss';
+import '@/styles/pages/user/home.scss';
 
 import { Category, fetchAllCategories } from '../../api/user/categoryAPI';
 import { ProductType, fetchAllProductTypes } from '../../api/user/productTypeAPI';
@@ -41,62 +41,107 @@ const HomePage: React.FC = () => {
     return type?.name.toLowerCase().includes('gaming');
   });
 
-  const renderProductCard = (product: Product) => (
-    <div key={product._id} className="product-card">
+  const renderProductItem = (product: Product) => (
+    <div key={product._id} className="product-item">
       <img src={product.img_url || '/images/no-image.png'} alt={product.name} />
-      <h4>{product.name}</h4>
-      <p>{product.price.toLocaleString()}₫</p>
+      <div className="product-brand">Thương hiệu</div>
+      <div className="product-name">{product.name}</div>
+      <div>
+        <span className="price">{product.price.toLocaleString()}đ</span>
+        <span className="discount">-20%</span>
+      </div>
+      <div className="old-price">{(product.price * 1.2).toLocaleString()}đ</div>
+      <button className="add-to-cart">Thêm vào giỏ</button>
     </div>
   );
 
   return (
-    <div className="product-page-container">
-      <div className="product-layout">
-        <aside className="sidebar">
-          <div className="sidebar-section">
+    <div>
+      <section id="banner">
+        <div className="container">
+          <div className="menu-left">
             <h3>DANH MỤC SẢN PHẨM</h3>
             <ul>
-              {categories.map(cate => (
+              {categories.map((cate) => (
                 <li key={cate._id}>{cate.name}</li>
               ))}
             </ul>
           </div>
-        </aside>
-
-        <main className="product-content">
-          <div className="product-banner">
-            <img src="/images/323.webp" alt="Banner chính" />
+          <div className="content-right">
+            <div className="top-banner">
+              <img src="/assets/home/banner.jpg" alt="Banner" />
+            </div>
           </div>
+        </div>
+        <div className="bottom-images">
+          {[1, 2, 3, 4].map((i) => (
+            <img key={i} src="/images/323.webp" alt={`Ảnh ${i}`} />
+          ))}
+        </div>
+      </section>
 
-          <div className="home-bottom-images">
-            <img src="/images/323.webp" alt="Ảnh 1" />
-            <img src="/images/323.webp" alt="Ảnh 2" />
-            <img src="/images/323.webp" alt="Ảnh 3" />
-            <img src="/images/323.webp" alt="Ảnh 4" />
+      <section className="hot-products">
+        <h2>Sản phẩm hot</h2>
+        <div className="product-list">
+          {featuredProducts.map(renderProductItem)}
+        </div>
+      </section>
+
+      <section className="hot-products">
+        <h2>Sản phẩm khuyến mãi</h2>
+        <div className="product-list">
+          {featuredProducts.map(renderProductItem)}
+        </div>
+      </section>
+
+      <section id="qc-gh">
+        <h2>PC Workstation - 3D Render</h2>
+        <div className="workstation-section">
+          <div className="left-banner">
+            <img src="/images/221213.jpg" alt="3D Render PC Workstation" />
           </div>
-
-          <section className="home__section">
-            <h2>Sản phẩm nổi bật</h2>
-            <div className="home__grid">
-              {featuredProducts.map(renderProductCard)}
+          <div className="right-products">
+            <div className="filter-buttons">
+              <button>Từ 10 đến 20 Triệu</button>
+              <button>Trên 20 Triệu</button>
             </div>
-          </section>
-
-          <section className="home__section">
-            <h2>Workstation PC</h2>
-            <div className="home__grid">
-              {workstationProducts.map(renderProductCard)}
+            <div className="product-grid">
+              {workstationProducts.map((p) => (
+                <div key={p._id} className="product-card">
+                  <img src={p.img_url || '/images/no-image.png'} alt={p.name} />
+                  <h4>{p.name}</h4>
+                  <div className="price">{p.price.toLocaleString()}đ</div>
+                  <div className="old-price">{(p.price * 1.2).toLocaleString()}đ</div>
+                  <div className="discount">-20%</div>
+                  <button>Thêm vào giỏ</button>
+                </div>
+              ))}
             </div>
-          </section>
-
-          <section className="home__section">
-            <h2>Gaming Gear</h2>
-            <div className="home__grid">
-              {gamingGearProducts.map(renderProductCard)}
+            <div className="load-more">
+              <button>Xem thêm</button>
             </div>
-          </section>
-        </main>
-      </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="gaming-gear-section">
+        <h2>GAMING GEAR</h2>
+        <div className="gear-list">
+          {gamingGearProducts.map((p) => (
+            <div key={p._id} className="gear-item">
+              <img src={p.img_url || '/images/no-image.png'} alt={p.name} />
+              <div className="gear-info">
+                <p className="gear-name">{p.name}</p>
+                <div className="gear-price">
+                  <span className="new-price">{p.price.toLocaleString()}đ</span>
+                  <span className="old-price">{(p.price * 1.1).toLocaleString()}đ</span>
+                  <span className="discount">-10%</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 };
