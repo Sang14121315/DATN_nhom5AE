@@ -32,7 +32,6 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose }) => {
       </div>
       <div className="cart-footer">
         <p>Tổng tiền: {totalPrice.toLocaleString()} đ</p>
-        <Link to="/cart" className="checkout-btn">Chi Tiết</Link>
         <Link to="/checkout" className="checkout-btn">Đặt hàng</Link>
       </div>
     </div>
