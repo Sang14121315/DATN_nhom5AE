@@ -6,11 +6,43 @@ body {
 }
 
 .container {
+  max-width: 1700px;
+  margin: 0 auto;
+  padding: 0 40px;
   display: flex;
   gap: 20px;
 }
 
+section {
+  margin-bottom: 60px; 
+}
 /* =========== SIDEBAR =========== */
+
+.top-menu {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 10px 20px;
+  background-color: #f7f7f7;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.3s;
+
+    &:hover {
+      color: #2196f3;
+      cursor: pointer;
+    }
+  }
+}
 .menu-left {
   width: 250px;
   background-color: #f0f0f0;
@@ -51,10 +83,11 @@ body {
 }
 
 .bottom-images {
+  max-width: 1700px;
+  margin: 0 auto;
+  padding: 0 40px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 10px;
+  gap: 20px;
 
   img {
     width: calc(25% - 10px);
@@ -63,11 +96,15 @@ body {
   }
 }
 
+
+
 /* =========== SẢN PHẨM HOT =========== */
 .hot-products {
   padding: 30px;
-  max-width: 1200px;
+  max-width: 1700px;
   margin: auto;
+  background-color: #d32f2f; // nền đỏ đậm (có thể chỉnh lại mã màu nếu muốn)
+  color: white; // chữ trắng cho dễ nhìn trên nền đỏ
 
   h2 {
     font-size: 24px;
@@ -77,17 +114,18 @@ body {
   .product-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 16px;
-    justify-content: space-between;
+    gap: 20px;
+    justify-content: flex-start; // <-- Để đảm bảo 4 sản phẩm / hàng
   }
 
   .product-item {
-    background: #999;
-    color: white;
-    width: calc(25% - 12px);
+    background: #ffffff;
+    color: rgb(6, 6, 6);
+    width: calc(25% - 15px); // 4 items + gap = 100%
     border-radius: 6px;
     padding: 10px;
     font-size: 13px;
+    box-sizing: border-box;
 
     img {
       width: 100%;
@@ -143,30 +181,119 @@ body {
   }
 }
 
+/* =========== SẢN PHẨM HOT =========== */
+.km-products {
+  padding: 30px;
+  max-width: 1700px;
+  margin: auto;
+  
+  h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+
+  .product-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: flex-start; // <-- Để đảm bảo 4 sản phẩm / hàng
+  }
+
+  .product-item {
+    background: #999;
+    color: white;
+    width: calc(25% - 15px); // 4 items + gap = 100%
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 13px;
+    box-sizing: border-box;
+
+    img {
+      width: 100%;
+      border-radius: 4px;
+    }
+
+    .product-brand {
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
+    .product-name {
+      margin: 5px 0;
+    }
+
+    .price {
+      color: red;
+      font-weight: bold;
+    }
+
+    .old-price {
+      text-decoration: line-through;
+      font-size: 12px;
+      color: #eee;
+    }
+
+    .discount {
+      background-color: red;
+      color: white;
+      padding: 2px 4px;
+      font-size: 11px;
+      border-radius: 4px;
+      margin-left: 5px;
+    }
+
+    .add-to-cart {
+      margin-top: 8px;
+      background-color: #2f2fff;
+      color: white;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      &::before {
+        content: "🛒";
+      }
+    }
+  }
+}
 /* =========== WORKSTATION PC =========== */
 #qc-gh {
-  padding: 30px;
+  padding: 30px 0;
+
+  .wrapper {
+    max-width: 1700px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
 
   h2 {
-    font-size: 22px;
+    font-size: 30px;
     margin-bottom: 20px;
   }
 
   .workstation-section {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-  }
+  max-width: 1700px;
+  margin: 0 auto;
+  padding: 0 40px;
+  display: flex;
+  gap: 20px;
+}
 
   .left-banner {
-    width: 250px;
-    flex-shrink: 0;
+  width: 350px; // tăng từ 300px lên
+  flex-shrink: 0;
 
-    img {
-      width: 100%;
-      border-radius: 6px;
-    }
+  img {
+    width: 100%;
+    border-radius: 6px;
+    object-fit: cover; // đảm bảo ảnh không bị méo khi mở rộng
   }
+}
 
   .right-products {
     flex: 1;
@@ -221,7 +348,7 @@ body {
       .discount {
         background: red;
         color: #fff;
-        font-size: 12px;
+        font-size: 14px;
         padding: 2px 6px;
         border-radius: 4px;
         display: inline-block;
@@ -259,11 +386,12 @@ body {
   }
 }
 
+
 /* =========== GAMING GEAR =========== */
 .gaming-gear-section {
   background: #ddd;
   padding: 30px 20px;
-  max-width: 1300px;
+  max-width: 1700px;
   margin: auto;
 
   h2 {
@@ -283,7 +411,7 @@ body {
     background: #999;
     padding: 10px;
     border-radius: 6px;
-    width: calc(30% - 10px);
+    width: calc(25% - 15px);
     box-sizing: border-box;
     color: white;
 
@@ -300,7 +428,7 @@ body {
       justify-content: space-between;
 
       .gear-name {
-        font-size: 13px;
+        font-size: 18px;
         margin-bottom: 8px;
       }
 
