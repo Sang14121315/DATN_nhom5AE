@@ -5,6 +5,7 @@
 
   // import user 
   import AuthLayout from "@/layouts/auth.layout";
+  import AboutPage from "@/pages/user/about";
   import ProductlistPage from "@/pages/user/productList";
   import ProductdetailPage from "@/pages/user/productDetail";
   import HomePage from "@/pages/user/home";
@@ -25,6 +26,7 @@
         <Route path="/" element={<AuthLayout />}>
           <Route index element={<HomePage />} />
           <Route path="home" element={<HomePage />} />
+          <Route path="about" element={<AboutPage />} />
           <Route path="productlist" element={<ProductlistPage />} />
           <Route path="productdetail" element={<ProductdetailPage />} />
           <Route path="login" element={<LoginPage />} />

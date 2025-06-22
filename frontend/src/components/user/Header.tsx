@@ -49,10 +49,18 @@ const Header: React.FC = () => {
           <div className="main-nav-wrapper">
             {/* Menu trái */}
             <div className="nav-menu">
-              <Link to="/" className="nav-item">Trang chủ</Link>
-              <Link to="/productlist" className="nav-item">Sản phẩm</Link>
-              <Link to="/contact" className="nav-item">Liên hệ</Link>
-              <Link to="/introduce" className="nav-item">Giới thiệu</Link>
+              <Link to="/" className="nav-item">
+                Trang chủ
+              </Link>
+              <Link to="/productlist" className="nav-item">
+                Sản phẩm
+              </Link>
+              <Link to="/contact" className="nav-item">
+                Liên hệ
+              </Link>
+              <Link to="/about" className="nav-item">
+                Giới thiệu
+              </Link>
             </div>
 
             {/* Thông tin phải */}
