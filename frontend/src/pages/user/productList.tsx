@@ -21,7 +21,10 @@ const ProductListPage: React.FC = () => {
   const navigate = useNavigate();
   const itemsPerPage = 12;
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedProducts = products.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedProducts = products.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
   const totalPages = Math.ceil(products.length / itemsPerPage);
   const { addToCart } = useCart();
 
@@ -160,6 +163,17 @@ const ProductListPage: React.FC = () => {
               </label>
             ))}
           </div>
+
+          <div className="sidebar-banner">
+            <img
+              src="/public/assets/about_vertical_sale_banner.png"
+              alt="Giảm giá sốc"
+            />
+            <img
+              src="/public/assets/about_vertical_sale2_banner.png"
+              alt="Giảm giá sốc"
+            />
+          </div>
         </aside>
 
         <main className="product-content">
@@ -171,7 +185,8 @@ const ProductListPage: React.FC = () => {
             <h2>
               {selectedCategory === "all"
                 ? "Sản phẩm"
-                : categories.find((c) => c._id === selectedCategory)?.name || "Sản phẩm"}
+                : categories.find((c) => c._id === selectedCategory)?.name ||
+                  "Sản phẩm"}
             </h2>
           </div>
 
@@ -220,7 +235,9 @@ const ProductListPage: React.FC = () => {
                         </div>
                       )}
                     </div>
-                    {product.sale && <div className="discount-percent">-34%</div>}
+                    {product.sale && (
+                      <div className="discount-percent">-34%</div>
+                    )}
                   </div>
 
                   <button

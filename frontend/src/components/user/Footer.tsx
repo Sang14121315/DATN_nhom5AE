@@ -14,7 +14,7 @@ const Footer: React.FC = () => {
             <h4>Về 5AE</h4>
             <p>
               Chuyên bán linh kiện điện tử uy tín, nhanh chóng. Luôn tìm kiếm
-              những sản phẩm vì game thủ.
+              những sản phẩm vì quý khách hàng.
             </p>
             <div className="footer__social">
               <FaFacebookF />
@@ -31,7 +31,7 @@ const Footer: React.FC = () => {
               <MdLocationOn /> Quận 12, QL1A, Tân Thới Hiệp, TP.HCM
             </p>
             <p>
-              <MdEmail /> anhbayco@gmail.com
+              <MdEmail /> 5anhem@gmail.com
             </p>
           </div>
 
