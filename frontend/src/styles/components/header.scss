@@ -2,6 +2,7 @@
 
 // Container layout
 .container {
+  // display: flex;
   max-width: $max-width;
   margin: 0 auto;
   padding: 0 16px;
@@ -18,12 +19,24 @@
   box-shadow: $box-shadow;
 
   &__search {
+    // display: flex;
+    align-items: center;
+    gap: 0;
     input {
-      width: 80%;
+      width: 70%;
       padding: 8px 12px;
       border-radius: 4px 0 0 4px;
       border: none;
       outline: none;
+    }
+
+    button {
+      padding: 8px 12px;
+      border: none;
+      background: darken($primary-color, 10%);
+      color: white;
+      border-radius: 0 4px 4px 0;
+      cursor: pointer;
     }
   }
 
