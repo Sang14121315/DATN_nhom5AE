@@ -55,3 +55,55 @@
     }
   }
 }
+
+.checkout-btn.no-underline {
+  text-decoration: none;
+}
+
+.cart-item {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+
+  img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+  }
+
+  .item-info {
+    flex: 1;
+
+    p {
+      margin: 4px 0;
+    }
+
+    .quantity-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+
+      button {
+        background: #eee;
+        border: none;
+        padding: 4px 6px;
+        cursor: pointer;
+
+        &:hover {
+          background: #ccc;
+        }
+
+        &.remove-btn {
+          color: red;
+        }
+      }
+
+      span {
+        width: 24px;
+        text-align: center;
+        font-weight: bold;
+      }
+    }
+  }
+}
