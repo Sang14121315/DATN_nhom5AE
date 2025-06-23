@@ -6,7 +6,7 @@ body {
 }
 
 .container {
-  max-width: 1700px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 40px;
   display: flex;
@@ -83,7 +83,7 @@ section {
 }
 
 .bottom-images {
-  max-width: 1700px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 40px;
   display: flex;
@@ -101,7 +101,7 @@ section {
 /* =========== SẢN PHẨM HOT =========== */
 .hot-products {
   padding: 30px;
-  max-width: 1700px;
+  max-width: 1200px;
   margin: auto;
   background-color: #d32f2f; // nền đỏ đậm (có thể chỉnh lại mã màu nếu muốn)
   color: white; // chữ trắng cho dễ nhìn trên nền đỏ
@@ -184,7 +184,7 @@ section {
 /* =========== SẢN PHẨM HOT =========== */
 .km-products {
   padding: 30px;
-  max-width: 1700px;
+  max-width: 1200px;
   margin: auto;
   
   h2 {
@@ -266,7 +266,7 @@ section {
   padding: 30px 0;
 
   .wrapper {
-    max-width: 1700px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 0 40px;
   }
@@ -391,7 +391,7 @@ section {
 .gaming-gear-section {
   background: #ddd;
   padding: 30px 20px;
-  max-width: 1700px;
+  max-width: 1200px;
   margin: auto;
 
   h2 {
@@ -411,7 +411,7 @@ section {
     background: #999;
     padding: 10px;
     border-radius: 6px;
-    width: calc(25% - 15px);
+    width: calc(33% - 15px);
     box-sizing: border-box;
     color: white;
 
