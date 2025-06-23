@@ -1,4 +1,4 @@
-    .cart-sidebar {
+.cart-sidebar {
   position: fixed;
   top: 0;
   right: -400px;
@@ -47,11 +47,32 @@
     text-align: center;
 
     .checkout-btn {
-      background: red;
+      background: linear-gradient(90deg, #e53935, #d32f2f);
       color: white;
       border: none;
-      padding: 0.5rem 1rem;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 16px;
       cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+
+      &:hover {
+        background: linear-gradient(90deg, #d32f2f, #c62828);
+        transform: translateY(-2px);
+      }
+
+      &:active {
+        transform: scale(0.98);
+      }
+
+      &.disabled {
+        background: #ccc;
+        color: #777;
+        cursor: not-allowed;
+        opacity: 0.7;
+        transform: none;
+      }
     }
   }
 }
@@ -106,4 +127,11 @@
       }
     }
   }
+}
+
+button.disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
