@@ -30,8 +30,8 @@ const HomePage: React.FC = () => {
   }, []);
 
   const featuredProducts = products.filter(p => p.hot).slice(0, 4);
-  const workstationProducts = products.filter(p => p.hot).slice(0, 10);
-  const gamingGearProducts = products.filter(p => p.hot).slice(0, 10);
+  const workstationProducts = products.filter(p => p.hot).slice(0, 6);
+  const gamingGearProducts = products.filter(p => p.hot).slice(0, 9);
 
   const renderProductItem = (product: Product) => (
     <div key={product._id} className="product-item">
