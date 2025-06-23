@@ -1,34 +1,63 @@
 .register-layout {
   display: flex;
-  padding: 20px 80px;
+  justify-content: center;
+  gap: 30px;
+  padding: 40px 60px;
+  max-width: 1400px;
+  margin: 0 auto;
   background-color: #fdfdfd;
+
+  .side-banner {
+    width: 180px;
+    img {
+      width: 100%;
+      display: block;
+    }
+  }
 
   .sidebar {
     width: 250px;
-    background: #fff;
-    margin-right: 40px;
+    position: relative;
 
     h4 {
       font-weight: bold;
       margin-bottom: 16px;
-      border-bottom: 1px solid #ccc;
-      padding-bottom: 8px;
+      font-size: 16px;
+      cursor: pointer;
     }
 
-    ul {
-      list-style: none;
-      padding: 0;
+    .dropdown {
+      position: absolute;
+      left: 0;
+      width: 220px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 10px;
+      display: none;
+      z-index: 10;
 
-      li {
-        padding: 6px 0;
-        font-size: 14px;
-        cursor: pointer;
-        color: #333;
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
 
-        &:hover {
-          color: #ff9f0d;
+        li {
+          padding: 8px;
+          font-size: 14px;
+          color: #333;
+          cursor: pointer;
+
+          &:hover {
+            color: #ff9f0d;
+          }
         }
       }
+    }
+
+    &:hover .dropdown {
+      display: block;
     }
   }
 
@@ -56,64 +85,86 @@
       width: 420px;
       max-width: 90%;
       margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
 
-      .auth-tabs {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 20px;
+    .auth-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-bottom: 25px;
+      font-size: 18px;
+      font-weight: 600;
 
-        span {
-          padding: 10px 20px;
-          font-weight: 500;
-          color: #555;
-          cursor: pointer;
+      span {
+        position: relative;
 
-          &.active {
-            color: #000;
-            border-bottom: 2px solid #000;
-          }
-
-          a {
-            text-decoration: none;
-            color: #555;
-
-            &:hover {
-              color: #000;
-            }
-          }
+        a {
+          text-decoration: none;
+          color: #333;
+          transition: color 0.3s ease;
         }
 
-        span + span {
-          margin-left: 16px;
+        &.active a {
+          color: #ff7a00; // Cam nổi bật
+        }
+
+        &:hover a {
+          color: #ff7a00;
+        }
+      }
+    }
+
+
+      input {
+        padding: 10px 12px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+
+        &:focus {
+          outline: none;
+          border-color: #ff9f0d;
         }
       }
 
       .form-group {
-        margin-bottom: 15px;
+        position: relative;
 
-        input {
-          width: 100%;
-          padding: 10px 12px;
-          font-size: 14px;
-          border: 1px solid #ccc;
-          border-radius: 6px;
+        &.password-group {
+          display: flex;
+          align-items: center;
 
-          &:focus {
-            outline: none;
-            border-color: #ff9f0d;
+          input {
+            flex: 1;
+          }
+
+          .toggle-password {
+            position: absolute;
+            right: 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #666;
           }
         }
       }
 
       .recaptcha-note {
-        font-size: 11px;
-        color: #777;
-        margin: 10px 0;
-        line-height: 1.4;
+        font-size: 12px;
+        color: #666;
+        line-height: 1.5;
       }
 
-      .submit-button {
-        width: 100%;
+      .error-message {
+        color: red;
+        font-size: 14px;
+        margin-bottom: 5px;
+      }
+
+      button[type="submit"] {
         background-color: #ff9f0d;
         color: #fff;
         border: none;
@@ -129,43 +180,19 @@
       }
 
       .form-footer {
-        margin-top: 20px;
         font-size: 13px;
+        color: #555;
         text-align: center;
 
         a {
-          color: #007bff;
+          color: #ff9f0d;
           text-decoration: none;
 
           &:hover {
             text-decoration: underline;
           }
         }
-
-        p {
-          margin: 4px 0;
-        }
       }
     }
   }
 }
-.error-message {
-  background-color: #fff3f3;
-  color: #d93025;
-  padding: 10px 14px;
-  border-radius: 6px;
-  font-size: 14px;
-  margin-bottom: 15px;
-  border-left: 4px solid #d93025;
-}
-
-.success-message {
-  background-color: #e6f7e6;
-  color: #0f9d58;
-  padding: 10px 14px;
-  border-radius: 6px;
-  font-size: 14px;
-  margin-bottom: 15px;
-  border-left: 4px solid #0f9d58;
-}
-

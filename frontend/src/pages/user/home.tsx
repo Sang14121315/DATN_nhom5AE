@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import '@/styles/pages/user/home.scss';
 
@@ -5,10 +6,22 @@ import { Category, fetchAllCategories } from '../../api/user/categoryAPI';
 import { ProductType, fetchAllProductTypes } from '../../api/user/productTypeAPI';
 import { Product, fetchAllProducts } from '../../api/user/productAPI';
 
+'use client';
+
+import React, { useEffect, useState } from "react";
+import { FaCartPlus } from "react-icons/fa";
+import { useCart } from "@/context/CartContext";
+import { Category, fetchAllCategories } from "@/api/user/categoryAPI";
+import { ProductType, fetchAllProductTypes } from "@/api/user/productTypeAPI";
+import { Product, fetchAllProducts } from "@/api/user/productAPI";
+import "@/styles/pages/user/home.scss";
+
+
 const HomePage: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [productTypes, setProductTypes] = useState<ProductType[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const { addToCart } = useCart();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -22,7 +35,7 @@ const HomePage: React.FC = () => {
         setProductTypes(types);
         setProducts(prods);
       } catch (error) {
-        console.error('Lỗi khi tải dữ liệu:', error);
+        console.error("Lỗi khi tải dữ liệu:", error);
       }
     };
 
@@ -30,8 +43,12 @@ const HomePage: React.FC = () => {
   }, []);
 
   const featuredProducts = products.filter(p => p.hot).slice(0, 4);
+
   const workstationProducts = products.filter(p => p.hot).slice(0, 6);
   const gamingGearProducts = products.filter(p => p.hot).slice(0, 9);
+
+  const workstationProducts = products.filter(p => p.hot).slice(0, 10);
+  const gamingGearProducts = products.filter(p => p.hot).slice(0, 10);
 
   const renderProductItem = (product: Product) => (
     <div key={product._id} className="product-item">
@@ -43,7 +60,7 @@ const HomePage: React.FC = () => {
         <span className="discount">-20%</span>
       </div>
       <div className="old-price">{(product.price * 1.2).toLocaleString()}đ</div>
-      <button className="add-to-cart">Thêm vào giỏ</button>
+      <button className="add-to-cart" onClick={() => addToCart({ ...product, quantity: 1 })}>Thêm vào giỏ</button>
     </div>
   );
 
@@ -61,38 +78,21 @@ const HomePage: React.FC = () => {
           </div>
           <div className="content-right">
             <div className="top-menu">
-  <div className="menu-item">
-    <span>🛡️</span>
-    <span>Chất lượng đảm bảo</span>
-  </div>
-  <div className="menu-item">
-    <span>🚛</span>
-    <span>Vận chuyển siêu nhanh</span>
-  </div>
-  <div className="menu-item">
-    <span>📞</span>
-    <span>Tư vấn PC</span>
-  </div>
-  <div className="menu-item">
-    <span>✉️</span>
-    <span>Liên hệ</span>
-  </div>
-</div>
+              <div className="menu-item"><span>🛡️</span> Chất lượng đảm bảo</div>
+              <div className="menu-item"><span>🚛</span> Vận chuyển siêu nhanh</div>
+              <div className="menu-item"><span>📞</span> Tư vấn PC</div>
+              <div className="menu-item"><span>✉️</span> Liên hệ</div>
+            </div>
             <div className="top-banner">
               <img src="/img/anh2.jpg" alt="Banner" />
             </div>
           </div>
         </div>
         <div className="bottom-images">
-  {[
-    "anh2.jpg",
-    "banner 1.webp",
-    "slide_1_img.webp",
-    "slide_3_img.jpg",
-  ].map((filename, i) => (
-    <img key={i} src={`/img/${filename}`} alt={`Ảnh ${i + 1}`} />
-  ))}
-</div>
+          {["anh2.jpg", "banner 1.webp", "slide_1_img.webp", "slide_3_img.jpg"].map((file, i) => (
+            <img key={i} src={`/img/${file}`} alt={`Ảnh ${i + 1}`} />
+          ))}
+        </div>
       </section>
 
       <section className="hot-products">
@@ -108,6 +108,7 @@ const HomePage: React.FC = () => {
           {featuredProducts.map(renderProductItem)}
         </div>
       </section>
+
 
      <section id="qc-gh">
   <div className="wrapper">
@@ -226,17 +227,32 @@ const HomePage: React.FC = () => {
               <div className="old-price">{(p.price * 1.2).toLocaleString()}đ</div>
               <div className="discount">-20%</div>
               <button>Thêm vào giỏ</button>
-            </div>
-          ))}
-        </div>
-        <div className="load-more">
-          <button>Xem thêm</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
+      {["PC Workstation - 3D Render", "Linh Kiện Nâng Cấp", "Linh kiện máy tính", "PC Gaming Hiệu Năng Cao"].map((title, index) => (
+        <section id="qc-gh" key={index}>
+          <div className="wrapper">
+            <h2>{title}</h2>
+            <div className="workstation-section">
+              <div className="left-banner">
+                <img src={`/img/p${index + 1}.webp`} alt={title} />
+              </div>
+              <div className="right-products">
+                <div className="filter-buttons">
+                  <button>Từ 10 đến 20 Triệu</button>
+                  <button>Trên 20 Triệu</button>
+                </div>
+                <div className="product-grid">
+                  {workstationProducts.map(renderProductItem)}
+                </div>
+                <div className="load-more">
+                  <button>Xem thêm</button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+      ))}
 
       <section className="gaming-gear-section">
         <h2>GAMING GEAR</h2>
@@ -251,6 +267,9 @@ const HomePage: React.FC = () => {
                   <span className="old-price">{(p.price * 1.1).toLocaleString()}đ</span>
                   <span className="discount">-10%</span>
                 </div>
+                <button onClick={() => addToCart({ ...p, quantity: 1 })}>
+                  <FaCartPlus /> Thêm vào giỏ
+                </button>
               </div>
             </div>
           ))}

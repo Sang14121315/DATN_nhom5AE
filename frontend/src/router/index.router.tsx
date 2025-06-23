@@ -9,9 +9,9 @@
   import ProductlistPage from "@/pages/user/productList";
   import ProductdetailPage from "@/pages/user/productDetail";
   import HomePage from "@/pages/user/home";
-  import LoginPage from "@/pages/user/login";
-  import RegisterPage from "@/pages/user/register";
-  import ForgotPasswordPage from "@/pages/user/forgotPassword";
+  import LoginPage from "@/pages/user/LoginPage";
+  import RegisterPage from "@/pages/user/RegisterPage";
+  import ForgotPasswordPage from "@/pages/user/ForgotPasswordPage";
   import CartPage from "@/pages/user/CartPage";
   import CheckoutPage from "@/pages/user/CheckoutPage";
 
