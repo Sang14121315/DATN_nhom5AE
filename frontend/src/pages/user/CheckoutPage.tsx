@@ -4,6 +4,7 @@ import { useCart } from "@/context/CartContext";
 import { useOrders } from "@/context/OrderContext";
 import { getProvinces, getDistrictsByProvinceCode, getWardsByDistrictCode } from "vn-provinces";
 import "@/styles/pages/user/checkoutPage.scss";
+import { useNavigate } from "react-router-dom";
 
 const CheckoutPage: React.FC = () => {
   const { cartItems } = useCart();
@@ -30,6 +31,7 @@ const CheckoutPage: React.FC = () => {
     ward: false,
     address: false,
   });
+  const navigate = useNavigate();
 
   const [provinces, setProvinces] = useState<any[]>([]);
   const [districts, setDistricts] = useState<any[]>([]);
@@ -183,7 +185,7 @@ const CheckoutPage: React.FC = () => {
           <textarea placeholder="Ghi chú"></textarea>
 
           <div className="action-buttons">
-            <button className="continue-btn" onClick={() => window.location.href = "/"}>Tiếp tục mua hàng</button>
+            <button className="continue-btn" onClick={() => navigate("/")}>Tiếp tục mua hàng</button>
             <button className="confirm-btn" onClick={handleSubmit}>Xác nhận & Đặt hàng</button>
           </div>
         </div>
