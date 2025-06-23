@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import '@/styles/pages/user/home.scss';
 
@@ -28,14 +27,6 @@ const HomePage: React.FC = () => {
     };
 
     fetchData();
-
-const HomePage: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const { addToCart } = useCart();
-
-  useEffect(() => {
-    fetchAllProducts().then(setProducts).catch(console.error);
-
   }, []);
 
   const featuredProducts = products.filter(p => p.hot).slice(0, 4);
@@ -57,7 +48,6 @@ const HomePage: React.FC = () => {
   );
 
   return (
-
     <div>
       <section id="banner">
         <div className="container">
@@ -145,21 +135,6 @@ const HomePage: React.FC = () => {
         </div>
         <div className="load-more">
           <button>Xem thêm</button>
-
-    <div className="homepage">
-      <div className="main-banner">
-        <aside className="sidebar">
-          <h3>DANH MỤC SẢN PHẨM</h3>
-          <ul>
-            {categories.map((cat, idx) => (
-              <li key={idx}>{cat}</li>
-            ))}
-          </ul>
-        </aside>
-
-        <div className="banner-images">
-          <img src="../../../assets/home/banner.jpg" alt="Main Banner" />
-
         </div>
       </div>
     </div>
@@ -211,7 +186,6 @@ const HomePage: React.FC = () => {
           <button>Trên 20 Triệu</button>
         </div>
         <div className="product-grid">
-
           {workstationProducts.map((p) => (
             <div key={p._id} className="product-card">
               <img src={p.img_url || '/images/no-image.png'} alt={p.name} />
@@ -221,10 +195,6 @@ const HomePage: React.FC = () => {
               <div className="discount">-20%</div>
               <button>Thêm vào giỏ</button>
             </div>
-
-          {products.filter(p => p.hot).map((product) => (
-            <ProductCard key={product._id} product={product} addToCart={addToCart} />
-
           ))}
         </div>
         <div className="load-more">
@@ -234,7 +204,6 @@ const HomePage: React.FC = () => {
     </div>
   </div>
 </section>
-
 
  <section id="qc-gh">
   <div className="wrapper">
@@ -288,31 +257,6 @@ const HomePage: React.FC = () => {
         </div>
       </section>
     </div>
-
-interface ProductCardProps {
-  product: Product;
-  addToCart: (item: Product & { quantity: number }) => void;
-}
-
-const ProductCard: React.FC<ProductCardProps> = ({ product, addToCart }) => {
-  const formatCurrency = (amount: number): string =>
-    new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
-
-  return (
-    <div className="product-card upgraded">
-      <img src={product.img_url} alt={product.name} />
-      <div className="product-info">
-        <div className="brand">
-          {typeof product.brand_id === "object" ? product.brand_id.name : product.brand_id}
-        </div>
-        <div className="name">{product.name}</div>
-        <div className="price">{formatCurrency(product.price)}</div>
-      </div>
-      <button className="add-cart" onClick={() => addToCart({ ...product, quantity: 1 })}>
-        <FaCartPlus /> THÊM VÀO GIỎ
-      </button>
-    </div>
-
   );
 };
 
