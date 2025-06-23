@@ -1,11 +1,5 @@
-'use client';
-
-
-
-
 import React, { useEffect, useState } from 'react';
 import '@/styles/pages/user/home.scss';
-
 
 import { Category, fetchAllCategories } from '../../api/user/categoryAPI';
 import { ProductType, fetchAllProductTypes } from '../../api/user/productTypeAPI';
@@ -13,7 +7,7 @@ import { Product, fetchAllProducts } from '../../api/user/productAPI';
 
 const HomePage: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [productTypes, setProductTypes] = useState<ProductType[]>([]); /* này là chạy theo dnah mục*/
+  const [productTypes, setProductTypes] = useState<ProductType[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
@@ -35,17 +29,9 @@ const HomePage: React.FC = () => {
     fetchData();
   }, []);
 
-  const featuredProducts = products.filter(p => p.hot).slice(0, 4);;
-  const workstationProducts = products.filter(p => p.hot).slice(0, 10);;/*này chỉ hiện thôi chứ chưa hiện theo dnah mục*/
-  const gamingGearProducts = products.filter(p => p.hot).slice(0, 10);;
-  // const workstationProducts = products.filter(p => {
-  //   const type = productTypes.find(t => t._id === p.product_type_id);
-  //   return type?.name.toLowerCase().includes('workstation');
-  // });
-  // const gamingGearProducts = products.filter(p => {
-  //   const type = productTypes.find(t => t._id === p.product_type_id);
-  //   return type?.name.toLowerCase().includes('gaming');
-  // });
+  const featuredProducts = products.filter(p => p.hot).slice(0, 4);
+  const workstationProducts = products.filter(p => p.hot).slice(0, 10);
+  const gamingGearProducts = products.filter(p => p.hot).slice(0, 10);
 
   const renderProductItem = (product: Product) => (
     <div key={product._id} className="product-item">
