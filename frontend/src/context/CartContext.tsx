@@ -11,7 +11,10 @@ interface CartItem {
 interface CartContextType {
   cartItems: CartItem[];
   totalPrice: number;
-  totalQuantity: number; // ✅ THÊM
+  totalQuantity: number;
+  isSidebarOpen: boolean;                  // ✅ trạng thái mở/đóng giỏ hàng
+  openCart: () => void;                    // ✅ mở
+  closeCart: () => void;                   // ✅ đóng
   addToCart: (item: CartItem) => void;
   removeFromCart: (id: string) => void;
   increaseQuantity: (id: string) => void;
@@ -22,9 +25,10 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // ✅ sidebar state
 
   const totalPrice = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
-  const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0); // ✅ TÍNH SỐ LƯỢNG
+  const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const addToCart = (item: CartItem) => {
     setCartItems(prev => {
@@ -60,12 +64,18 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
   };
 
+  const openCart = () => setIsSidebarOpen(true);  // ✅ mở
+  const closeCart = () => setIsSidebarOpen(false); // ✅ đóng
+
   return (
     <CartContext.Provider
       value={{
         cartItems,
         totalPrice,
-        totalQuantity, // ✅ TRUYỀN VÀO CONTEXT
+        totalQuantity,
+        isSidebarOpen,
+        openCart,
+        closeCart,
         addToCart,
         removeFromCart,
         increaseQuantity,

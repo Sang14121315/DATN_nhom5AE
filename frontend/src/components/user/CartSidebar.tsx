@@ -2,7 +2,7 @@ import React from 'react';
 import { FaTimes, FaPlus, FaMinus, FaTrash } from 'react-icons/fa';
 import { useCart } from '@/context/CartContext';
 import '@/styles/components/user/cartSidebar.scss';
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 interface CartSidebarProps {
   isOpen: boolean;
@@ -17,6 +17,15 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose }) => {
     decreaseQuantity,
     removeFromCart,
   } = useCart();
+
+  const navigate = useNavigate();
+
+  const handleCheckout = () => {
+    onClose(); // ✅ Đóng sidebar từ prop truyền vào
+    setTimeout(() => {
+      navigate("/checkout"); // ✅ Chuyển trang sau 200ms
+    }, 200);
+  };
 
   return (
     <div className={`cart-sidebar ${isOpen ? 'open' : ''}`}>
@@ -45,7 +54,7 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose }) => {
 
       <div className="cart-footer">
         <p>Tổng tiền: {totalPrice.toLocaleString()} đ</p>
-        <Link to="/checkout" className="checkout-btn no-underline">Đặt hàng</Link>
+        <button onClick={handleCheckout}>Đặt hàng</button>
       </div>
     </div>
   );
