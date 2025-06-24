@@ -1,16 +1,9 @@
 
-'use client';
-=======
 import React, { useState, useEffect } from "react";
 import { FaCartPlus } from "react-icons/fa";
 import { useCart } from "@/context/CartContext";
 import { Product, fetchAllProducts } from "@/api/user/productAPI";
 import "@/styles/pages/user/home.scss";
-
-
-
-
-
 
 import React, { useEffect, useState } from 'react';
 import '@/styles/pages/user/home.scss';
