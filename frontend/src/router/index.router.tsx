@@ -14,7 +14,7 @@
   import ForgotPasswordPage from "@/pages/user/ForgotPasswordPage";
   import CartPage from "@/pages/user/CartPage";
   import CheckoutPage from "@/pages/user/CheckoutPage";
-
+  import SearchResultPage from "@/pages/user/searchResult";
   const MainRouter = () => {
     return (
       <Routes>
@@ -26,6 +26,7 @@
         <Route path="/" element={<AuthLayout />}>
           <Route index element={<HomePage />} />
           <Route path="home" element={<HomePage />} />
+          <Route path="search" element={<SearchResultPage />} />
           <Route path="about" element={<AboutPage />} />
           <Route path="productlist" element={<ProductlistPage />} />
           <Route path="productdetail" element={<ProductdetailPage />} />
