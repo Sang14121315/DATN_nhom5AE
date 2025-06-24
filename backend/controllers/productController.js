@@ -92,13 +92,19 @@ exports.searchProducts = async (req, res) => {
     if (minPrice) filters.price.$gte = Number(minPrice);
     if (maxPrice) filters.price.$lte = Number(maxPrice);
 
+    console.log("Filters:", filters);
+
     let queryObj = ProductService.getAll(filters);
+
     if (sort === 'price_asc') queryObj = queryObj.sort({ price: 1 });
     else if (sort === 'price_desc') queryObj = queryObj.sort({ price: -1 });
 
     const products = await queryObj;
+    console.log("Found:", products.length, "products");
+
     res.json(products);
   } catch (error) {
+    console.error("Search error:", error);
     res.status(500).json({ message: error.message || 'Error searching products' });
   }
 };

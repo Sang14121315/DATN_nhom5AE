@@ -30,6 +30,8 @@ router.post('/forgot-password', userController.forgotPassword);
 router.post('/reset-password', userController.resetPassword);
 
 // Products
+router.get("/products/search", productController.searchProducts);
+
 router.get('/products', productController.getProducts);
 router.post('/products', auth, upload.single('image'), productController.createProduct);
 router.get('/products/:id', productController.getProductById);
