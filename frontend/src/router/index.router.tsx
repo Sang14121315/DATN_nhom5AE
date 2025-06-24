@@ -14,7 +14,12 @@
   import ForgotPasswordPage from "@/pages/user/ForgotPasswordPage";
   import CartPage from "@/pages/user/CartPage";
   import CheckoutPage from "@/pages/user/CheckoutPage";
+
   import SearchResultPage from "@/pages/user/searchResult";
+
+  import OrderTrackingPage from "@/pages/user/OrderTrackingPage";
+
+
   const MainRouter = () => {
     return (
       <Routes>
@@ -36,6 +41,8 @@
           <Route path="forgot-password" element={<ForgotPasswordPage />} />
           <Route path="cart" element={<CartPage />} />
           <Route path="checkout" element={<CheckoutPage />} />
+          <Route path="orders" element={<OrderTrackingPage />} />
+          
         </Route>
       </Routes>
     );

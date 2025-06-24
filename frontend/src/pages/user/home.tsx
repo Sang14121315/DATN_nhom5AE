@@ -47,12 +47,15 @@ const HomePage: React.FC = () => {
         <span className="discount">-20%</span>
       </div>
       <div className="old-price">{(product.price * 1.2).toLocaleString()}đ</div>
-      <button className="add-to-cart" onClick={() => addToCart({ ...product, quantity: 1 })}>Thêm vào giỏ</button>
+      <button className="add-to-cart" onClick={() => addToCart({ ...product, quantity: 1 })}>
+        Thêm vào giỏ
+      </button>
     </div>
   );
 
   return (
     <div>
+      {/* Banner */}
       <section id="banner">
         <div className="container">
           <div className="menu-left">
@@ -82,6 +85,7 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
+      {/* Sản phẩm hot */}
       <section className="hot-products">
         <h2>Sản phẩm hot</h2>
         <div className="product-list">
@@ -89,6 +93,7 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
+      {/* Khuyến mãi */}
       <section className="km-products">
         <h2>Sản phẩm khuyến mãi</h2>
         <div className="product-list">
@@ -96,31 +101,103 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {["PC Workstation - 3D Render", "Linh Kiện Nâng Cấp", "Linh kiện máy tính", "PC Gaming Hiệu Năng Cao"].map((title, index) => (
-        <section id="qc-gh" key={index}>
-          <div className="wrapper">
-            <h2>{title}</h2>
-            <div className="workstation-section">
-              <div className="left-banner">
-                <img src={`/img/p${index + 1}.webp`} alt={title} />
+      {/* PC Workstation - 3D Render */}
+      <section id="qc-gh">
+        <div className="wrapper">
+          <h2>PC Workstation - 3D Render</h2>
+          <div className="workstation-section">
+            <div className="left-banner">
+              <img src="/img/bannerphu.jpg" alt="3D Render PC Workstation" />
+            </div>
+            <div className="right-products">
+              <div className="filter-buttons">
+                <button>Từ 10 đến 20 Triệu</button>
+                <button>Trên 20 Triệu</button>
               </div>
-              <div className="right-products">
-                <div className="filter-buttons">
-                  <button>Từ 10 đến 20 Triệu</button>
-                  <button>Trên 20 Triệu</button>
-                </div>
-                <div className="product-grid">
-                  {workstationProducts.map(renderProductItem)}
-                </div>
-                <div className="load-more">
-                  <button>Xem thêm</button>
-                </div>
+              <div className="product-grid">
+                {workstationProducts.map(renderProductItem)}
+              </div>
+              <div className="load-more">
+                <button>Xem thêm</button>
               </div>
             </div>
           </div>
-        </section>
-      ))}
+        </div>
+      </section>
 
+      {/* Linh Kiện Nâng Cấp */}
+      <section id="qc-gh">
+        <div className="wrapper">
+          <h2>Linh Kiện Nâng Cấp</h2>
+          <div className="workstation-section">
+            <div className="left-banner">
+              <img src="/img/p2.webp" alt="Linh Kiện Nâng Cấp" />
+            </div>
+            <div className="right-products">
+              <div className="filter-buttons">
+                <button>Từ 10 đến 20 Triệu</button>
+                <button>Trên 20 Triệu</button>
+              </div>
+              <div className="product-grid">
+                {workstationProducts.map(renderProductItem)}
+              </div>
+              <div className="load-more">
+                <button>Xem thêm</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Linh kiện máy tính */}
+      <section id="qc-gh">
+        <div className="wrapper">
+          <h2>Linh kiện máy tính</h2>
+          <div className="workstation-section">
+            <div className="left-banner">
+              <img src="/img/p3.webp" alt="Linh kiện máy tính" />
+            </div>
+            <div className="right-products">
+              <div className="filter-buttons">
+                <button>Từ 10 đến 20 Triệu</button>
+                <button>Trên 20 Triệu</button>
+              </div>
+              <div className="product-grid">
+                {workstationProducts.map(renderProductItem)}
+              </div>
+              <div className="load-more">
+                <button>Xem thêm</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* PC Gaming */}
+      <section id="qc-gh">
+        <div className="wrapper">
+          <h2>PC Gaming Hiệu Năng Cao</h2>
+          <div className="workstation-section">
+            <div className="left-banner">
+              <img src="/img/p4.jpg" alt="PC Gaming Hiệu Năng Cao" />
+            </div>
+            <div className="right-products">
+              <div className="filter-buttons">
+                <button>Từ 10 đến 20 Triệu</button>
+                <button>Trên 20 Triệu</button>
+              </div>
+              <div className="product-grid">
+                {workstationProducts.map(renderProductItem)}
+              </div>
+              <div className="load-more">
+                <button>Xem thêm</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Gaming gear */}
       <section className="gaming-gear-section">
         <h2>GAMING GEAR</h2>
         <div className="gear-list">
