@@ -44,7 +44,7 @@
           <Route path="cart" element={<CartPage />} />
           <Route path="checkout" element={<CheckoutPage />} />
           <Route path="orders" element={<OrderTrackingPage />} />
-          <Route path="ContactPage" element={<ContactPage />} />
+          <Route path="contact" element={<ContactPage />} />
           
         </Route>
       </Routes>
