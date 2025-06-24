@@ -19,6 +19,9 @@
 
   import OrderTrackingPage from "@/pages/user/OrderTrackingPage";
 
+  import ContactPage
+   from "@/pages/user/ContactPage";
+
 
   const MainRouter = () => {
     return (
@@ -42,7 +45,7 @@
           <Route path="cart" element={<CartPage />} />
           <Route path="checkout" element={<CheckoutPage />} />
           <Route path="orders" element={<OrderTrackingPage />} />
-          
+          <Route path="contact" element={<ContactPage />} />
         </Route>
       </Routes>
     );
