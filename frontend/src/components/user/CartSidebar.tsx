@@ -1,8 +1,8 @@
 import React from 'react';
-import { FaTimes } from 'react-icons/fa';
+import { FaTimes, FaPlus, FaMinus, FaTrash } from 'react-icons/fa';
 import { useCart } from '@/context/CartContext';
 import '@/styles/components/user/cartSidebar.scss';
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 interface CartSidebarProps {
   isOpen: boolean;
@@ -10,7 +10,27 @@ interface CartSidebarProps {
 }
 
 const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose }) => {
-  const { cartItems, totalPrice } = useCart();
+  const {
+    cartItems,
+    totalPrice,
+    increaseQuantity,
+    decreaseQuantity,
+    removeFromCart,
+  } = useCart();
+
+  const navigate = useNavigate();
+
+  const handleCheckout = () => {
+    if (cartItems.length === 0) {
+      alert("❗Bạn chưa có sản phẩm nào trong giỏ hàng!");
+      return;
+    }
+
+    onClose(); // ✅ Đóng sidebar
+    setTimeout(() => {
+      navigate("/checkout"); // ✅ Chuyển trang sau khi đóng sidebar
+    }, 200);
+  };
 
   return (
     <div className={`cart-sidebar ${isOpen ? 'open' : ''}`}>
@@ -18,21 +38,38 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose }) => {
         <h3>GIỎ HÀNG CỦA TÔI ({cartItems.length})</h3>
         <button onClick={onClose}><FaTimes /></button>
       </div>
+
       <div className="cart-content">
-        {cartItems.map(item => (
-          <div className="cart-item" key={item._id}>
-            <img src={item.img_url} alt={item.name} />
-            <div>
-              <p>{item.name}</p>
-              <p>{item.price.toLocaleString()} đ</p>
-              <p>Số lượng: {item.quantity}</p>
+        {cartItems.length === 0 ? (
+          <p className="empty-cart">🛒 Chưa có sản phẩm nào trong giỏ hàng.</p>
+        ) : (
+          cartItems.map(item => (
+            <div className="cart-item" key={item._id}>
+              <img src={item.img_url} alt={item.name} />
+              <div className="item-info">
+                <p>{item.name}</p>
+                <p>{item.price.toLocaleString()} đ</p>
+                <div className="quantity-controls">
+                  <button onClick={() => decreaseQuantity(item._id)}><FaMinus /></button>
+                  <span>{item.quantity}</span>
+                  <button onClick={() => increaseQuantity(item._id)}><FaPlus /></button>
+                  <button onClick={() => removeFromCart(item._id)} className="remove-btn"><FaTrash /></button>
+                </div>
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
+
       <div className="cart-footer">
         <p>Tổng tiền: {totalPrice.toLocaleString()} đ</p>
-        <Link to="/checkout" className="checkout-btn">Đặt hàng</Link>
+       <button 
+  onClick={handleCheckout} 
+  disabled={cartItems.length === 0}
+  className={`checkout-btn ${cartItems.length === 0 ? 'disabled' : ''}`}
+>
+  Đặt hàng
+</button>
       </div>
     </div>
   );
