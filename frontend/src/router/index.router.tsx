@@ -1,4 +1,4 @@
-  import { Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
   import AdminLayout from "@/layouts/admin.layout";
   import DashboardPage from "@/pages/admin/Dashboard";
 
@@ -19,7 +19,8 @@
 
   import OrderTrackingPage from "@/pages/user/OrderTrackingPage";
 
-  import ContactPage from "@/pages/user/ContactPage";
+  import ContactPage
+   from "@/pages/user/ContactPage";
 
 
   const MainRouter = () => {
@@ -44,8 +45,7 @@
           <Route path="cart" element={<CartPage />} />
           <Route path="checkout" element={<CheckoutPage />} />
           <Route path="orders" element={<OrderTrackingPage />} />
-          <Route path="ContactPage" element={<ContactPage />} />
-          
+          <Route path="contact" element={<ContactPage />} />
         </Route>
       </Routes>
     );
