@@ -66,3 +66,9 @@ export const fetchProductDetail = async (slug: string): Promise<Product> => {
   const response = await axios.get(`http://localhost:5000/api/products/${slug}`);
   return response.data;
 };
+
+export const searchProducts = async (keyword: string): Promise<Product[]> => {
+  const res = await fetch(`/api/products/search?query=${encodeURIComponent(keyword)}`);
+  if (!res.ok) throw new Error("Không thể tìm kiếm sản phẩm");
+  return res.json();
+};

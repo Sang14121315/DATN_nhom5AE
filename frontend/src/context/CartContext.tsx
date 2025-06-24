@@ -1,7 +1,6 @@
-import React, { createContext, useContext, useReducer, ReactNode } from "react";
+import React, { createContext, useContext, useState } from 'react';
 
-// Kiểu dữ liệu sản phẩm trong giỏ hàng
-export interface CartItem {
+interface CartItem {
   _id: string;
   name: string;
   price: number;
@@ -9,67 +8,64 @@ export interface CartItem {
   quantity: number;
 }
 
-// Kiểu dữ liệu context
 interface CartContextType {
   cartItems: CartItem[];
   totalPrice: number;
   totalQuantity: number;
+  isSidebarOpen: boolean;                  // ✅ trạng thái mở/đóng giỏ hàng
+  openCart: () => void;                    // ✅ mở
+  closeCart: () => void;                   // ✅ đóng
   addToCart: (item: CartItem) => void;
   removeFromCart: (id: string) => void;
-  clearCart: () => void;
+  increaseQuantity: (id: string) => void;
+  decreaseQuantity: (id: string) => void;
 }
 
-// Context mặc định
-const CartContext = createContext<CartContextType | null>(null);
+const CartContext = createContext<CartContextType | undefined>(undefined);
 
-// Reducer xử lý hành động
-type CartAction =
-  | { type: "ADD_TO_CART"; payload: CartItem }
-  | { type: "REMOVE_FROM_CART"; payload: string }
-  | { type: "CLEAR_CART" };
+export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // ✅ sidebar state
 
-const cartReducer = (state: CartItem[], action: CartAction): CartItem[] => {
-  switch (action.type) {
-    case "ADD_TO_CART": {
-      const existingItem = state.find(item => item._id === action.payload._id);
-      if (existingItem) {
-        return state.map(item =>
-          item._id === action.payload._id
-            ? { ...item, quantity: item.quantity + action.payload.quantity }
-            : item
-        );
-      }
-      return [...state, action.payload];
-    }
-    case "REMOVE_FROM_CART":
-      return state.filter(item => item._id !== action.payload);
-    case "CLEAR_CART":
-      return [];
-    default:
-      return state;
-  }
-};
-
-// Provider component
-export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [cartItems, dispatch] = useReducer(cartReducer, []);
-
-  // Tính tổng số lượng và tổng tiền
-  const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const totalPrice = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
   const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-  // Các hàm xử lý
   const addToCart = (item: CartItem) => {
-    dispatch({ type: "ADD_TO_CART", payload: item });
+    setCartItems(prev => {
+      const existing = prev.find(p => p._id === item._id);
+      if (existing) {
+        return prev.map(p =>
+          p._id === item._id ? { ...p, quantity: p.quantity + item.quantity } : p
+        );
+      }
+      return [...prev, { ...item, quantity: item.quantity || 1 }];
+    });
   };
 
   const removeFromCart = (id: string) => {
-    dispatch({ type: "REMOVE_FROM_CART", payload: id });
+    setCartItems(prev => prev.filter(item => item._id !== id));
   };
 
-  const clearCart = () => {
-    dispatch({ type: "CLEAR_CART" });
+  const increaseQuantity = (id: string) => {
+    setCartItems(prev =>
+      prev.map(item =>
+        item._id === id ? { ...item, quantity: item.quantity + 1 } : item
+      )
+    );
   };
+
+  const decreaseQuantity = (id: string) => {
+    setCartItems(prev =>
+      prev.map(item =>
+        item._id === id
+          ? { ...item, quantity: item.quantity > 1 ? item.quantity - 1 : 1 }
+          : item
+      )
+    );
+  };
+
+  const openCart = () => setIsSidebarOpen(true);  // ✅ mở
+  const closeCart = () => setIsSidebarOpen(false); // ✅ đóng
 
   return (
     <CartContext.Provider
@@ -77,9 +73,13 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         cartItems,
         totalPrice,
         totalQuantity,
+        isSidebarOpen,
+        openCart,
+        closeCart,
         addToCart,
         removeFromCart,
-        clearCart,
+        increaseQuantity,
+        decreaseQuantity,
       }}
     >
       {children}
@@ -87,9 +87,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// Hook để dùng trong component
 export const useCart = () => {
   const context = useContext(CartContext);
-  if (!context) throw new Error("useCart must be used within a CartProvider");
+  if (!context) throw new Error('useCart must be used within a CartProvider');
   return context;
 };
