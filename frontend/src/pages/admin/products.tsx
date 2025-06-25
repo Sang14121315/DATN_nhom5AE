@@ -39,10 +39,38 @@ const ProductsPage: React.FC = () => {
       setLoading(false);
     }
   };
+// useEffect(() => {
+//   fetchData();
+// }, [currentPage, search, sortBy, order]);
+ useEffect(() => {
+  // Dữ liệu mẫu hiển thị trước khi có API
+  const sampleData: Product[] = [
+    {
+      _id: '1',
+      slug: 'cpu-intel-i5',
+      name: 'CPU Intel Core i5-10400F - TRAY NEW',
+      description: 'Mô tả ngắn gọn',
+      price: 1980000,
+      stock: 10,
+      img_url: '',
+      category_id: { _id: 'cat1', name: 'CPU' },
+      brand_id: { _id: 'brand1', name: 'Intel' },
+      product_type_id: { _id: 'type1', name: 'Intel CPU' },
+      sale: false,
+      view: 123,
+      hot: false,
+      coupons_id: '',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }
+    
+  ];
 
-  useEffect(() => {
-    fetchData();
-  }, [currentPage, search, sortBy, order]);
+  setProducts(sampleData);
+  setTotal(sampleData.length);
+  setTotalPages(1);
+  setLoading(false);
+}, []);
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
@@ -65,8 +93,11 @@ const ProductsPage: React.FC = () => {
       <h1>Sản phẩm</h1>
 
       <div className="filters">
+         <button onClick={() => setSortBy('price')}> Danh mục</button>
+         <button onClick={() => setSortBy('price')}> Loại</button>
+          <button onClick={() => setSortBy('price')}>Thương hiệu</button>
         <button onClick={() => setSortBy('price')}>⬍ Giá</button>
-        <button onClick={() => setSortBy('view')}>👁️ Lượt xem</button>
+        
         <input
           type="text"
           placeholder="Tìm kiếm..."

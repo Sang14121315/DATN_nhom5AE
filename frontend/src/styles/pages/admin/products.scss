@@ -1,34 +1,36 @@
-body {
-      font-family: Arial, sans-serif;
-      margin: 40px;
-      background: #f9f9fb;
-    }
+.products-page {
+  padding: 20px;
 
-    h1 {
-      font-size: 24px;
-      color: #333;
-      margin-bottom: 16px;
-    }
+  h1 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+  }
 
-    .filters {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-    }
+  .filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
 
-    .filters button,
-    .filters input {
+    button,
+    input {
       padding: 8px 12px;
       border: 1px solid #ccc;
-      background-color: white;
       border-radius: 6px;
+      background-color: white;
+      font-size: 14px;
       cursor: pointer;
+      transition: all 0.2s ease;
     }
 
-    .filters input {
+    button:hover {
+      background-color: #f0f0f0;
+    }
+
+    input {
       flex: 1;
-      max-width: 250px;
+      max-width: 240px;
     }
 
     .add-button {
@@ -37,90 +39,135 @@ body {
       border: 1px solid #00a693;
       font-weight: bold;
     }
+  }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background-color: white;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+    thead {
+      background-color: #f5f5f5;
+
+      th {
+        padding: 12px 8px;
+        text-align: left;
+        border-bottom: 2px solid #ddd;
+        font-weight: 600;
+        font-size: 14px;
+        color: #333;
+      }
     }
 
-    th, td {
-      text-align: left;
-      padding: 12px;
-      border-bottom: 1px solid #eee;
-    }
+    tbody {
+      tr {
+        border-bottom: 1px solid #eee;
 
-    th {
-      background-color: #f2f2f2;
+        &:hover {
+          background-color: #fafafa;
+        }
+
+        td {
+          padding: 10px 8px;
+          font-size: 14px;
+          color: #444;
+        }
+      }
     }
 
     .product-cell {
       display: flex;
       align-items: center;
       gap: 10px;
-    }
 
-    .product-cell .image-placeholder {
-      width: 40px;
-      height: 40px;
-      background-color: #ddd;
-      border-radius: 4px;
+      .image-placeholder {
+        width: 40px;
+        height: 40px;
+        background-color: #ddd;
+        border-radius: 4px;
+        overflow: hidden;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
     }
 
     .status {
       padding: 4px 8px;
-      border-radius: 8px;
+      border-radius: 12px;
       font-size: 13px;
+      font-weight: 600;
       display: inline-block;
+      text-align: center;
+      min-width: 80px;
     }
 
     .approved {
       background-color: #e0f7f3;
       color: #00a693;
     }
+  }
 
-    .view-btn {
-      background-color: #fff0f0;
-      color: #cc0000;
-      border: 1px solid #cc0000;
-      padding: 4px 10px;
-      border-radius: 20px;
+  .view-btn {
+    background-color: #fff0f0;
+    color: #cc0000;
+    border: 1px solid #cc0000;
+    padding: 4px 10px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #ffeaea;
+    }
+  }
+
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #555;
+
+    .pages {
       display: flex;
-      align-items: center;
       gap: 6px;
-      font-size: 14px;
-      cursor: pointer;
-    }
 
-    .pagination {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 16px;
-      font-size: 14px;
-      color: #555;
-    }
+      button {
+        padding: 6px 12px;
+        border: 1px solid #ccc;
+        background-color: white;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
 
-    .pagination .pages {
-      display: flex;
-      gap: 6px;
-    }
+      button.active {
+        background-color: #00a693;
+        color: white;
+        font-weight: bold;
+        border-color: #00a693;
+      }
 
-    .pages button {
-      padding: 6px 12px;
-      border: 1px solid #ccc;
-      background-color: white;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+      button:hover {
+        background-color: #00a69320;
+      }
 
-    .pages button.active {
-      background-color: #00a693;
-      color: white;
-      font-weight: bold;
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
     }
-
-    .pages button:hover {
-      background-color: #00a69320;
-    }
+  }
+}
