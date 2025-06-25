@@ -1,0 +1,126 @@
+body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background: #f9f9fb;
+    }
+
+    h1 {
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 16px;
+    }
+
+    .filters {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .filters button,
+    .filters input {
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      background-color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .filters input {
+      flex: 1;
+      max-width: 250px;
+    }
+
+    .add-button {
+      background-color: #e0f7f3;
+      color: #00a693;
+      border: 1px solid #00a693;
+      font-weight: bold;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    th, td {
+      text-align: left;
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    .product-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .product-cell .image-placeholder {
+      width: 40px;
+      height: 40px;
+      background-color: #ddd;
+      border-radius: 4px;
+    }
+
+    .status {
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-size: 13px;
+      display: inline-block;
+    }
+
+    .approved {
+      background-color: #e0f7f3;
+      color: #00a693;
+    }
+
+    .view-btn {
+      background-color: #fff0f0;
+      color: #cc0000;
+      border: 1px solid #cc0000;
+      padding: 4px 10px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 16px;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .pagination .pages {
+      display: flex;
+      gap: 6px;
+    }
+
+    .pages button {
+      padding: 6px 12px;
+      border: 1px solid #ccc;
+      background-color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .pages button.active {
+      background-color: #00a693;
+      color: white;
+      font-weight: bold;
+    }
+
+    .pages button:hover {
+      background-color: #00a69320;
+    }

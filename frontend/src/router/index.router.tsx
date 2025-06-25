@@ -1,6 +1,7 @@
   import { Routes, Route } from "react-router-dom";
   import AdminLayout from "@/layouts/admin.layout";
   import DashboardPage from "@/pages/admin/Dashboard";
+  import ProductsPage from "@/pages/admin/products";
 
 
   // import user 
@@ -28,6 +29,8 @@
         {/* Admin layout */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route path="dashboard" element={<DashboardPage />} />
+           <Route path="products" element={<ProductsPage />} />
+           
         </Route>
         {/* User layout */}
         <Route path="/" element={<AuthLayout />}>
