@@ -1,6 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import '@/styles/pages/user/home.scss';
+
+
+import React, { useState, useEffect } from "react";
+import { FaCartPlus } from "react-icons/fa";
+import { useCart } from "@/context/CartContext";
+import { Product, fetchAllProducts } from "@/api/user/productAPI";
+import "@/styles/pages/user/home.scss";
 
 import { fetchHomeData, HomeDataResponse } from '../../api/user/homeAPI';
 import { Category } from '../../api/user/categoryAPI';

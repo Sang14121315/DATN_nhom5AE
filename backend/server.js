@@ -42,6 +42,11 @@ io.on('connection', (socket) => {
     console.log(`User ${userId} joined`);
   });
 
+  socket.on('join-admin', () => {
+    socket.join('admin');
+    console.log('Admin joined');
+  });
+
   socket.on('send-message', (message) => {
     io.to(message.receiver_id).emit('new-message', message);
   });
