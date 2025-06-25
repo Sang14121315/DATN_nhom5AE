@@ -1,13 +1,17 @@
-import React, { useState } from "react";
+// CheckoutPage.tsx
+import React, { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
+import { useOrders } from "@/context/OrderContext";
+import { getProvinces, getDistrictsByProvinceCode, getWardsByDistrictCode } from "vn-provinces";
 import "@/styles/pages/user/checkoutPage.scss";
+import { useNavigate } from "react-router-dom";
 
 const CheckoutPage: React.FC = () => {
   const { cartItems } = useCart();
+  const { addOrder } = useOrders();
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const [showSuccess, setShowSuccess] = useState(false);
   const [showError, setShowError] = useState(false);
-
 
   const [formData, setFormData] = useState({
     name: "",
@@ -27,6 +31,27 @@ const CheckoutPage: React.FC = () => {
     ward: false,
     address: false,
   });
+  const navigate = useNavigate();
+
+  const [provinces, setProvinces] = useState<any[]>([]);
+  const [districts, setDistricts] = useState<any[]>([]);
+  const [wards, setWards] = useState<any[]>([]);
+
+  useEffect(() => {
+    setProvinces(getProvinces());
+  }, []);
+
+  useEffect(() => {
+    const selectedProvince = provinces.find(p => p.name === formData.city);
+    setDistricts(selectedProvince ? getDistrictsByProvinceCode(selectedProvince.code) : []);
+    setFormData(prev => ({ ...prev, district: "", ward: "" }));
+  }, [formData.city]);
+
+  useEffect(() => {
+    const selectedDistrict = districts.find(d => d.name === formData.district);
+    setWards(selectedDistrict ? getWardsByDistrictCode(selectedDistrict.code) : []);
+    setFormData(prev => ({ ...prev, ward: "" }));
+  }, [formData.district]);
 
   const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
@@ -35,8 +60,6 @@ const CheckoutPage: React.FC = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
     setFormErrors((prev) => ({ ...prev, [name]: false }));
   };
-
-  
 
   const validateForm = () => {
     const errors = {
@@ -47,113 +70,81 @@ const CheckoutPage: React.FC = () => {
       ward: !formData.ward,
       address: !formData.address.trim(),
     };
-
     setFormErrors(errors);
     return !Object.values(errors).some(Boolean);
   };
 
   const handleSubmit = () => {
-  if (validateForm()) {
-    setShowSuccess(true);
-    setShowError(false); // ẩn lỗi nếu từng có
-  } else {
-    setShowError(true);
-    setShowSuccess(false); // ẩn thành công nếu từng có
-  }
-};
-
+    if (validateForm()) {
+      const newOrder = {
+        id: `DH${Date.now()}`,
+        date: new Date().toLocaleDateString("vi-VN"),
+        status: "Đã xác nhận",
+        total,
+        items: cartItems,
+      };
+      addOrder(newOrder);
+      setShowSuccess(true);
+      setShowError(false);
+    } else {
+      setShowError(true);
+      setShowSuccess(false);
+    }
+  };
 
   return (
     <div className="checkout-page">
       <h2>🧾 Thanh toán</h2>
-
       <div className="checkout-grid">
-        {/* Thông tin khách hàng */}
         <div className="checkout-section customer-info">
           <h3>Thông tin khách hàng</h3>
           <form>
-            <input
-              type="text"
-              name="name"
-              placeholder="Họ và tên *"
-              value={formData.name}
-              onChange={handleChange}
-            />
+            <input name="name" placeholder="Họ và tên *" value={formData.name} onChange={handleChange} />
             {formErrors.name && <p className="error">Phải nhập họ và tên</p>}
 
-            <input
-              type="tel"
-              name="phone"
-              placeholder="Điện thoại *"
-              value={formData.phone}
-              onChange={handleChange}
-            />
+            <input name="phone" placeholder="Điện thoại *" value={formData.phone} onChange={handleChange} />
             {formErrors.phone && <p className="error">Phải nhập số điện thoại</p>}
 
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={formData.email}
-              onChange={handleChange}
-            />
+            <input name="email" placeholder="Email" value={formData.email} onChange={handleChange} />
 
             <select name="city" value={formData.city} onChange={handleChange}>
               <option value="">Tỉnh / Thành phố *</option>
-              <option value="TP.HCM">TP.HCM</option>
-              <option value="Hà Nội">Hà Nội</option>
-              <option value="Đà Nẵng">Đà Nẵng</option>
+              {provinces.map((pv) => (
+                <option key={pv.code} value={pv.name}>{pv.name}</option>
+              ))}
             </select>
             {formErrors.city && <p className="error">Phải chọn tỉnh / thành phố</p>}
 
-            <select name="district" value={formData.district} onChange={handleChange}>
+            <select name="district" value={formData.district} onChange={handleChange} disabled={!formData.city}>
               <option value="">Quận / Huyện *</option>
-              <option value="Quận 1">Quận 1</option>
-              <option value="Quận 2">Quận 2</option>
+              {districts.map((dt) => (
+                <option key={dt.code} value={dt.name}>{dt.name}</option>
+              ))}
             </select>
             {formErrors.district && <p className="error">Phải chọn quận / huyện</p>}
 
-            <select name="ward" value={formData.ward} onChange={handleChange}>
+            <select name="ward" value={formData.ward} onChange={handleChange} disabled={!formData.district}>
               <option value="">Phường / Xã *</option>
-              <option value="Phường A">Phường A</option>
-              <option value="Phường B">Phường B</option>
+              {wards.map((wd) => (
+                <option key={wd.code} value={wd.name}>{wd.name}</option>
+              ))}
             </select>
             {formErrors.ward && <p className="error">Phải chọn phường / xã</p>}
 
-            <input
-              type="text"
-              name="address"
-              placeholder="Địa chỉ *"
-              value={formData.address}
-              onChange={handleChange}
-            />
+            <input name="address" placeholder="Địa chỉ *" value={formData.address} onChange={handleChange} />
             {formErrors.address && <p className="error">Phải nhập địa chỉ</p>}
           </form>
         </div>
 
-        {/* Hình thức thanh toán */}
         <div className="checkout-section payment-methods">
           <h3>Hình thức thanh toán</h3>
-
           <label className={`payment-option ${paymentMethod === "cod" ? "selected" : ""}`}>
-            <input
-              type="radio"
-              name="payment"
-              value="cod"
-              checked={paymentMethod === "cod"}
-              onChange={() => setPaymentMethod("cod")}
-            />
+            <input type="radio" name="payment" value="cod" checked={paymentMethod === "cod"} onChange={() => setPaymentMethod("cod")} />
             <span>💵 Thanh toán khi nhận hàng / Chuyển phát nhanh - COD</span>
           </label>
 
           <label className={`payment-option ${paymentMethod === "bank" ? "selected" : ""}`}>
-            <input
-              type="radio"
-              name="payment"
-              value="bank"
-              checked={paymentMethod === "bank"}
-              onChange={() => setPaymentMethod("bank")}
-            />
+            <input type="radio" name="payment" value="bank" checked={paymentMethod === "bank"} onChange={() => setPaymentMethod("bank")} />
             <span>🏦 Chuyển khoản qua ngân hàng</span>
           </label>
 
@@ -169,7 +160,6 @@ const CheckoutPage: React.FC = () => {
           )}
         </div>
 
-        {/* Thông tin đơn hàng */}
         <div className="checkout-section order-summary">
           <h3>Thông tin đơn hàng</h3>
           {cartItems.map((item) => (
@@ -195,13 +185,12 @@ const CheckoutPage: React.FC = () => {
           <textarea placeholder="Ghi chú"></textarea>
 
           <div className="action-buttons">
-           <button className="continue-btn" onClick={() => window.location.href = "/"}>Tiếp tục mua hàng</button>
+            <button className="continue-btn" onClick={() => navigate("/")}>Tiếp tục mua hàng</button>
             <button className="confirm-btn" onClick={handleSubmit}>Xác nhận & Đặt hàng</button>
           </div>
         </div>
       </div>
 
-      {/* Thông báo đặt hàng thành công */}
       {showSuccess && (
         <div className="order-success-popup">
           <div className="popup-content">
@@ -209,23 +198,21 @@ const CheckoutPage: React.FC = () => {
             <p>Cảm ơn bạn đã mua hàng.</p>
             <button onClick={() => window.location.href = "/"}>Xem Thêm </button>
             <button onClick={() => window.location.href = "/orders"}>Theo dõi đơn hàng</button>
-            
             <span className="close-btn" onClick={() => setShowSuccess(false)}>×</span>
           </div>
         </div>
       )}
 
       {showError && (
-  <div className="order-success-popup">
-    <div className="popup-content">
-      <h3 style={{ color: "#dc3545" }}>❌ Đặt hàng thất bại</h3>
-      <p>Vui lòng kiểm tra lại thông tin bạn đã nhập.</p>
-      <button onClick={() => setShowError(false)}>Thử lại</button>
-      <span className="close-btn" onClick={() => setShowError(false)}>×</span>
-    </div>
-  </div>
-)}
-
+        <div className="order-success-popup">
+          <div className="popup-content">
+            <h3 style={{ color: "#dc3545" }}>❌ Đặt hàng thất bại</h3>
+            <p>Vui lòng kiểm tra lại thông tin bạn đã nhập.</p>
+            <button onClick={() => setShowError(false)}>Thử lại</button>
+            <span className="close-btn" onClick={() => setShowError(false)}>×</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

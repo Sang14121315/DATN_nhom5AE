@@ -38,6 +38,8 @@ router.delete('/cart', auth, cartController.removeItem);
 router.delete('/cart/clear', auth, cartController.clearCart);
 
 // Products
+router.get("/products/search", productController.searchProducts);
+
 router.get('/products', productController.getProducts);
 router.post('/products', auth, upload.single('image'), productController.createProduct);
 router.get('/products/:id', productController.getProductById);
