@@ -1,15 +1,10 @@
-
-
 import React, { useState, useEffect } from "react";
-import { FaCartPlus } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
 import { Product, fetchAllProducts } from "@/api/user/productAPI";
-import "@/styles/pages/user/home.scss";
-
 import { fetchHomeData, HomeDataResponse } from '../../api/user/homeAPI';
 import { Category } from '../../api/user/categoryAPI';
-import { Product } from '../../api/user/productAPI';
-import { useCart } from '@/context/CartContext';
+import "@/styles/pages/user/home.scss";
 
 const HomePage: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -62,16 +57,16 @@ const HomePage: React.FC = () => {
         <div className="container">
           <div className="menu-left">
             <h3>DANH MỤC SẢN PHẨM</h3>
-                <ul>
-                {categories.map((cate) => (
-                  <li
-                    key={cate._id}
-                    onClick={() => navigate(`/product-list?category=${cate._id}`)}
-                  >
-                    {cate.name}
-                  </li>
-                ))}
-              </ul>
+            <ul>
+              {categories.map((cate) => (
+                <li
+                  key={cate._id}
+                  onClick={() => navigate(`/product-list?category=${cate._id}`)}
+                >
+                  {cate.name}
+                </li>
+              ))}
+            </ul>
           </div>
           <div className="content-right">
             <div className="top-menu">
