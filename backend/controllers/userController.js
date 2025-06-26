@@ -92,8 +92,7 @@ exports.getUsers = async (req, res) => {
     if (name) filters.name = new RegExp(name, 'i');
     if (email) filters.email = new RegExp(email, 'i');
     if (role) filters.role = role;
-
-    const users = await UserService.getAll(filters);
+const users = await UserService.getAll(filters);
     res.json(users);
   } catch (error) {
     res.status(500).json({ message: error.message || 'Error fetching users' });
