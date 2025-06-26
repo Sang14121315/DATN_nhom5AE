@@ -89,7 +89,11 @@ class UserService {
       html: `
         <p>Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản tại cửa hàng laptop.</p>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         <p>Vui lòng nhấn vào liên kết dưới đây để đặt lại mật khẩu:</p>
+=======
+<p>Vui lòng nhấn vào liên kết dưới đây để đặt lại mật khẩu:</p>
+>>>>>>> Stashed changes
 =======
 <p>Vui lòng nhấn vào liên kết dưới đây để đặt lại mật khẩu:</p>
 >>>>>>> Stashed changes

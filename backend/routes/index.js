@@ -29,6 +29,7 @@ router.post('/register', userController.register);
 router.post('/login', userController.login);
 router.post('/forgot-password', userController.forgotPassword);
 router.post('/reset-password', userController.resetPassword);
+<<<<<<< Updated upstream
 
 // Cart
 router.post('/cart', auth, cartController.addItem);
@@ -36,6 +37,8 @@ router.get('/cart', auth, cartController.getCart);
 router.put('/cart', auth, cartController.updateItem);
 router.delete('/cart', auth, cartController.removeItem);
 router.delete('/cart/clear', auth, cartController.clearCart);
+=======
+>>>>>>> Stashed changes
 
 // Products
 router.get("/products/search", productController.searchProducts);
@@ -47,11 +50,14 @@ router.put('/products/:id', auth, upload.single('image'), productController.upda
 router.delete('/products/:id', auth, productController.deleteProduct);
 
 // Product Types
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 <<<<<<< Updated upstream
 router.get('/product-types/:id', productTypeController.getProductTypeById);
 router.get('/product-types', productTypeController.getProductTypes);
 =======
+=======
+>>>>>>> Stashed changes
 router.get('/product-types', auth, productTypeController.getProductTypes);
 router.get('/product-types/:id', auth, productTypeController.getProductTypeById);
 >>>>>>> Stashed changes
@@ -71,11 +77,14 @@ router.put('/categories/:id', auth, categoryController.updateCategory);
 router.delete('/categories/:id', auth, categoryController.deleteCategory);
 
 // Brands
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 <<<<<<< Updated upstream
 router.get('/brands/:id',  brandController.getBrandById);
 router.get('/brands', brandController.getBrands);
 =======
+=======
+>>>>>>> Stashed changes
 router.get('/brands', auth, brandController.getBrands);
 router.get('/brands/:id', auth, brandController.getBrandById);
 >>>>>>> Stashed changes
