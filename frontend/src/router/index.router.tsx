@@ -46,10 +46,6 @@ import { Routes, Route } from "react-router-dom";
           <Route path="checkout" element={<CheckoutPage />} />
           <Route path="orders" element={<OrderTrackingPage />} />
           <Route path="contact" element={<ContactPage />} />
-<<<<<<< HEAD
-          
-=======
->>>>>>> heads/origin/Tien
         </Route>
       </Routes>
     );
