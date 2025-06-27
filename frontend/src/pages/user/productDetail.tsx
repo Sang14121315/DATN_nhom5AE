@@ -12,7 +12,7 @@ import {
   Product,
   fetchFilteredProducts,
   fetchProductById,
-} from "../../api/user/productAPI";
+} from "@/api/user/productAPI";
 import "@/styles/pages/user/productDetail.scss";
 import { useCart } from "@/context/CartContext";
 const ProductDetail: React.FC = () => {
