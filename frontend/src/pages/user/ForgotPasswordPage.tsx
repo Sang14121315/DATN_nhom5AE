@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import '@/styles/pages/user/forgotPassword.scss';
+import { Eye, EyeOff } from 'lucide-react';
+import { forgotPassword } from '@/api/user/userAPI';
+
+
 
 const ForgotPasswordPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -18,24 +22,27 @@ const ForgotPasswordPage: React.FC = () => {
     return regex.test(email);
   };
 
-  const handleSendCode = async () => {
-    if (!validateEmail(email)) {
-      setMessage('❌ Vui lòng nhập địa chỉ email hợp lệ.');
-      return;
-    }
+const handleSendCode = async () => {
+  if (!validateEmail(email)) {
+    setMessage('❌ Vui lòng nhập địa chỉ email hợp lệ.');
+    return;
+  }
 
-    try {
-      setSending(true);
-      setMessage(null);
-      await new Promise((resolve) => setTimeout(resolve, 1500)); // Giả lập gửi email
-      setMessage('✅ Mã xác thực đã được gửi đến email của bạn.');
-      setShowOtpInput(true);
-    } catch (error) {
-      setMessage('❌ Đã xảy ra lỗi khi gửi mã. Vui lòng thử lại.');
-    } finally {
-      setSending(false);
-    }
-  };
+  try {
+    setSending(true);
+    setMessage(null);
+
+    const res = await forgotPassword(email);  // <-- Gọi API thực
+    setMessage('✅ ' + res.message);
+    setShowOtpInput(true);
+
+  } catch (error: any) {
+    setMessage('❌ ' + (error.response?.data?.message || 'Gửi mã thất bại.'));
+  } finally {
+    setSending(false);
+  }
+};
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,29 +63,13 @@ const ForgotPasswordPage: React.FC = () => {
 
   return (
     <div className="register-layout">
-      {/* Banner trái */}
-      <div className="side-banner">
-        <img src="/assets/banner-left.png" alt="Banner trái" />
-      </div>
-
-      {/* Sidebar */}
-      <div className="sidebar">
-        <h4>📋 DANH MỤC SẢN PHẨM</h4>
-        <div className="dropdown">
-          <ul>
-            <li>PC Gaming - Máy tính chơi game</li>
-            <li>PC Workstation</li>
-            <li>Tự Build Cấu Hình PC</li>
-            <li>PC VĂN PHÒNG</li>
-            <li>PC AMD GAMING</li>
-            <li>PC Core Ultra</li>
-            <li>PC GAMING ĐẸP – CAO CẤP</li>
-            <li>PC GIẢ LẬP - ẢO HÓA</li>
-            <li>PC MINI</li>
-            <li>PC Refurbished</li>
-          </ul>
+      {/* Banner trái - Link tới sản phẩm 684b0b700a18dcee50370f35 */}
+      <Link to="/product/684b0b700a18dcee50370f35" className="side-banner-link">
+        <div className="side-banner">
+          <img src="/assets/banner-left.png" alt="Banner trái" />
         </div>
-      </div>
+      </Link>
+
 
       {/* Nội dung chính */}
       <div className="main-auth-content">
@@ -137,9 +128,11 @@ const ForgotPasswordPage: React.FC = () => {
                   type="button"
                   className="toggle-password"
                   onClick={() => setShowNewPassword(!showNewPassword)}
+                  aria-label="Toggle new password visibility"
                 >
-                  {showNewPassword ? 'ẩn' : 'hiện'}
+                  {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
+
               </div>
 
               <div className="form-group password-group">
@@ -150,13 +143,15 @@ const ForgotPasswordPage: React.FC = () => {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                 />
-                <button
-                  type="button"
-                  className="toggle-password"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                >
-                  {showConfirmPassword ? 'ẩn' : 'hiện'}
-                </button>
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                aria-label="Toggle confirm password visibility"
+              >
+                {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+
               </div>
             </>
           )}
@@ -174,10 +169,12 @@ const ForgotPasswordPage: React.FC = () => {
         </form>
       </div>
 
-      {/* Banner phải */}
-      <div className="side-banner">
-        <img src="/assets/banner-right.png" alt="Banner phải" />
-      </div>
+      {/* Banner phải - Link tới sản phẩm 684b0b700a18dcee50370f3f */}
+      <Link to="/product/684b0b700a18dcee50370f3f" className="side-banner-link">
+        <div className="side-banner">
+          <img src="/assets/banner-right.png" alt="Banner phải" />
+        </div>
+      </Link>
     </div>
   );
 };
