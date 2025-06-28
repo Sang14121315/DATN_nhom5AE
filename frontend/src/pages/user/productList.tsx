@@ -4,9 +4,9 @@ import { FaShoppingCart } from "react-icons/fa";
 import "@/styles/pages/user/productList.scss";
 
 import { useCart } from "@/context/CartContext";
-import { Product, fetchFilteredProducts } from "../../api/user/productAPI";
-import { Brand, fetchAllBrands } from "../../api/user/brandAPI";
-import { Category, fetchAllCategories } from "../../api/user/categoryAPI";
+import { Product, fetchFilteredProducts } from "@/api/user/productAPI";
+import { Brand, fetchAllBrands } from "@/api/user/brandAPI";
+import { Category, fetchAllCategories } from "@/api/user/categoryAPI";
 
 const ProductListPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);

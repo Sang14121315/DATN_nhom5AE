@@ -20,9 +20,9 @@ const SidebarMenu: React.FC = () => {
   const menuItems = [
     { icon: <FaHome />, label: "Dashboard", path: "/admin/dashboard" },
     { icon: <FaBox />, label: "Sản phẩm", path: "/admin/products" },
-    { icon: <FaThList />, label: "Danh mục", path: "/admin/categories" },
+    { icon: <FaThList />, label: "Danh mục", path: "/admin/category" },
     { icon: <FaListAlt />, label: "Loại sản phẩm", path: "/admin/product-types" },
-    { icon: <FaTags />, label: "Thương hiệu", path: "/admin/brands" },
+    { icon: <FaTags />, label: "Thương hiệu", path: "/admin/brand" },
     { icon: <FaShoppingCart />, label: "Đơn hàng", path: "/admin/orders" },
     { icon: <FaTicketAlt />, label: "Mã giảm giá", path: "/admin/discounts" },
     { icon: <FaUser />, label: "Người dùng", path: "/admin/users" },
