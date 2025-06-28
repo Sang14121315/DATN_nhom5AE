@@ -5,12 +5,19 @@ const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
 const path = require('path');
 const { Server } = require('socket.io');
+const cookieParser = require('cookie-parser');
 
 dotenv.config();
 connectDB();
 
-const app = express();
-app.use(cors());
+const app = express(); // ✅ app phải được khai báo trước
+
+// Middlewares
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
+app.use(cookieParser()); // ✅ sau khi app đã khai báo
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'Uploads')));
 
@@ -27,15 +34,15 @@ const server = app.listen(PORT, () =>
   console.log(`🚀 Server running at: http://localhost:${PORT}/`)
 );
 
-// Socket.io setup
+// Socket.io
 const io = new Server(server, {
   cors: {
     origin: 'http://localhost:5173',
-    methods: ['GET', 'POST']
+    methods: ['GET', 'POST'],
+    credentials: true
   }
 });
 
-// Handle Socket connections
 io.on('connection', (socket) => {
   socket.on('join', (userId) => {
     socket.join(userId);
@@ -52,5 +59,4 @@ io.on('connection', (socket) => {
   });
 });
 
-// Make io accessible in controllers
 app.set('io', io);

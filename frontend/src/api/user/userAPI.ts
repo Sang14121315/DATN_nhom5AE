@@ -1,11 +1,12 @@
-import axios from 'axios';
+import axios from '../axios'; // đường dẫn tới file axios.ts
+
 
 // Định nghĩa kiểu dữ liệu User
 export interface User {
   _id: string;
   name: string;
   email: string;
-  password?: string; // Không nên gửi mật khẩu từ client trừ khi đăng ký/đăng nhập
+  password?: string;
   phone?: string;
   address?: string;
   role: 'user' | 'admin';
@@ -13,7 +14,6 @@ export interface User {
   updated_at?: string;
 }
 
-// API URL gốc
 const BASE_URL = 'http://localhost:5000/api';
 
 // -------------------------
@@ -26,7 +26,9 @@ export const registerUser = async (userData: {
   phone?: string;
   address?: string;
 }): Promise<User> => {
-  const response = await axios.post(`${BASE_URL}/register`, userData);
+  const response = await axios.post(`${BASE_URL}/register`, userData, {
+    withCredentials: true, // gửi cookie (token)
+  });
   return response.data;
 };
 
@@ -37,7 +39,9 @@ export const loginUser = async (credentials: {
   email: string;
   password: string;
 }): Promise<{ token: string; user: User }> => {
-  const response = await axios.post(`${BASE_URL}/login`, credentials);
+  const response = await axios.post(`${BASE_URL}/login`, credentials, {
+    withCredentials: true, // gửi cookie (token)
+  });
   return response.data;
 };
 
@@ -64,7 +68,9 @@ export const resetPassword = async (token: string, newPassword: string): Promise
 // API: Lấy tất cả người dùng (admin)
 // -------------------------
 export const fetchAllUsers = async (): Promise<User[]> => {
-  const response = await axios.get(`${BASE_URL}/users`);
+  const response = await axios.get(`${BASE_URL}/users`, {
+    withCredentials: true,
+  });
   return response.data;
 };
 
@@ -72,7 +78,9 @@ export const fetchAllUsers = async (): Promise<User[]> => {
 // API: Lấy chi tiết người dùng theo ID
 // -------------------------
 export const fetchUserById = async (userId: string): Promise<User> => {
-  const response = await axios.get(`${BASE_URL}/users/${userId}`);
+  const response = await axios.get(`${BASE_URL}/users/${userId}`, {
+    withCredentials: true,
+  });
   return response.data;
 };
 
@@ -83,7 +91,9 @@ export const updateUser = async (
   userId: string,
   updatedData: Partial<Omit<User, '_id' | 'created_at' | 'updated_at' | 'role'>>
 ): Promise<User> => {
-  const response = await axios.put(`${BASE_URL}/users/${userId}`, updatedData);
+  const response = await axios.put(`${BASE_URL}/users/${userId}`, updatedData, {
+    withCredentials: true,
+  });
   return response.data;
 };
 
@@ -91,6 +101,8 @@ export const updateUser = async (
 // API: Xóa người dùng
 // -------------------------
 export const deleteUser = async (userId: string): Promise<{ message: string }> => {
-  const response = await axios.delete(`${BASE_URL}/users/${userId}`);
+  const response = await axios.delete(`${BASE_URL}/users/${userId}`, {
+    withCredentials: true,
+  });
   return response.data;
 };

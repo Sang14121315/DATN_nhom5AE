@@ -41,9 +41,17 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loadCart = async () => {
     try {
       const data = await fetchCart();
+
+      // ✅ Check nếu không có items thì log ra để debug
+      if (!data || !Array.isArray(data.items)) {
+        console.warn('Cart data không hợp lệ:', data);
+        setCartItems([]); // fallback
+        return;
+      }
+
       setCartItems(data.items);
-    } catch (error) {
-      console.error('Error loading cart:', error);
+    } catch (error: any) {
+      console.error('❌ Lỗi khi load cart:', error?.response?.data || error.message);
     }
   };
 
@@ -52,39 +60,59 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const addToCart = async (item: CartItem) => {
-    const existing = cartItems.find(p => p._id === item._id);
-    if (existing) {
-      await updateCartItemAPI(item._id, existing.quantity + item.quantity);
-    } else {
-      await addToCartAPI(item._id, item.quantity || 1, item.price);
+    try {
+      const existing = cartItems.find(p => p._id === item._id);
+      if (existing) {
+        await updateCartItemAPI(item._id, existing.quantity + item.quantity);
+      } else {
+       await addToCartAPI(item._id, item.quantity || 1);
+      }
+      await loadCart();
+    } catch (error: any) {
+      console.error('❌ Lỗi khi thêm vào giỏ hàng:', error?.response?.data || error.message);
     }
-    loadCart();
   };
 
   const removeFromCart = async (id: string) => {
-    await removeCartItemAPI(id);
-    loadCart();
+    try {
+      await removeCartItemAPI(id);
+      await loadCart();
+    } catch (error: any) {
+      console.error('❌ Lỗi khi xoá sản phẩm:', error?.response?.data || error.message);
+    }
   };
 
   const increaseQuantity = async (id: string) => {
-    const item = cartItems.find(i => i._id === id);
-    if (item) {
-      await updateCartItemAPI(id, item.quantity + 1);
-      loadCart();
+    try {
+      const item = cartItems.find(i => i._id === id);
+      if (item) {
+        await updateCartItemAPI(id, item.quantity + 1);
+        await loadCart();
+      }
+    } catch (error: any) {
+      console.error('❌ Lỗi khi tăng số lượng:', error?.response?.data || error.message);
     }
   };
 
   const decreaseQuantity = async (id: string) => {
-    const item = cartItems.find(i => i._id === id);
-    if (item && item.quantity > 1) {
-      await updateCartItemAPI(id, item.quantity - 1);
-      loadCart();
+    try {
+      const item = cartItems.find(i => i._id === id);
+      if (item && item.quantity > 1) {
+        await updateCartItemAPI(id, item.quantity - 1);
+        await loadCart();
+      }
+    } catch (error: any) {
+      console.error('❌ Lỗi khi giảm số lượng:', error?.response?.data || error.message);
     }
   };
 
   const clearCart = async () => {
-    await clearCartAPI();
-    loadCart();
+    try {
+      await clearCartAPI();
+      await loadCart();
+    } catch (error: any) {
+      console.error('❌ Lỗi khi xoá giỏ hàng:', error?.response?.data || error.message);
+    }
   };
 
   const openCart = () => setIsSidebarOpen(true);
