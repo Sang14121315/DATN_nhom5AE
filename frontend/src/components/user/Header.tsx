@@ -134,7 +134,7 @@ const Header: React.FC = () => {
               <Link to="/productlist" className="nav-item">
                 Sản phẩm
               </Link>
-              <Link to="/ContactPage" className="nav-item">
+              <Link to="/contact" className="nav-item">
                 Liên hệ
               </Link>
               <Link to="/about" className="nav-item">
