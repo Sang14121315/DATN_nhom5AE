@@ -18,7 +18,7 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <CartProvider>
-        <OrderProvider> {/* ✅ Bọc App bằng OrderProvider */}
+        <OrderProvider> 
           <App />
         </OrderProvider>
       </CartProvider>

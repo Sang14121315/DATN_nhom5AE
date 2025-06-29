@@ -4,7 +4,11 @@ import { useOrders } from "@/context/OrderContext";
 import "@/styles/pages/user/orderTrackingPage.scss";
 
 const OrderTrackingPage: React.FC = () => {
-  const { orders, cancelOrder } = useOrders();
+  const { orders, cancelOrder } = useOrders()
+
+if (orders.length > 0) {
+  // xử lý
+}
 
   return (
     <div className="order-page">
