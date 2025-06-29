@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { FaSearch, FaShoppingCart, FaUserCircle } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
-import "../../styles/components/user/header.scss";
+import "@/styles/components/user/header.scss";
 import { useCart } from "@/context/CartContext";
 import CartSidebar from "@/components/user/CartSidebar";
 import { searchProductsAPI } from "@/api/user/searchAPI";
@@ -12,9 +12,18 @@ const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [searchResults, setSearchResults] = useState<Product[]>([]);
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
+
   const timeoutRef = useRef<any>(null);
+  const userDropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -25,24 +34,23 @@ const Header: React.FC = () => {
       if (value.trim()) {
         searchProductsAPI(value.trim())
           .then((res) => {
-            console.log("Kết quả tìm kiếm:", res); // 👈 Log ra để kiểm tra
             setSearchResults(res.slice(0, 5));
-            setShowDropdown(true);
+            setShowSearchDropdown(true);
           })
-          .catch((err) => {
-            console.error("Lỗi tìm kiếm:", err);
+          .catch(() => {
             setSearchResults([]);
+            setShowSearchDropdown(false);
           });
       } else {
         setSearchResults([]);
-        setShowDropdown(false);
+        setShowSearchDropdown(false);
       }
     }, 300);
   };
 
   const handleGoToList = () => {
     navigate(`/search?query=${encodeURIComponent(searchKeyword.trim())}`);
-    setShowDropdown(false);
+    setShowSearchDropdown(false);
   };
 
   const formatCurrency = (amount: number): string =>
@@ -50,10 +58,20 @@ const Header: React.FC = () => {
       style: "currency",
       currency: "VND",
     }).format(amount);
+
   useEffect(() => {
-    console.log("ShowDropdown:", showDropdown);
-    console.log("SearchResults:", searchResults);
-  }, [showDropdown, searchResults]);
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        userDropdownRef.current &&
+        !userDropdownRef.current.contains(e.target as Node)
+      ) {
+        setShowUserDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
     <>
       <header className="header">
@@ -71,23 +89,23 @@ const Header: React.FC = () => {
               value={searchKeyword}
               onChange={handleSearchChange}
               onFocus={() => {
-                if (searchResults.length > 0) setShowDropdown(true);
+                if (searchResults.length > 0) setShowSearchDropdown(true);
               }}
-              onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+              onBlur={() => setTimeout(() => setShowSearchDropdown(false), 200)}
             />
             <button onClick={handleGoToList}>
               <FaSearch />
             </button>
 
-            {showDropdown && searchResults.length > 0 && (
+            {showSearchDropdown && searchResults.length > 0 && (
               <div className="search-dropdown">
                 {searchResults.map((item) => (
                   <div
                     key={item._id}
                     className="dropdown-item"
-                    onClick={() => {
+                    onMouseDown={() => {
                       navigate(`/product/${item._id}`);
-                      setShowDropdown(false);
+                      setShowSearchDropdown(false);
                     }}
                   >
                     <div>
@@ -99,7 +117,7 @@ const Header: React.FC = () => {
                     <img src={item.img_url} alt={item.name} />
                   </div>
                 ))}
-                <div className="see-more" onClick={handleGoToList}>
+                <div className="see-more" onMouseDown={handleGoToList}>
                   Xem thêm sản phẩm
                 </div>
               </div>
@@ -107,10 +125,36 @@ const Header: React.FC = () => {
           </div>
 
           {/* Auth */}
-          <div className="header__auth">
-            <Link to="/login" className="auth-link">
-              <FaUserCircle />
-            </Link>
+          <div className="header__auth" ref={userDropdownRef}>
+            {user ? (
+              <div className="header__user-dropdown">
+                <div
+                  className="auth-user"
+                  onClick={() => setShowUserDropdown((prev) => !prev)}
+                >
+                  <FaUserCircle className="user-icon" />
+                  <span className="user-name">{user.name} ▼</span>
+                </div>
+
+                {showUserDropdown && (
+                  <div className="dropdown-menu">
+                    <div
+                      className="dropdown-item"
+                      onClick={() => navigate("/forgot-password")}
+                    >
+                      Quên mật khẩu
+                    </div>
+                    <div className="dropdown-item" onClick={handleLogout}>
+                      Đăng xuất
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link to="/login" className="auth-link">
+                <FaUserCircle />
+              </Link>
+            )}
           </div>
 
           {/* Cart */}
