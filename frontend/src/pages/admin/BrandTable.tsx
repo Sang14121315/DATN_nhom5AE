@@ -31,9 +31,18 @@ const BrandTable: React.FC = () => {
 
   const totalPages = Math.ceil(brands.length / itemsPerPage);
 
+  // Hàm xử lý URL ảnh
+  const getLogoUrl = (logo_url?: string): string => {
+    if (!logo_url) return '';
+    // Nếu là URL bắt đầu bằng http hoặc https thì dùng luôn
+    if (logo_url.startsWith('http')) return logo_url;
+    // Nếu là tên file (ảnh đã upload lên backend), thì thêm đường dẫn server
+    return `http://localhost:5000/uploads/brands/${logo_url}`;
+  };
+
   return (
     <div className="category-page-container">
-        <h2 className="page-title">Thương hiệu</h2>
+      <h2 className="page-title">Thương hiệu</h2>
 
       <div className="top-controls">
         <div className="left-filters">
@@ -42,7 +51,7 @@ const BrandTable: React.FC = () => {
         </div>
         <div className="right-controls">
           <input type="text" placeholder="Tìm kiếm thương hiệu..." />
-          <button className="add-button" onClick={() => navigate('/admin/brands/create')}>
+          <button className="add-button" onClick={() => navigate('/admin/brand/create')}>
             <FaPlus /> Thêm thương hiệu
           </button>
         </div>
@@ -67,22 +76,30 @@ const BrandTable: React.FC = () => {
                   #{(currentPage - 1) * itemsPerPage + index + 1}
                 </span>
               </td>
-              <td className="brand-logo">{brand.name}</td>
+              <td>{brand.name}</td>
               <td>
-                <img 
-                  src={brand.logo_url || '/no-image.png'}
-                  alt={brand.name}
-                  style={{ width: 100, height: 50 }}
-                />
+                {brand.logo_url ? (
+                  <img
+                    src={getLogoUrl(brand.logo_url)}
+                    alt={brand.name}
+                    style={{ width: 80, height: 40, objectFit: 'contain' }}
+                  />
+                ) : (
+                  <span>Không có</span>
+                )}
               </td>
-              <td>{new Date(brand.created_at).toLocaleDateString('vi-VN')}</td>
+              <td>
+                {brand.created_at
+                  ? new Date(brand.created_at).toLocaleDateString('vi-VN')
+                  : ''}
+              </td>
               <td>
                 <span className="status">Đã duyệt</span>
               </td>
               <td>
                 <button
                   className="view-button"
-                  onClick={() => navigate(`/admin/brands/${brand._id}`)}
+                  onClick={() => navigate(`/admin/brand/${brand._id}/form`)}
                 >
                   <FaEye /> Xem
                 </button>
