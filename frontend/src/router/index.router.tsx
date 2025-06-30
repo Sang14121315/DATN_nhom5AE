@@ -2,6 +2,8 @@
   import AdminLayout from "@/layouts/admin.layout";
   import DashboardPage from "@/pages/admin/Dashboard";
   import ProductsPage from "@/pages/admin/products";
+  import ProductDetailPage from "@/pages/admin/ProductDetailPage";
+  import AddProductPage from "@/pages/admin/AddProductPage";
 
 
   // import user 
@@ -30,6 +32,11 @@
         <Route path="/admin" element={<AdminLayout />}>
           <Route path="dashboard" element={<DashboardPage />} />
            <Route path="products" element={<ProductsPage />} />
+           <Route path="products/:id" element={<ProductDetailPage />} />
+           <Route path="pproducts/edit/:id" element={<ProductDetailPage />} />
+           <Route path="products/add" element={<AddProductPage />} />
+           
+
            
         </Route>
         {/* User layout */}

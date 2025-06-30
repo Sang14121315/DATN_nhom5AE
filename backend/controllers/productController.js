@@ -19,7 +19,12 @@ const productSchema = Joi.object({
 
 exports.getProducts = async (req, res) => {
   try {
-    const { name, category_id, brand_id, minPrice, maxPrice, sale, hot, sort } = req.query;
+    const {
+      name, category_id, brand_id,
+      minPrice, maxPrice, sale, hot,
+      sort, page = 3, limit = 10
+    } = req.query;
+
     const filters = {};
     if (name) filters.name = new RegExp(name, 'i');
     if (category_id) filters.category_id = category_id;
@@ -30,16 +35,25 @@ exports.getProducts = async (req, res) => {
     if (sale) filters.sale = sale === 'true';
     if (hot) filters.hot = hot === 'true';
 
-    let query = ProductService.getAll(filters);
-    if (sort === 'price_asc') query = query.sort({ price: 1 });
-    else if (sort === 'price_desc') query = query.sort({ price: -1 });
+    const skip = (Number(page) - 1) * Number(limit);
+    const sortOption = sort === 'price_asc' ? { price: 1 }
+                     : sort === 'price_desc' ? { price: -1 }
+                     : sort === 'view_desc' ? { view: -1 }
+                     : { created_at: -1 }; // default sort
 
-    const products = await query;
-    res.json(products);
+    const [products, total] = await Promise.all([
+      ProductService.getAll(filters, Number(limit), sortOption, skip),
+      ProductService.count(filters)
+    ]);
+
+    const totalPages = Math.ceil(total / Number(limit));
+    res.json({ products, total, totalPages });
+
   } catch (error) {
     res.status(500).json({ message: error.message || 'Error fetching products' });
   }
 };
+
 
 exports.getProductById = async (req, res) => {
   try {
