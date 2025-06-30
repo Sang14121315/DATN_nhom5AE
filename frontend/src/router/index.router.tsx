@@ -2,7 +2,9 @@ import { Routes, Route } from "react-router-dom";
 import AdminLayout from "@/layouts/admin.layout";
 import DashboardPage from "@/pages/admin/Dashboard";
 import CategoryTablePage from "@/pages/admin/CategoryTable";
+import CategoryFormPage from "@/pages/admin/CategoryForm";
 import BrandTablePage from "@/pages/admin/BrandTable";
+import BrandFormPage from "@/pages/admin/BrandForm";
 
 // import user
 import AuthLayout from "@/layouts/auth.layout";
@@ -26,7 +28,11 @@ const MainRouter = () => {
       <Route path="/admin" element={<AdminLayout />}>
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="category" element={<CategoryTablePage />} />
+        <Route path="category/create" element={<CategoryFormPage />} />
+        <Route path="category/:id/form" element={<CategoryFormPage />} />
         <Route path="brand" element={<BrandTablePage />} />
+        <Route path="brand/create" element={<BrandFormPage />} />
+        <Route path="brand/:id/form" element={<BrandFormPage />} />
       </Route>
       {/* User layout */}
       <Route path="/" element={<AuthLayout />}>

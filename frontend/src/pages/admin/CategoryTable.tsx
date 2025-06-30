@@ -43,7 +43,7 @@ const CategoryTable: React.FC = () => {
 
         <div className="right-controls">
           <input type="text" placeholder="Tìm kiếm danh mục..." />
-          <button className="add-button" onClick={() => navigate('/admin/categories/create')}>
+          <button className="add-button" onClick={() => navigate('/admin/category/create')}>
             <FaPlus /> Thêm danh mục
           </button>
         </div>
@@ -67,13 +67,13 @@ const CategoryTable: React.FC = () => {
                 <span className="id-link">#{(currentPage - 1) * itemsPerPage + index + 1}</span>
               </td>
               <td>{cat.name}</td>
-              <td>{cat.description?.slice(0, 20)}...</td>
-              <td>{new Date(cat.created_at).toLocaleDateString('vi-VN')}</td>
+              <td>{cat.description?.slice(0, 20) || '...'}...</td>
+              <td>{new Date(cat.created_at || '').toLocaleDateString('vi-VN')}</td>
               <td><span className="status">Đã duyệt</span></td>
               <td>
                 <button
                   className="view-button"
-                  onClick={() => navigate(`/admin/categories/${cat._id}`)}
+                  onClick={() => navigate(`/admin/category/${cat._id}/form`)}
                 >
                   <FaEye /> Xem
                 </button>

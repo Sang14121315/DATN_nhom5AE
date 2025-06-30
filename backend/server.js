@@ -25,6 +25,10 @@ app.use('/uploads', express.static(path.join(__dirname, 'Uploads')));
 app.use('/api', require('./routes/index'));
 app.use('/api/admin', require('./routes/admin'));
 
+// Image upload
+app.use('/api/upload', require('./routes/upload'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Error Handler Middleware
 app.use(errorHandler);
 

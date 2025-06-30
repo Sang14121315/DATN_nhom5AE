@@ -29,6 +29,17 @@ exports.getBrandById = async (req, res) => {
   }
 };
 
+exports.uploadBrandImage = (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: "No file uploaded" });
+  }
+
+  const filename = req.file.filename;
+  const filePath = `/uploads/brands/${filename}`;
+
+  res.status(200).json({ filename, url: filePath });
+};
+
 exports.createBrand = async (req, res) => {
   try {
     const { error } = brandSchema.validate(req.body);

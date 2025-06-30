@@ -72,33 +72,16 @@ router.delete('/product-types/:id', auth, productTypeController.deleteProductTyp
 // Categories
 router.get('/categories', categoryController.getCategories);
 router.get('/categories/:id', categoryController.getCategoryById);
-router.post('/categories', auth, categoryController.createCategory);
-router.put('/categories/:id', auth, categoryController.updateCategory);
-router.delete('/categories/:id', auth, categoryController.deleteCategory);
+router.post('/categories', categoryController.createCategory);
+router.put('/categories/:id', categoryController.updateCategory);
+router.delete('/categories/:id', categoryController.deleteCategory);
 
 // Brands
-
-
-router.get('/brands/:id',  brandController.getBrandById);
-router.get('/brands', brandController.getBrands);
-
-router.get('/brands', auth, brandController.getBrands);
-router.get('/brands/:id', auth, brandController.getBrandById);
-
 router.get('/brands', brandController.getBrands);
 router.get('/brands/:id', brandController.getBrandById);
-
-
-router.get('/brands/:id',  brandController.getBrandById);
-router.get('/brands', brandController.getBrands);
-router.get('/brands', auth, brandController.getBrands);
-router.get('/brands/:id', auth, brandController.getBrandById);
-router.get('/brands', brandController.getBrands);
-router.get('/brands/:id', brandController.getBrandById);
-
-router.post('/brands', auth, upload.single('logo'), brandController.createBrand);
-router.put('/brands/:id', auth, upload.single('logo'), brandController.updateBrand);
-router.delete('/brands/:id', auth, brandController.deleteBrand);
+router.post('/brands', upload.single('logo'), brandController.createBrand);
+router.put('/brands/:id', upload.single('logo'), brandController.updateBrand);
+router.delete('/brands/:id', brandController.deleteBrand);
 
 // Coupons
 router.get('/coupons', auth, couponController.getCoupons);
