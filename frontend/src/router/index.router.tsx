@@ -4,6 +4,8 @@
   import ProductsPage from "@/pages/admin/products";
   import ProductDetailPage from "@/pages/admin/ProductDetailPage";
   import AddProductPage from "@/pages/admin/AddProductPage";
+  import OrdersPage from '@/pages/admin/orders';
+// import OrderDetailPage from '@/pages/admin/OrderDetailPage';
 
 
   // import user 
@@ -33,8 +35,10 @@
           <Route path="dashboard" element={<DashboardPage />} />
            <Route path="products" element={<ProductsPage />} />
            <Route path="products/:id" element={<ProductDetailPage />} />
-           <Route path="pproducts/edit/:id" element={<ProductDetailPage />} />
+           <Route path="products/edit/:id" element={<ProductDetailPage />} />
            <Route path="products/add" element={<AddProductPage />} />
+            <Route path="orders" element={<OrdersPage />} />
+               {/* <Route path="orders/:id" element={<OrderDetailPage />} /> */}
            
 
            

@@ -1,0 +1,90 @@
+.admin-orders {
+  padding: 20px;
+
+  .filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+
+    input {
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+  }
+
+  .orders-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+    }
+
+    tbody tr {
+      border-top: 1px solid #ddd;
+    }
+
+    .product-info {
+      display: flex;
+      align-items: center;
+
+      img {
+        width: 40px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 6px;
+        margin-right: 10px;
+      }
+
+      span {
+        color: gray;
+        font-size: 0.85em;
+      }
+    }
+
+    .status {
+      background-color: #d0f0e8;
+      color: #007f5f;
+      padding: 4px 8px;
+      border-radius: 8px;
+
+      &.pending {
+        background-color: #fff8c5;
+        color: #b38600;
+      }
+
+      &.cancelled {
+        background-color: #ffd6d6;
+        color: #d40000;
+      }
+    }
+
+    .view-btn {
+      background: #fff;
+      border: 1px solid red;
+      color: red;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  }
+
+  .pagination {
+    margin-top: 20px;
+    display: flex;
+    gap: 8px;
+
+    button {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+
+      &.active {
+        background-color: #00c896;
+        color: white;
+      }
+    }
+  }
+}
