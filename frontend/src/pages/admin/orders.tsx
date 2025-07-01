@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchAllOrders, Order } from '@/api/orderAPI';
+import { fetchAllOrders, Order } from '@/api/ordersAPI';
 import '@/styles/pages/admin/orders.scss';
 import { formatCurrency } from '@/api/productsAPI';
 
@@ -30,7 +30,7 @@ const OrdersPage: React.FC = () => {
 
       <div className="filters">
         <button>📅 Ngày</button>
-        <button>Trạng thái ⬍</button>
+        <button>Trạng thái </button>
         <input
           type="text"
           placeholder="🔍"
