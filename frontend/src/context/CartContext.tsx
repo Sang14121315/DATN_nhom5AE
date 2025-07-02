@@ -8,6 +8,7 @@ import {
 } from '@/api/user/cartAPI';
 
 interface CartItem {
+  
   _id: string;
   name: string;
   price: number;

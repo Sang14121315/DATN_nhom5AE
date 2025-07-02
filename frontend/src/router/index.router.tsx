@@ -5,7 +5,7 @@ import CategoryTablePage from "@/pages/admin/CategoryTable";
 import CategoryFormPage from "@/pages/admin/CategoryForm";
 import BrandTablePage from "@/pages/admin/BrandTable";
 import BrandFormPage from "@/pages/admin/BrandForm";
-
+import Orderfrom from "@/pages/admin/OrderPage";
 // import user
 import AuthLayout from "@/layouts/auth.layout";
 import AboutPage from "@/pages/user/about";
@@ -21,6 +21,7 @@ import SearchResultPage from "@/pages/user/searchResult";
 import OrderTrackingPage from "@/pages/user/OrderTrackingPage";
 import ContactPage from "@/pages/user/ContactPage";
 
+
 const MainRouter = () => {
   return (
     <Routes>
@@ -33,6 +34,7 @@ const MainRouter = () => {
         <Route path="brand" element={<BrandTablePage />} />
         <Route path="brand/create" element={<BrandFormPage />} />
         <Route path="brand/:id/form" element={<BrandFormPage />} />
+        <Route path="order" element={<Orderfrom />} />
       </Route>
       {/* User layout */}
       <Route path="/" element={<AuthLayout />}>

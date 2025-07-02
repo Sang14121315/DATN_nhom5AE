@@ -1,4 +1,3 @@
-// CheckoutPage.tsx
 import React, { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 import { useOrders } from "@/context/OrderContext";
@@ -7,7 +6,7 @@ import "@/styles/pages/user/checkoutPage.scss";
 import { useNavigate } from "react-router-dom";
 
 const CheckoutPage: React.FC = () => {
-  const { cartItems } = useCart();
+  const { cartItems, clearCart } = useCart();
   const { addOrder } = useOrders();
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const [showSuccess, setShowSuccess] = useState(false);
@@ -31,6 +30,7 @@ const CheckoutPage: React.FC = () => {
     ward: false,
     address: false,
   });
+
   const navigate = useNavigate();
 
   const [provinces, setProvinces] = useState<any[]>([]);
@@ -74,23 +74,48 @@ const CheckoutPage: React.FC = () => {
     return !Object.values(errors).some(Boolean);
   };
 
-  const handleSubmit = () => {
-    if (validateForm()) {
-      const newOrder = {
-        id: `DH${Date.now()}`,
-        date: new Date().toLocaleDateString("vi-VN"),
-        status: "Đã xác nhận",
-        total,
-        items: cartItems,
-      };
-      addOrder(newOrder);
-      setShowSuccess(true);
-      setShowError(false);
-    } else {
-      setShowError(true);
-      setShowSuccess(false);
-    }
+  const handleSubmit = async () => {
+  if (!validateForm()) {
+    setShowError(true);
+    setShowSuccess(false);
+    return;
+  }
+
+  const fullAddress = `${formData.address}, ${formData.ward}, ${formData.district}, ${formData.city}`;
+
+  const payload = {
+    payment_method: paymentMethod,
+    total,
+    city: formData.city,
+    district: formData.district,
+    ward: formData.ward,
+    customer: {
+      name: formData.name,
+      phone: formData.phone,
+      email: formData.email || '',
+      address: fullAddress
+    },
+    items: cartItems.map(item => ({
+      product_id: item._id,
+      quantity: item.quantity,
+      price: item.price
+    }))
   };
+
+  try {
+    console.log("📦 Gửi đơn hàng:", payload);
+    await addOrder(payload); // gọi API từ OrderContext
+    await clearCart(); // xoá giỏ hàng
+    setShowSuccess(true);
+    setShowError(false);
+  } catch (error: any) {
+    console.error("❌ Lỗi khi đặt hàng:", error?.response?.data || error.message);
+    alert(error?.response?.data?.message || "Đặt hàng thất bại");
+    setShowSuccess(false);
+    setShowError(true);
+  }
+};
+
 
   return (
     <div className="checkout-page">
@@ -177,11 +202,6 @@ const CheckoutPage: React.FC = () => {
           <div className="summary-row">Phí vận chuyển: 0</div>
           <div className="summary-row total">Tổng tiền: {total.toLocaleString()} ₫</div>
 
-          <div className="discount-code">
-            <input type="text" placeholder="Mã giảm giá" />
-            <button className="apply-btn">Sử dụng</button>
-          </div>
-
           <textarea placeholder="Ghi chú"></textarea>
 
           <div className="action-buttons">
@@ -194,9 +214,9 @@ const CheckoutPage: React.FC = () => {
       {showSuccess && (
         <div className="order-success-popup">
           <div className="popup-content">
-            <h3> Đặt hàng thành công!</h3>
+            <h3>🎉 Đặt hàng thành công!</h3>
             <p>Cảm ơn bạn đã mua hàng.</p>
-            <button onClick={() => window.location.href = "/"}>Xem Thêm </button>
+            <button onClick={() => window.location.href = "/"}>Trang chủ</button>
             <button onClick={() => window.location.href = "/orders"}>Theo dõi đơn hàng</button>
             <span className="close-btn" onClick={() => setShowSuccess(false)}>×</span>
           </div>

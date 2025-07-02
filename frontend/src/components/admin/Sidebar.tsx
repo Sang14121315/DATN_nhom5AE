@@ -23,7 +23,7 @@ const SidebarMenu: React.FC = () => {
     { icon: <FaThList />, label: "Danh mục", path: "/admin/category" },
     { icon: <FaListAlt />, label: "Loại sản phẩm", path: "/admin/product-types" },
     { icon: <FaTags />, label: "Thương hiệu", path: "/admin/brand" },
-    { icon: <FaShoppingCart />, label: "Đơn hàng", path: "/admin/orders" },
+    { icon: <FaShoppingCart />, label: "Đơn hàng", path: "/admin/order" },
     { icon: <FaTicketAlt />, label: "Mã giảm giá", path: "/admin/discounts" },
     { icon: <FaUser />, label: "Người dùng", path: "/admin/users" },
     { icon: <FaCommentDots />, label: "Phản hồi & Thông báo", path: "/admin/feedback" },
