@@ -1,97 +1,50 @@
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const withCredentialsConfig = { withCredentials: true };
 
-// Kiểu dữ liệu chuẩn dùng cho frontend
-export interface Order {
-  _id: string;
-  product: string;
-  orderNumber: string;
-  date: string;
-  customer: string;
-  status: string;
-  amount: number;
-}
-
-// Thống kê tổng quan dashboard
-export interface DashboardStats {
-  totalOrders: number;
-  totalDelivered: number;
-  totalCanceled: number;
-  totalRevenue: number;
-}
-
-// API: Lấy danh sách đơn hàng gần đây (kèm thông tin chi tiết từ orderDetails)
-export const getRecentOrders = async (): Promise<Order[]> => {
-  try {
-    const res = await axios.get(`${API_URL}/orders`, { withCredentials: true });
-    const rawOrders = res.data || [];
-
-    const ordersWithDetails: Order[] = await Promise.all(
-      rawOrders.map(async (order: any) => {
-        const detailRes = await axios.get(`${API_URL}/orders/${order._id}`, {
-          withCredentials: true,
-        });
-
-        const orderDetails = detailRes.data.orderDetails || [];
-        const firstItem = orderDetails[0] || {};
-
-        const productName =
-          firstItem?.product_id?.name || firstItem?.name || "Không rõ sản phẩm";
-
-        const total = orderDetails.reduce(
-          (sum, item) => sum + item.price * item.quantity,
-          0
-        );
-
-        return {
-          _id: order._id,
-          product: productName,
-          orderNumber: order.code || order._id,
-          date: order.created_at || order.date || new Date().toISOString(),
-          customer: order.customer?.name || "Không rõ",
-          status: translateStatus(order.status),
-          amount: total,
-        };
-      })
-    );
-
-    return ordersWithDetails;
-  } catch (error) {
-    console.error("❌ Lỗi khi lấy đơn hàng:", error);
-    throw error;
-  }
+// 🧾 Tạo đơn hàng mới
+export const createOrder = async (orderData: any) => {
+  const res = await axios.post(`${API_URL}/orders`, orderData, withCredentialsConfig);
+  return res.data;
 };
 
-
-// API: Lấy số liệu thống kê tổng quan
-export const getDashboardStats = async (): Promise<DashboardStats> => {
-  try {
-    const response = await axios.get(`${API_URL}/orders/stats`, {
-      withCredentials: true,
-    });
-    const data = response.data;
-
-    return {
-      totalOrders: data.totalOrders ?? 0,
-      totalDelivered: data.totalDelivered ?? 0,
-      totalCanceled: data.totalCanceled ?? 0,
-      totalRevenue: data.totalRevenue ?? 0,
-    };
-  } catch (error) {
-    console.error('❌ Lỗi khi lấy thống kê dashboard:', error);
-    throw error;
-  }
+// 📄 Lấy danh sách tất cả đơn hàng (cho admin)
+export const getOrders = async () => {
+  const res = await axios.get(`${API_URL}/orders`, withCredentialsConfig);
+  return res.data.map((order: any) => ({
+    ...order,
+    items: (order.items || []).map((item: any) => ({
+      ...item,
+      img_url: item.img_url || '', // tránh lỗi thiếu ảnh
+    })),
+  }));
 };
 
-// Chuyển trạng thái đơn hàng sang tiếng Việt
-const translateStatus = (status: string): string => {
-  const statusMap: Record<string, string> = {
-    pending: 'Đang chờ xử lý',
-    processing: 'Đang xử lý',
-    delivered: 'Đã giao hàng',
-    cancelled: 'Đã hủy',
-    confirmed: 'Đã xác nhận',
-  };
-  return statusMap[status] || status;
+// 🔍 Lấy chi tiết 1 đơn hàng theo ID
+export const getOrderById = async (id: string) => {
+  const res = await axios.get(`${API_URL}/orders/${id}`, withCredentialsConfig);
+  return res.data;
+};
+
+// 🔄 Cập nhật trạng thái đơn hàng (hủy)
+export const cancelOrder = async (id: string) => {
+  const res = await axios.put(`${API_URL}/orders/${id}`, { status: 'cancelled' }, withCredentialsConfig);
+  return res.data;
+};
+
+// ❌ Xoá đơn hàng
+export const deleteOrder = async (id: string) => {
+  const res = await axios.delete(`${API_URL}/orders/${id}`, withCredentialsConfig);
+  return res.data;
+};
+
+export const cancelOrderAPI = async (id: string) => {
+  const res = await axios.put(`${API_URL}/orders/${id}`, { status: "cancelled" }, { withCredentials: true });
+  return res.data;
+};
+
+export const deleteOrderAPI = async (id: string) => {
+  const res = await axios.delete(`${API_URL}/orders/${id}`, { withCredentials: true });
+  return res.data;
 };

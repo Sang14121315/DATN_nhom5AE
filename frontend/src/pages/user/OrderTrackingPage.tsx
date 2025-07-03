@@ -31,31 +31,45 @@ const OrderTrackingPage: React.FC = () => {
         <div className="order-list">
           {orders.map((order) => (
             <div key={order._id} className="order-card">
-              <h4>Mã đơn: {order._id}</h4>
+              <h4>
+                🧾 Mã đơn: <span style={{ color: "#555" }}>{order._id}</span>
+              </h4>
               <div className="order-info">
-                <span>Khách: {order.customer?.name || "Không rõ"}</span>
-                <span>Ngày: {new Date(order.date).toLocaleDateString("vi-VN")}</span>
-                <span>Trạng thái: {translateStatus(order.status)}</span>
-                <span>Tổng: {order.total.toLocaleString()} ₫</span>
+                <span>👤 Khách: {order.customer?.name || "Không rõ"}</span>
+                <span>📅 Ngày: {new Date(order.created_at).toLocaleDateString("vi-VN")}</span>
+                <span>🚚 Trạng thái: <strong>{translateStatus(order.status)}</strong></span>
+                <span>💰 Tổng: {order.total.toLocaleString()} ₫</span>
               </div>
+
               <div className="order-items">
-                {(order.items || []).map((item, index) => (
-                  <div key={item.product_id || index} className="item">
-                    <img
-                      src={item.img_url || "/images/placeholder.png"}
-                      alt={item.name || "Sản phẩm"}
-                      className="product-image"
-                    />
-                    <div>
-                      <p>{item.name || "Sản phẩm"}</p>
-                      <p>Số lượng: {item.quantity}</p>
-                      <p>Giá: {item.price.toLocaleString()} ₫</p>
+                {(order.items || []).map((item, index) => {
+                  const productId = typeof item.product_id === "string" ? item.product_id : `item-${index}`;
+                  const key = `${order._id}-${productId}-${index}`;
+
+                  const imgSrc = item.img_url && item.img_url !== ""
+                    ? item.img_url
+                    : "/images/placeholder.png";
+
+                  const altText = typeof item.name === "string" ? item.name : "Sản phẩm";
+
+                  return (
+                    <div key={key} className="item">
+                      <img src={imgSrc} alt={altText} className="product-image" />
+                      <div>
+                        <p>{altText}</p>
+                        <p>Số lượng: {item.quantity}</p>
+                        <p>Giá: {item.price.toLocaleString()} ₫</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
-              {order.status !== "cancelled" && (
-                <button className="cancel-btn" onClick={() => handleCancel(order._id)}>
+
+              {order.status === "pending" && (
+                <button
+                  className="cancel-btn"
+                  onClick={() => handleCancel(order._id)}
+                >
                   ❌ Huỷ đơn
                 </button>
               )}

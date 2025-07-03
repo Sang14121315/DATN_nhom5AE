@@ -6,6 +6,8 @@ import CategoryFormPage from "@/pages/admin/CategoryForm";
 import BrandTablePage from "@/pages/admin/BrandTable";
 import BrandFormPage from "@/pages/admin/BrandForm";
 import Orderfrom from "@/pages/admin/OrderPage";
+import AdminOrderDetailPage from "@/pages/admin/AdminOrderDetailPage";
+import CouponAdmin from "@/pages/admin/AdminCouponPage"
 // import user
 import AuthLayout from "@/layouts/auth.layout";
 import AboutPage from "@/pages/user/about";
@@ -35,6 +37,8 @@ const MainRouter = () => {
         <Route path="brand/create" element={<BrandFormPage />} />
         <Route path="brand/:id/form" element={<BrandFormPage />} />
         <Route path="order" element={<Orderfrom />} />
+        <Route path="orders/:id" element={<AdminOrderDetailPage/>} />
+        <Route path="coupons" element={<CouponAdmin/>} />
       </Route>
       {/* User layout */}
       <Route path="/" element={<AuthLayout />}>

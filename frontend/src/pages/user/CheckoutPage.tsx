@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 import { useOrders } from "@/context/OrderContext";
 import { getProvinces, getDistrictsByProvinceCode, getWardsByDistrictCode } from "vn-provinces";
+import { fetchCoupons } from "@/api/couponAPI";
 import "@/styles/pages/user/checkoutPage.scss";
 import { useNavigate } from "react-router-dom";
 
@@ -11,6 +12,10 @@ const CheckoutPage: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const [showSuccess, setShowSuccess] = useState(false);
   const [showError, setShowError] = useState(false);
+
+  const [couponCode, setCouponCode] = useState("");
+  const [coupon, setCoupon] = useState<any>(null);
+  const [discount, setDiscount] = useState(0);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -53,7 +58,8 @@ const CheckoutPage: React.FC = () => {
     setFormData(prev => ({ ...prev, ward: "" }));
   }, [formData.district]);
 
-  const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const total = subtotal - discount;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -74,48 +80,78 @@ const CheckoutPage: React.FC = () => {
     return !Object.values(errors).some(Boolean);
   };
 
-  const handleSubmit = async () => {
-  if (!validateForm()) {
-    setShowError(true);
-    setShowSuccess(false);
-    return;
-  }
+  const handleApplyCoupon = async () => {
+    try {
+      const coupons = await fetchCoupons();
+      const found = coupons.find(c => c.code === couponCode && c.is_active);
+      if (!found) return alert('Mã giảm giá không hợp lệ hoặc đã hết hạn');
 
-  const fullAddress = `${formData.address}, ${formData.ward}, ${formData.district}, ${formData.city}`;
+      const now = new Date();
+      if (new Date(found.start_date) > now || new Date(found.end_date) < now) {
+        return alert('Mã giảm giá chưa đến hạn hoặc đã hết hạn');
+      }
 
-  const payload = {
-    payment_method: paymentMethod,
-    total,
-    city: formData.city,
-    district: formData.district,
-    ward: formData.ward,
-    customer: {
-      name: formData.name,
-      phone: formData.phone,
-      email: formData.email || '',
-      address: fullAddress
-    },
-    items: cartItems.map(item => ({
-      product_id: item._id,
-      quantity: item.quantity,
-      price: item.price
-    }))
+      if (subtotal < found.min_order_value) {
+        return alert(`Đơn hàng phải tối thiểu ${found.min_order_value} để áp dụng mã`);
+      }
+
+      setCoupon(found);
+
+      const discountAmount = found.discount_type === 'percentage'
+        ? (subtotal * found.discount_value) / 100
+        : found.discount_value;
+
+      setDiscount(discountAmount);
+    } catch (err) {
+      console.error('❌ Lỗi khi áp mã:', err);
+      alert('Có lỗi xảy ra khi áp dụng mã');
+    }
   };
 
-  try {
-    console.log("📦 Gửi đơn hàng:", payload);
-    await addOrder(payload); // gọi API từ OrderContext
-    await clearCart(); // xoá giỏ hàng
-    setShowSuccess(true);
-    setShowError(false);
-  } catch (error: any) {
-    console.error("❌ Lỗi khi đặt hàng:", error?.response?.data || error.message);
-    alert(error?.response?.data?.message || "Đặt hàng thất bại");
-    setShowSuccess(false);
-    setShowError(true);
-  }
-};
+  const handleSubmit = async () => {
+    if (!validateForm()) {
+      setShowError(true);
+      setShowSuccess(false);
+      return;
+    }
 
+    const payload: any = {
+      payment_method: paymentMethod,
+      total,
+      city: formData.city,
+      district: formData.district,
+      ward: formData.ward,
+      customer: {
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email || '',
+        address: formData.address,
+      },
+      items: cartItems.map(item => ({
+        product_id: item._id,
+        quantity: item.quantity,
+        price: item.price,
+        name: item.name,
+        img_url: item.img_url || '',
+      }))
+    };
+
+    // Chỉ thêm coupon nếu schema backend cho phép
+    // payload.coupon = coupon?.code;
+
+    try {
+      console.log("📦 Payload gửi đi:", payload);
+      await addOrder(payload);
+      await clearCart();
+      setShowSuccess(true);
+      setShowError(false);
+    } catch (error: any) {
+      console.error("❌ Lỗi khi đặt hàng:", error?.response?.data || error.message);
+      alert(error?.response?.data?.message || "Đặt hàng thất bại");
+      setShowSuccess(false);
+      setShowError(true);
+    }
+  };
 
   return (
     <div className="checkout-page">
@@ -159,6 +195,8 @@ const CheckoutPage: React.FC = () => {
             <input name="address" placeholder="Địa chỉ *" value={formData.address} onChange={handleChange} />
             {formErrors.address && <p className="error">Phải nhập địa chỉ</p>}
           </form>
+
+
         </div>
 
         <div className="checkout-section payment-methods">
@@ -197,10 +235,23 @@ const CheckoutPage: React.FC = () => {
               </div>
             </div>
           ))}
-          <div className="summary-row">Tổng đơn hàng: {total.toLocaleString()} ₫</div>
-          <div className="summary-row">Chiết khấu: 0</div>
+          <div className="summary-row">Tổng đơn hàng: {subtotal.toLocaleString()} ₫</div>
+          <div className="summary-row">Giảm giá: -{discount.toLocaleString()} ₫</div>
           <div className="summary-row">Phí vận chuyển: 0</div>
           <div className="summary-row total">Tổng tiền: {total.toLocaleString()} ₫</div>
+          
+          <div className="coupon-section">
+  <input
+    type="text"
+    value={couponCode}
+    onChange={(e) => setCouponCode(e.target.value)}
+    placeholder="Nhập mã giảm giá"
+  />
+  <button onClick={handleApplyCoupon}>Áp dụng</button>
+  {coupon && (
+    <p className="discount-info">Đã áp dụng mã: <strong>{coupon.code}</strong> (-{discount.toLocaleString()} ₫)</p>
+  )}
+</div>
 
           <textarea placeholder="Ghi chú"></textarea>
 

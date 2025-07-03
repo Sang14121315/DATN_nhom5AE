@@ -1,0 +1,80 @@
+// 📁 styles/pages/admin/AdminCouponPage.scss
+
+.admin-coupon-page {
+  padding: 32px;
+  max-width: 1000px;
+  margin: 0 auto;
+
+  h2 {
+    font-size: 24px;
+    margin-bottom: 24px;
+  }
+
+  .coupon-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    background: #f9f9f9;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 32px;
+
+    input, select {
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      flex: 1 1 200px;
+    }
+
+    button {
+      background: #007bff;
+      color: white;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: 0.2s;
+
+      &:hover {
+        background: #0056b3;
+      }
+    }
+  }
+
+  .coupon-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th, td {
+      padding: 12px 16px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+
+    th {
+      background: #f0f0f0;
+    }
+
+    tr:hover {
+      background: #f9f9f9;
+    }
+
+    .actions button {
+      margin-right: 8px;
+      padding: 6px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+
+      &.edit {
+        background: #ffc107;
+        color: white;
+      }
+
+      &.delete {
+        background: #dc3545;
+        color: white;
+      }
+    }
+  }
+}

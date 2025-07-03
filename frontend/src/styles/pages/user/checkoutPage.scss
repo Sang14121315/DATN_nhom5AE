@@ -56,6 +56,7 @@
 
   // ✅ THÊM VÀO ĐÂY
   margin-bottom: 12px;
+  
 }
 
 
@@ -261,5 +262,25 @@
         }
       }
     }
+  }
+}
+.coupon-section {
+  margin-top: 20px;
+  input {
+    padding: 8px;
+    margin-right: 10px;
+    width: 200px;
+  }
+  button {
+    padding: 8px 12px;
+    background-color: #28a745;
+    border: none;
+    color: white;
+    cursor: pointer;
+  }
+  .discount-info {
+    margin-top: 10px;
+    color: #2d995b;
+    font-weight: 500;
   }
 }
