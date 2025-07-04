@@ -86,9 +86,6 @@ router.delete('/brands/:id', brandController.deleteBrand);
 // Coupons
 router.get('/coupons', auth, couponController.getCoupons);
 router.get('/coupons/:id', auth, couponController.getCouponById);
-router.post('/coupons', auth, adminAuth, couponController.createCoupon);
-router.put('/coupons/:id', auth, adminAuth, couponController.updateCoupon);
-router.delete('/coupons/:id', auth, adminAuth, couponController.deleteCoupon);
 // Orders
 router.get('/orders', auth, orderController.getOrders);
 router.get('/orders/:id', auth, orderController.getOrderById);
