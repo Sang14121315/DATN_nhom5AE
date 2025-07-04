@@ -15,6 +15,7 @@ const cartController = require('../controllers/cartController');
 const auth = require('../middleware/auth');
 const upload = require('../middleware/upload');
 
+
 // Home
 router.get('/home', homeController.getHomeData);
 
