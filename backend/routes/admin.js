@@ -11,6 +11,10 @@ const notificationController = require('../controllers/notificationController');
 const messageController = require('../controllers/messageController');
 const couponController = require('../controllers/couponController');
 const contactController = require('../controllers/contactController');
+const categoryController = require('../controllers/categoryController');
+console.log("🧪 categoryController =", categoryController);
+
+ // ✅ THÊM DÒNG NÀY
 
 // Admin routes
 router.get('/users', adminAuth, userController.getUsers);
@@ -38,9 +42,9 @@ router.put('/coupons/:id', auth, adminAuth, couponController.updateCoupon);
 router.delete('/coupons/:id', auth, adminAuth, couponController.deleteCoupon);
 
 // Admin routes: Chat Management
-router.get('/messages', auth, adminAuth, messageController.getConversation); // Lấy lịch sử chat với người dùng
-router.post('/messages', auth, adminAuth, messageController.sendMessage); // Gửi tin nhắn đến người dùng
-router.get('/users-for-chat', auth, adminAuth, userController.getUsers); // Lấy danh sách người dùng để chat
+router.get('/messages', auth, adminAuth, messageController.getConversation);
+router.post('/messages', auth, adminAuth, messageController.sendMessage);
+router.get('/users-for-chat', auth, adminAuth, userController.getUsers);
 
 // Admin routes: Contact Management
 router.get('/contacts', auth, adminAuth, contactController.getContacts);
@@ -49,11 +53,12 @@ router.put('/contacts/:id', auth, adminAuth, contactController.updateContact);
 // Dashboard
 router.get('/dashboard',  adminController.getDashboardData);
 
-router.get('/categories', categoryController.getCategories); 
-router.get('/categories/names',  categoryController.getCategoryNames); 
-router.get('/categories/:id',  categoryController.getCategoryById); 
-router.post('/categories', categoryController.createCategory); 
-router.put('/categories/:id',categoryController.updateCategory); 
-router.delete('/categories/:id', categoryController.deleteCategory);
+// Categories
+router.get('/categories', auth, adminAuth,  categoryController.getCategories); 
+router.get('/categories/names', auth, adminAuth,  categoryController.getCategoryNames); 
+router.get('/categories/:id', auth, adminAuth,  categoryController.getCategoryById); 
+router.post('/categories',auth, adminAuth,  categoryController.createCategory); 
+router.put('/categories/:id',auth, adminAuth, categoryController.updateCategory); 
+router.delete('/categories/:id',auth, adminAuth,  categoryController.deleteCategory);
 
 module.exports = router;
