@@ -49,4 +49,11 @@ router.put('/contacts/:id', auth, adminAuth, contactController.updateContact);
 // Dashboard
 router.get('/dashboard',  adminController.getDashboardData);
 
+router.get('/categories', categoryController.getCategories); 
+router.get('/categories/names',  categoryController.getCategoryNames); 
+router.get('/categories/:id',  categoryController.getCategoryById); 
+router.post('/categories', categoryController.createCategory); 
+router.put('/categories/:id',categoryController.updateCategory); 
+router.delete('/categories/:id', categoryController.deleteCategory);
+
 module.exports = router;

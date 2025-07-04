@@ -8,15 +8,27 @@ const categorySchema = Joi.object({
   parent: Joi.string().allow(null, '') 
 });
 
+const CategoryService = require('../services/categoryService');
+
 exports.getCategories = async (req, res) => {
   try {
-    const { name } = req.query;
+    const { name, parent, startDate, endDate } = req.query;
     const filters = {};
-    if (name) filters.name = new RegExp(name, 'i');
 
+    if (name) filters.name = new RegExp(name, 'i');
+    if (parent) {
+      filters.parent = parent === 'null' ? null : parent; // Xử lý parent=null
+    }
+    if (startDate || endDate) filters.created_at = {};
+    if (startDate) filters.created_at.$gte = new Date(startDate + 'T00:00:00.000Z'); // Thêm múi giờ
+    if (endDate) filters.created_at.$lte = new Date(endDate + 'T23:59:59.999Z'); // Bao gồm cả ngày cuối
+
+    console.log('Filters:', filters); // Debug bộ lọc
     const categories = await CategoryService.getAll(filters);
+    console.log('Categories:', categories); // Debug danh mục trả về
     res.json(categories);
   } catch (error) {
+    console.error('Error fetching categories:', error);
     res.status(500).json({ message: error.message || 'Error fetching categories' });
   }
 };
