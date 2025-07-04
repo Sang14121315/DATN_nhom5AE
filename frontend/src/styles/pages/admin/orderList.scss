@@ -1,0 +1,82 @@
+/* AdminOrderPage.scss */
+.admin-orders {
+  padding: 24px;
+
+  h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
+  }
+
+  .order-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+
+    th, td {
+      padding: 16px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f8f9fa;
+      font-weight: 600;
+    }
+
+    tbody tr {
+      border-top: 1px solid #eaeaea;
+
+      &:hover {
+        background-color: #f4f4f4;
+      }
+
+      .id {
+        color: #007bff;
+        font-weight: 500;
+      }
+
+      .product {
+        font-weight: 500;
+      }
+
+      .status-label {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 500;
+        display: inline-block;
+        color: rgb(0, 0, 0);
+
+        &.đã-duyệt {
+          background-color: #28a745;
+        }
+
+        &.đã-hủy {
+          background-color: #dc3545;
+        }
+
+        &.đang-xử-lý {
+          background-color: #ffc107;
+          color: #333;
+        }
+      }
+
+      .view-btn {
+        padding: 6px 14px;
+        background-color: #ff4757;
+        color: rgb(255, 255, 255);
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+
+        &:hover {
+          background-color: #e84141;
+        }
+      }
+    }
+  }
+}

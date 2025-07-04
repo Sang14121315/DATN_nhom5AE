@@ -11,6 +11,7 @@ const messageController = require('../controllers/messageController');
 const homeController = require('../controllers/homeController');
 const contactController = require('../controllers/contactController');
 const productTypeController = require('../controllers/productTypeController');
+const cartController = require('../controllers/cartController');
 const auth = require('../middleware/auth');
 const upload = require('../middleware/upload');
 
@@ -29,9 +30,18 @@ router.post('/login', userController.login);
 router.post('/forgot-password', userController.forgotPassword);
 router.post('/reset-password', userController.resetPassword);
 
+
+// Cart
+router.post('/cart', auth, cartController.addItem);
+router.get('/cart', auth, cartController.getCart);
+router.put('/cart', auth, cartController.updateItem);
+router.delete('/cart', auth, cartController.removeItem);
+router.delete('/cart/clear', auth, cartController.clearCart);
+
+
+
 // Products
 router.get("/products/search", productController.searchProducts);
-
 router.get('/products', productController.getProducts);
 router.post('/products', auth, upload.single('image'), productController.createProduct);
 router.get('/products/:id', productController.getProductById);
@@ -39,30 +49,46 @@ router.put('/products/:id', auth, upload.single('image'), productController.upda
 router.delete('/products/:id', auth, productController.deleteProduct);
 
 // Product Types
+
 router.get('/product-types/:id', productTypeController.getProductTypeById);
 router.get('/product-types', productTypeController.getProductTypes);
+
+router.get('/product-types', auth, productTypeController.getProductTypes);
+router.get('/product-types/:id', auth, productTypeController.getProductTypeById);
+
+router.get('/product-types', productTypeController.getProductTypes);
+router.get('/product-types/:id', productTypeController.getProductTypeById);
+
+router.get('/product-types/:id', productTypeController.getProductTypeById);
+router.get('/product-types', productTypeController.getProductTypes);
+router.get('/product-types', auth, productTypeController.getProductTypes);
+router.get('/product-types/:id', auth, productTypeController.getProductTypeById);
+router.get('/product-types', productTypeController.getProductTypes);
+router.get('/product-types/:id', productTypeController.getProductTypeById);
 router.post('/product-types', auth, productTypeController.createProductType);
 router.put('/product-types/:id', auth, productTypeController.updateProductType);
 router.delete('/product-types/:id', auth, productTypeController.deleteProductType);
 
 // Categories
-router.get('/categories/:id', categoryController.getCategoryById);
 router.get('/categories', categoryController.getCategories);
-router.post('/categories', auth, categoryController.createCategory);
-router.put('/categories/:id', auth, categoryController.updateCategory);
-router.delete('/categories/:id', auth, categoryController.deleteCategory);
+router.get('/categories/:id', categoryController.getCategoryById);
+router.post('/categories', categoryController.createCategory);
+router.put('/categories/:id', categoryController.updateCategory);
+router.delete('/categories/:id', categoryController.deleteCategory);
 
 // Brands
-router.get('/brands/:id',  brandController.getBrandById);
 router.get('/brands', brandController.getBrands);
-router.post('/brands', auth, upload.single('logo'), brandController.createBrand);
-router.put('/brands/:id', auth, upload.single('logo'), brandController.updateBrand);
-router.delete('/brands/:id', auth, brandController.deleteBrand);
+router.get('/brands/:id', brandController.getBrandById);
+router.post('/brands', upload.single('logo'), brandController.createBrand);
+router.put('/brands/:id', upload.single('logo'), brandController.updateBrand);
+router.delete('/brands/:id', brandController.deleteBrand);
 
 // Coupons
 router.get('/coupons', auth, couponController.getCoupons);
 router.get('/coupons/:id', auth, couponController.getCouponById);
-
+router.post('/coupons', auth, adminAuth, couponController.createCoupon);
+router.put('/coupons/:id', auth, adminAuth, couponController.updateCoupon);
+router.delete('/coupons/:id', auth, adminAuth, couponController.deleteCoupon);
 // Orders
 router.get('/orders', auth, orderController.getOrders);
 router.get('/orders/:id', auth, orderController.getOrderById);

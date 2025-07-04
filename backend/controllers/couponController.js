@@ -28,14 +28,13 @@ const getCoupons = async (req, res) => {
 const getCouponById = async (req, res) => {
   try {
     const coupon = await CouponService.getById(req.params.id);
-    if (!coupon) {
-      return res.status(404).json({ message: 'Coupon not found' });
-    }
+    if (!coupon) return res.status(404).json({ message: 'Coupon not found' });
     res.json(coupon);
-  } catch (error) {
-    res.status(500).json({ message: error.message || 'Error fetching coupon' });
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching coupon' });
   }
 };
+
 
 const createCoupon = async (req, res) => {
   try {

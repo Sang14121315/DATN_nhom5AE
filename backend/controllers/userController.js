@@ -2,6 +2,7 @@ const UserService = require('../services/userService');
 const Joi = require('joi');
 const jwt = require('jsonwebtoken');
 
+// Validation schemas
 const userSchema = Joi.object({
   name: Joi.string().required(),
   email: Joi.string().email().required(),
@@ -33,7 +34,15 @@ exports.register = async (req, res) => {
     const user = await UserService.create(req.body);
     const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    res.status(201).json({ user, token });
+    res
+      .cookie('token', token, {
+        httpOnly: true,
+        secure: false, // đặt true nếu dùng HTTPS
+        sameSite: 'Lax',
+        maxAge: 60 * 60 * 1000 // 1 giờ
+      })
+      .status(201)
+      .json({ user, token });
   } catch (error) {
     res.status(500).json({ message: error.message || 'Error registering user' });
   }
@@ -47,13 +56,22 @@ exports.login = async (req, res) => {
     const { email, password } = req.body;
     const token = await UserService.login(email, password);
     const user = await UserService.getByEmail(email);
+
     const userData = {
       id: user._id,
       name: user.name,
       email: user.email,
       role: user.role
     };
-    res.json({ user: userData, token });
+
+    res
+      .cookie('token', token, {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'Lax',
+        maxAge: 60 * 60 * 1000
+      })
+      .json({ user: userData, token });
   } catch (error) {
     res.status(500).json({ message: error.message || 'Error logging in' });
   }

@@ -4,7 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 
 import App from "./App";
 import { CartProvider } from "@/context/CartContext";
-import { OrderProvider } from "@/context/OrderContext"; // ✅ thêm dòng này
+import { OrderProvider } from "@/context/OrderContext"; 
 
 // Import global styles
 import "@/styles/main.scss";
@@ -18,7 +18,7 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <CartProvider>
-        <OrderProvider> {/* ✅ Bọc App bằng OrderProvider */}
+        <OrderProvider> 
           <App />
         </OrderProvider>
       </CartProvider>

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import '@/styles/pages/user/register.scss'; // Dùng chung style với register
+import '@/styles/pages/user/register.scss';
 import { loginUser } from '@/api/user/userAPI';
+import { Eye, EyeOff } from 'lucide-react';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -15,9 +16,15 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
     try {
       const res = await loginUser({ email, password });
-      localStorage.setItem('token', res.token);
+
+      // ✅ Không cần lưu token nếu backend đã set cookie
       localStorage.setItem('user', JSON.stringify(res.user));
-      navigate('/');
+
+      if (res.user.role === 'admin') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/');
+      }
     } catch (error: any) {
       setErrorMsg(error.response?.data?.message || 'Đăng nhập thất bại!');
     }
@@ -26,28 +33,11 @@ const LoginPage: React.FC = () => {
   return (
     <div className="register-layout">
       {/* Banner trái */}
-      <div className="side-banner">
-        <img src="/assets/banner-left.png" alt="Banner trái" />
-      </div>
-
-      {/* Sidebar */}
-      <div className="sidebar">
-        <h4>📋 DANH MỤC SẢN PHẨM</h4>
-        <div className="dropdown">
-          <ul>
-            <li>PC Gaming - Máy tính chơi game</li>
-            <li>PC Workstation</li>
-            <li>Tự Build Cấu Hình PC</li>
-            <li>PC VĂN PHÒNG</li>
-            <li>PC AMD GAMING</li>
-            <li>PC Core Ultra</li>
-            <li>PC GAMING ĐẸP – CAO CẤP</li>
-            <li>PC GIẢ LẬP - ẢO HÓA</li>
-            <li>PC MINI</li>
-            <li>PC Refurbished</li>
-          </ul>
+      <Link to="/product/684b0b700a18dcee50370f35" className="side-banner-link">
+        <div className="side-banner">
+          <img src="/assets/banner-left.png" alt="Banner trái" />
         </div>
-      </div>
+      </Link>
 
       {/* Nội dung chính */}
       <div className="main-auth-content">
@@ -90,8 +80,9 @@ const LoginPage: React.FC = () => {
               type="button"
               className="toggle-password"
               onClick={() => setShowPassword(!showPassword)}
+              aria-label="Toggle password visibility"
             >
-              {showPassword ? 'ẩn' : 'hiện'}
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
           </div>
 
@@ -109,9 +100,11 @@ const LoginPage: React.FC = () => {
       </div>
 
       {/* Banner phải */}
-      <div className="side-banner">
-        <img src="/assets/banner-right.png" alt="Banner phải" />
-      </div>
+      <Link to="/product/684b0b700a18dcee50370f3f" className="side-banner-link">
+        <div className="side-banner">
+          <img src="/assets/banner-right.png" alt="Banner phải" />
+        </div>
+      </Link>
     </div>
   );
 };

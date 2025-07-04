@@ -6,9 +6,13 @@ class OrderDetailService {
   }
 
   static async getByOrderId(orderId) {
-    const detail = await OrderDetail.find({ order_id: orderId }).populate('product_id');
-    if (!detail) throw new Error('Order detail not found');
-    return detail;
+    const details = await OrderDetail.find({ order_id: orderId }).populate('product_id');
+    if (!details.length) throw new Error('Order details not found');
+    return details;
+  }
+
+  static async createMany(details) {
+    return await OrderDetail.insertMany(details);
   }
 }
 

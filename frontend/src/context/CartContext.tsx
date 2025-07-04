@@ -1,6 +1,14 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import {
+  fetchCart,
+  addToCartAPI,
+  updateCartItemAPI,
+  removeCartItemAPI,
+  clearCartAPI
+} from '@/api/user/cartAPI';
 
 interface CartItem {
+  
   _id: string;
   name: string;
   price: number;
@@ -12,60 +20,104 @@ interface CartContextType {
   cartItems: CartItem[];
   totalPrice: number;
   totalQuantity: number;
-  isSidebarOpen: boolean;                  // ✅ trạng thái mở/đóng giỏ hàng
-  openCart: () => void;                    // ✅ mở
-  closeCart: () => void;                   // ✅ đóng
-  addToCart: (item: CartItem) => void;
-  removeFromCart: (id: string) => void;
-  increaseQuantity: (id: string) => void;
-  decreaseQuantity: (id: string) => void;
+  isSidebarOpen: boolean;
+  openCart: () => void;
+  closeCart: () => void;
+  addToCart: (item: CartItem) => Promise<void>;
+  removeFromCart: (id: string) => Promise<void>;
+  increaseQuantity: (id: string) => Promise<void>;
+  decreaseQuantity: (id: string) => Promise<void>;
+  clearCart: () => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // ✅ sidebar state
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const totalPrice = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
   const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-  const addToCart = (item: CartItem) => {
-    setCartItems(prev => {
-      const existing = prev.find(p => p._id === item._id);
-      if (existing) {
-        return prev.map(p =>
-          p._id === item._id ? { ...p, quantity: p.quantity + item.quantity } : p
-        );
+  const loadCart = async () => {
+    try {
+      const data = await fetchCart();
+
+      // ✅ Check nếu không có items thì log ra để debug
+      if (!data || !Array.isArray(data.items)) {
+        console.warn('Cart data không hợp lệ:', data);
+        setCartItems([]); // fallback
+        return;
       }
-      return [...prev, { ...item, quantity: item.quantity || 1 }];
-    });
+
+      setCartItems(data.items);
+    } catch (error: any) {
+      console.error('❌ Lỗi khi load cart:', error?.response?.data || error.message);
+    }
   };
 
-  const removeFromCart = (id: string) => {
-    setCartItems(prev => prev.filter(item => item._id !== id));
+  useEffect(() => {
+    loadCart();
+  }, []);
+
+  const addToCart = async (item: CartItem) => {
+    try {
+      const existing = cartItems.find(p => p._id === item._id);
+      if (existing) {
+        await updateCartItemAPI(item._id, existing.quantity + item.quantity);
+      } else {
+       await addToCartAPI(item._id, item.quantity || 1);
+      }
+      await loadCart();
+    } catch (error: any) {
+      console.error('❌ Lỗi khi thêm vào giỏ hàng:', error?.response?.data || error.message);
+    }
   };
 
-  const increaseQuantity = (id: string) => {
-    setCartItems(prev =>
-      prev.map(item =>
-        item._id === id ? { ...item, quantity: item.quantity + 1 } : item
-      )
-    );
+  const removeFromCart = async (id: string) => {
+    try {
+      await removeCartItemAPI(id);
+      await loadCart();
+    } catch (error: any) {
+      console.error('❌ Lỗi khi xoá sản phẩm:', error?.response?.data || error.message);
+    }
   };
 
-  const decreaseQuantity = (id: string) => {
-    setCartItems(prev =>
-      prev.map(item =>
-        item._id === id
-          ? { ...item, quantity: item.quantity > 1 ? item.quantity - 1 : 1 }
-          : item
-      )
-    );
+  const increaseQuantity = async (id: string) => {
+    try {
+      const item = cartItems.find(i => i._id === id);
+      if (item) {
+        await updateCartItemAPI(id, item.quantity + 1);
+        await loadCart();
+      }
+    } catch (error: any) {
+      console.error('❌ Lỗi khi tăng số lượng:', error?.response?.data || error.message);
+    }
   };
 
-  const openCart = () => setIsSidebarOpen(true);  // ✅ mở
-  const closeCart = () => setIsSidebarOpen(false); // ✅ đóng
+  const decreaseQuantity = async (id: string) => {
+    try {
+      const item = cartItems.find(i => i._id === id);
+      if (item && item.quantity > 1) {
+        await updateCartItemAPI(id, item.quantity - 1);
+        await loadCart();
+      }
+    } catch (error: any) {
+      console.error('❌ Lỗi khi giảm số lượng:', error?.response?.data || error.message);
+    }
+  };
+
+  const clearCart = async () => {
+    try {
+      await clearCartAPI();
+      await loadCart();
+    } catch (error: any) {
+      console.error('❌ Lỗi khi xoá giỏ hàng:', error?.response?.data || error.message);
+    }
+  };
+
+  const openCart = () => setIsSidebarOpen(true);
+  const closeCart = () => setIsSidebarOpen(false);
 
   return (
     <CartContext.Provider
@@ -80,6 +132,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         removeFromCart,
         increaseQuantity,
         decreaseQuantity,
+        clearCart,
       }}
     >
       {children}

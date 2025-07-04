@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '@/styles/pages/user/register.scss';
 import { registerUser } from '@/api/user/userAPI';
+import { Eye, EyeOff } from 'lucide-react';
+
 
 const RegisterPage: React.FC = () => {
   const [fullName, setFullName] = useState('');
@@ -33,29 +35,13 @@ const RegisterPage: React.FC = () => {
 
   return (
     <div className="register-layout">
-      {/* Banner trái */}
-      <div className="side-banner">
-        <img src="/assets/banner-left.png" alt="Banner trái" />
-      </div>
-
-      {/* Sidebar */}
-      <div className="sidebar">
-        <h4>📋 DANH MỤC SẢN PHẨM</h4>
-        <div className="dropdown">
-          <ul>
-            <li>PC Gaming - Máy tính chơi game</li>
-            <li>PC Workstation</li>
-            <li>Tự Build Cấu Hình PC</li>
-            <li>PC VĂN PHÒNG</li>
-            <li>PC AMD GAMING</li>
-            <li>PC Core Ultra</li>
-            <li>PC GAMING ĐẸP – CAO CẤP</li>
-            <li>PC GIẢ LẬP - ẢO HÓA</li>
-            <li>PC MINI</li>
-            <li>PC Refurbished</li>
-          </ul>
+      {/* Banner trái - Link tới sản phẩm 684b0b700a18dcee50370f35 */}
+      <Link to="/product/684b0b700a18dcee50370f35" className="side-banner-link">
+        <div className="side-banner">
+          <img src="/assets/banner-left.png" alt="Banner trái" />
         </div>
-      </div>
+      </Link>
+
 
       {/* Nội dung chính */}
       <div className="main-auth-content">
@@ -106,14 +92,16 @@ const RegisterPage: React.FC = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-            <button
-              type="button"
-              className="toggle-password"
-              onClick={() => setShowPassword(!showPassword)}
-              aria-label="Toggle password visibility"
-            >
-              {showPassword ? 'ẩn' : 'hiện'}
-            </button>
+          <button
+            type="button"
+            className="toggle-password"
+            onClick={() => setShowPassword(!showPassword)}
+            aria-label="Toggle password visibility"
+          >
+            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+
+
           </div>
 
           <div className="form-group password-group">
@@ -130,9 +118,10 @@ const RegisterPage: React.FC = () => {
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               aria-label="Toggle confirm password visibility"
             >
-              {showConfirmPassword ? 'ẩn' : 'hiện'}
+              {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
           </div>
+
 
           <div className="recaptcha-note">
             Trang này được bảo vệ bởi reCAPTCHA và tuân theo Chính sách quyền riêng tư cùng Điều khoản dịch vụ của Google.
@@ -146,10 +135,12 @@ const RegisterPage: React.FC = () => {
         </form>
       </div>
 
-      {/* Banner phải */}
-      <div className="side-banner">
-        <img src="/assets/banner-right.png" alt="Banner phải" />
-      </div>
+      {/* Banner phải - Link tới sản phẩm 684b0b700a18dcee50370f3f */}
+      <Link to="/product/684b0b700a18dcee50370f3f" className="side-banner-link">
+        <div className="side-banner">
+          <img src="/assets/banner-right.png" alt="Banner phải" />
+        </div>
+      </Link>
     </div>
   );
 };

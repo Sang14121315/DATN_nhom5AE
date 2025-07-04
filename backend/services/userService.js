@@ -88,7 +88,19 @@ class UserService {
       subject: 'Đặt lại mật khẩu',
       html: `
         <p>Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản tại cửa hàng laptop.</p>
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
         <p>Vui lòng nhấn vào liên kết dưới đây để đặt lại mật khẩu:</p>
+=======
+<p>Vui lòng nhấn vào liên kết dưới đây để đặt lại mật khẩu:</p>
+>>>>>>> Stashed changes
+=======
+<p>Vui lòng nhấn vào liên kết dưới đây để đặt lại mật khẩu:</p>
+>>>>>>> Stashed changes
+=======
+<p>Vui lòng nhấn vào liên kết dưới đây để đặt lại mật khẩu:</p>
+>>>>>>> Stashed changes
         <a href="${resetLink}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">Đặt lại mật khẩu</a>
         <p>Liên kết sẽ hết hạn sau 1 giờ.</p>
         <p>Nếu bạn không yêu cầu, vui lòng bỏ qua email này.</p>

@@ -1,7 +1,10 @@
 const jwt = require('jsonwebtoken');
 
 const auth = (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
+  const token =
+    req.cookies?.token ||                    // lấy từ cookie
+    req.header('Authorization')?.replace('Bearer ', ''); // fallback: lấy từ header
+
   if (!token) return res.status(401).json({ message: 'No token provided' });
 
   try {
@@ -12,5 +15,5 @@ const auth = (req, res, next) => {
     res.status(401).json({ message: 'Invalid token' });
   }
 };
-
+  
 module.exports = auth;

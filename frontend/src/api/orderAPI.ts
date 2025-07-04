@@ -1,87 +1,50 @@
-// import axios from 'axios';
+import axios from 'axios';
 
-// const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const withCredentialsConfig = { withCredentials: true };
 
-// // Kiểu dữ liệu đã chuẩn hóa sau khi xử lý API
-// export interface Order {
-//   _id: string;
-//   product: string;
-//   orderNumber: string;
-//   date: string;
-//   customer: string;
-//   status: string;
-//   amount: number;
-// }
+// 🧾 Tạo đơn hàng mới
+export const createOrder = async (orderData: any) => {
+  const res = await axios.post(`${API_URL}/orders`, orderData, withCredentialsConfig);
+  return res.data;
+};
 
-// // Kiểu dữ liệu cho thống kê dashboard
-// export interface DashboardStats {
-//   totalOrders: number;
-//   totalDelivered: number;
-//   totalCanceled: number;
-//   totalRevenue: number;
-// }
+// 📄 Lấy danh sách tất cả đơn hàng (cho admin)
+export const getOrders = async () => {
+  const res = await axios.get(`${API_URL}/orders`, withCredentialsConfig);
+  return res.data.map((order: any) => ({
+    ...order,
+    items: (order.items || []).map((item: any) => ({
+      ...item,
+      img_url: item.img_url || '', // tránh lỗi thiếu ảnh
+    })),
+  }));
+};
 
-// // Kiểu dữ liệu thô trả về từ API
-// interface RawOrder {
-//   _id: string;
-//   product?: string;
-//   name?: string;
-//   orderNumber?: string;
-//   code?: string;
-//   createdAt?: string;
-//   date?: string;
-//   customer: string;
-//   status: string;
-//   amount?: number;
-//   value?: number;
-// }
+// 🔍 Lấy chi tiết 1 đơn hàng theo ID
+export const getOrderById = async (id: string) => {
+  const res = await axios.get(`${API_URL}/orders/${id}`, withCredentialsConfig);
+  return res.data;
+};
 
-// // API: Lấy danh sách đơn hàng gần đây
-// export const getRecentOrders = async (): Promise<Order[]> => {
-//   try {
-//     const response = await axios.get(`${API_URL}/orders/recent`);
-//     const rawOrders: RawOrder[] = response.data.orders;
+// 🔄 Cập nhật trạng thái đơn hàng (hủy)
+export const cancelOrder = async (id: string) => {
+  const res = await axios.put(`${API_URL}/orders/${id}`, { status: 'cancelled' }, withCredentialsConfig);
+  return res.data;
+};
 
-//     return rawOrders.map((order): Order => ({
-//       _id: order._id,
-//       product: order.product || order.name || 'Không rõ sản phẩm',
-//       orderNumber: order.orderNumber || order.code || 'Mã đơn không rõ',
-//       date: order.createdAt || order.date || new Date().toISOString(),
-//       customer: order.customer,
-//       status: translateStatus(order.status),
-//       amount: order.amount ?? order.value ?? 0
-//     }));
-//   } catch (error) {
-//     console.error('Error fetching recent orders:', error);
-//     throw error;
-//   }
-// };
+// ❌ Xoá đơn hàng
+export const deleteOrder = async (id: string) => {
+  const res = await axios.delete(`${API_URL}/orders/${id}`, withCredentialsConfig);
+  return res.data;
+};
 
-// // API: Lấy thống kê tổng quan dashboard
-// export const getDashboardStats = async (): Promise<DashboardStats> => {
-//   try {
-//     const response = await axios.get(`${API_URL}/orders/stats`);
-//     return {
-//       totalOrders: response.data.totalOrders || 0,
-//       totalDelivered: response.data.totalDelivered || 0,
-//       totalCanceled: response.data.totalCanceled || 0,
-//       totalRevenue: response.data.totalRevenue || 0
-//     };
-//   } catch (error) {
-//     console.error('Error fetching dashboard stats:', error);
-//     throw error;
-//   }
-// };
+export const cancelOrderAPI = async (id: string) => {
+  const res = await axios.put(`${API_URL}/orders/${id}`, { status: "cancelled" }, { withCredentials: true });
+  return res.data;
+};
 
-// // Hàm chuyển trạng thái từ tiếng Anh sang tiếng Việt
-// const translateStatus = (status: string): string => {
-//   const statusMap: Record<string, string> = {
-//     'pending': 'Đang xử lý',
-//     'processing': 'Đang xử lý',
-//     'delivered': 'Đã giao hàng',
-//     'canceled': 'Đã hủy',
-//     'Đã đặt': 'Đã đặt',
-//     'Đã hủy': 'Đã hủy'
-//   };
-//   return statusMap[status] || status;
-// };
+export const deleteOrderAPI = async (id: string) => {
+  const res = await axios.delete(`${API_URL}/orders/${id}`, { withCredentials: true });
+  return res.data;
+};

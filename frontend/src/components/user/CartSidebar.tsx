@@ -26,9 +26,9 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose }) => {
       return;
     }
 
-    onClose(); // ✅ Đóng sidebar
+    onClose();
     setTimeout(() => {
-      navigate("/checkout"); // ✅ Chuyển trang sau khi đóng sidebar
+      navigate("/checkout");
     }, 200);
   };
 
@@ -63,13 +63,13 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose }) => {
 
       <div className="cart-footer">
         <p>Tổng tiền: {totalPrice.toLocaleString()} đ</p>
-       <button 
-  onClick={handleCheckout} 
-  disabled={cartItems.length === 0}
-  className={`checkout-btn ${cartItems.length === 0 ? 'disabled' : ''}`}
->
-  Đặt hàng
-</button>
+        <button 
+          onClick={handleCheckout} 
+          disabled={cartItems.length === 0}
+          className={`checkout-btn ${cartItems.length === 0 ? 'disabled' : ''}`}
+        >
+          Đặt hàng
+        </button>
       </div>
     </div>
   );
