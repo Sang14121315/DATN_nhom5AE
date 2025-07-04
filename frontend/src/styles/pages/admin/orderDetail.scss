@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 .order-detail-container {
   padding: 24px;
   font-family: 'Inter', sans-serif;
@@ -111,68 +111,7 @@
       &:hover {
         background-color: #f1f1f1;
       }
-=======
-.admin-order-detail {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 24px;
 
-  h2 {
-    margin-bottom: 24px;
-  }
-
-  .order-section {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 20px;
-  }
-
-  .product-row {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 12px;
-
-    img {
-      width: 60px;
-      height: 60px;
-      object-fit: cover;
-      border-radius: 8px;
-    }
-  }
-
-  .status-label {
-    padding: 4px 8px;
-    border-radius: 4px;
-    &.pending { background: #ffc107; color: #fff; }
-    &.completed { background: #28a745; color: #fff; }
-    &.cancelled { background: #dc3545; color: #fff; }
-  }
-
-  .action-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-
-    .back-btn,
-    .delete-btn {
-      padding: 10px 16px;
-      border: none;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .back-btn {
-      background: #6c757d;
-      color: #fff;
-    }
-
-    .delete-btn {
-      background: #dc3545;
-      color: #fff;
->>>>>>> main
     }
   }
 }

@@ -1,29 +1,27 @@
-<<<<<<< HEAD
-  import { Routes, Route } from "react-router-dom";
-  import AdminLayout from "@/layouts/admin.layout";
-  import DashboardPage from "@/pages/admin/Dashboard";
-  import ProductsPage from "@/pages/admin/products";
-  import ProductDetailPage from "@/pages/admin/ProductDetailPage";
-  import AddProductPage from "@/pages/admin/AddProductPage";
-  import OrdersPage from '@/pages/admin/orders';
-// import OrderDetailPage from '@/pages/admin/OrderDetailPage';
-=======
 import { Routes, Route } from "react-router-dom";
+
+// Layouts
 import AdminLayout from "@/layouts/admin.layout";
+import AuthLayout from "@/layouts/auth.layout";
+
+// Admin Pages
 import DashboardPage from "@/pages/admin/Dashboard";
+import ProductsPage from "@/pages/admin/products";
+import ProductDetailPage from "@/pages/admin/ProductDetailPage";
+import AddProductPage from "@/pages/admin/AddProductPage";
+import OrdersPage from "@/pages/admin/orders";
+import AdminOrderDetailPage from "@/pages/admin/AdminOrderDetailPage";
 import CategoryTablePage from "@/pages/admin/CategoryTable";
 import CategoryFormPage from "@/pages/admin/CategoryForm";
 import BrandTablePage from "@/pages/admin/BrandTable";
 import BrandFormPage from "@/pages/admin/BrandForm";
-import Orderfrom from "@/pages/admin/OrderPage";
-import AdminOrderDetailPage from "@/pages/admin/AdminOrderDetailPage";
-import CouponAdmin from "@/pages/admin/AdminCouponPage"
-// import user
-import AuthLayout from "@/layouts/auth.layout";
+import CouponAdmin from "@/pages/admin/AdminCouponPage";
+
+// User Pages
+import HomePage from "@/pages/user/home";
 import AboutPage from "@/pages/user/about";
 import ProductlistPage from "@/pages/user/productList";
 import ProductdetailPage from "@/pages/user/productDetail";
-import HomePage from "@/pages/user/home";
 import LoginPage from "@/pages/user/LoginPage";
 import RegisterPage from "@/pages/user/RegisterPage";
 import ForgotPasswordPage from "@/pages/user/ForgotPasswordPage";
@@ -32,26 +30,29 @@ import CheckoutPage from "@/pages/user/CheckoutPage";
 import SearchResultPage from "@/pages/user/searchResult";
 import OrderTrackingPage from "@/pages/user/OrderTrackingPage";
 import ContactPage from "@/pages/user/ContactPage";
->>>>>>> main
-
 
 const MainRouter = () => {
   return (
     <Routes>
-      {/* Admin layout */}
+      {/* Admin Layout */}
       <Route path="/admin" element={<AdminLayout />}>
         <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="products" element={<ProductsPage />} />
+        <Route path="products/add" element={<AddProductPage />} />
+        <Route path="products/:id" element={<ProductDetailPage />} />
+        <Route path="products/edit/:id" element={<ProductDetailPage />} />
+        <Route path="orders" element={<OrdersPage />} />
+        <Route path="orders/:id" element={<AdminOrderDetailPage />} />
         <Route path="category" element={<CategoryTablePage />} />
         <Route path="category/create" element={<CategoryFormPage />} />
         <Route path="category/:id/form" element={<CategoryFormPage />} />
         <Route path="brand" element={<BrandTablePage />} />
         <Route path="brand/create" element={<BrandFormPage />} />
         <Route path="brand/:id/form" element={<BrandFormPage />} />
-        <Route path="order" element={<Orderfrom />} />
-        <Route path="orders/:id" element={<AdminOrderDetailPage/>} />
-        <Route path="coupons" element={<CouponAdmin/>} />
+        <Route path="coupons" element={<CouponAdmin />} />
       </Route>
-      {/* User layout */}
+
+      {/* User Layout */}
       <Route path="/" element={<AuthLayout />}>
         <Route index element={<HomePage />} />
         <Route path="home" element={<HomePage />} />
@@ -59,8 +60,8 @@ const MainRouter = () => {
         <Route path="about" element={<AboutPage />} />
         <Route path="productlist" element={<ProductlistPage />} />
         <Route path="productdetail" element={<ProductdetailPage />} />
-        <Route path="login" element={<LoginPage />} />
         <Route path="product/:id" element={<ProductdetailPage />} />
+        <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
         <Route path="forgot-password" element={<ForgotPasswordPage />} />
         <Route path="cart" element={<CartPage />} />
@@ -72,54 +73,4 @@ const MainRouter = () => {
   );
 };
 
-<<<<<<< HEAD
-  import SearchResultPage from "@/pages/user/searchResult";
-
-  import OrderTrackingPage from "@/pages/user/OrderTrackingPage";
-
-  import ContactPage from "@/pages/user/ContactPage";
-
-
-  const MainRouter = () => {
-    return (
-      <Routes>
-        {/* Admin layout */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route path="dashboard" element={<DashboardPage />} />
-           <Route path="products" element={<ProductsPage />} />
-           <Route path="products/:id" element={<ProductDetailPage />} />
-           <Route path="products/edit/:id" element={<ProductDetailPage />} />
-           <Route path="products/add" element={<AddProductPage />} />
-            <Route path="orders" element={<OrdersPage />} />
-               {/* <Route path="orders/:id" element={<OrderDetailPage />} /> */}
-           
-
-           
-        </Route>
-        {/* User layout */}
-        <Route path="/" element={<AuthLayout />}>
-          <Route index element={<HomePage />} />
-          <Route path="home" element={<HomePage />} />
-          <Route path="search" element={<SearchResultPage />} />
-          <Route path="about" element={<AboutPage />} />
-          <Route path="productlist" element={<ProductlistPage />} />
-          <Route path="productdetail" element={<ProductdetailPage />} />
-          <Route path="login" element={<LoginPage />} />
-          <Route path="product/:id" element={<ProductdetailPage />} />
-          <Route path="register" element={<RegisterPage />} />
-          <Route path="forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="cart" element={<CartPage />} />
-          <Route path="checkout" element={<CheckoutPage />} />
-          <Route path="orders" element={<OrderTrackingPage />} />
-          <Route path="ContactPage" element={<ContactPage />} />
-          
-        </Route>
-      </Routes>
-    );
-  };
-
-
-  export default MainRouter;
-=======
 export default MainRouter;
->>>>>>> main
