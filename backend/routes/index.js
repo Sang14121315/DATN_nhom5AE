@@ -112,4 +112,9 @@ router.get('/messages', auth, messageController.getConversation);
 router.post('/messages', auth, messageController.sendMessage);
 router.get('/admins', auth, messageController.getAdmins);
 
+// Momo payment
+
+router.post('/momo/create', orderController.createMomoOrder);
+router.post('/momo/webhook', orderController.momoWebhook);
+
 module.exports = router;
