@@ -60,6 +60,7 @@ class CouponService {
   }
 
   static async update(id, data) {
+    if ('created_at' in data) delete data.created_at;
     return await Coupon.findByIdAndUpdate(id, data, { new: true });
   }
 
