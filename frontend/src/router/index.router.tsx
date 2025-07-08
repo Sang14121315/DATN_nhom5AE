@@ -9,7 +9,6 @@ import DashboardPage from "@/pages/admin/Dashboard";
 import ProductsPage from "@/pages/admin/products";
 import ProductDetailPage from "@/pages/admin/ProductDetailPage";
 import AddProductPage from "@/pages/admin/AddProductPage";
-import OrdersPage from "@/pages/admin/orders";
 import AdminOrderDetailPage from "@/pages/admin/AdminOrderDetailPage";
 import CategoryTablePage from "@/pages/admin/CategoryTable";
 import CategoryFormPage from "@/pages/admin/CategoryForm";
@@ -41,7 +40,7 @@ const MainRouter = () => {
         <Route path="products/add" element={<AddProductPage />} />
         <Route path="products/:id" element={<ProductDetailPage />} />
         <Route path="products/edit/:id" element={<ProductDetailPage />} />
-        <Route path="orders" element={<OrdersPage />} />
+        {/* <Route path="orders" element={<OrdersPage />} /> */}
         <Route path="orders/:id" element={<AdminOrderDetailPage />} />
         <Route path="category" element={<CategoryTablePage />} />
         <Route path="category/create" element={<CategoryFormPage />} />

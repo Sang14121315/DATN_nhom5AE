@@ -1,8 +1,5 @@
-import axios from 'axios';
+import axios from '@/api/axios';
 
-const API_URL = 'http://localhost:5000/api/products';
-
-// Interfaces
 export interface Product {
   _id: string;
   name: string;
@@ -18,6 +15,7 @@ export interface Product {
   hot?: boolean;
   view?: number;
   created_at?: string;
+  updated_at?: string;
 }
 
 export interface ProductListResponse {
@@ -27,104 +25,91 @@ export interface ProductListResponse {
 }
 
 export interface ProductQueryParams {
-  page?: number;
-  limit?: number;
-  search?: string;
-  sortBy?: 'price' | 'created_at' | 'view';
-  order?: 'asc' | 'desc';
+  name?: string;
   category_id?: string;
   brand_id?: string;
   minPrice?: number;
   maxPrice?: number;
   sale?: boolean;
   hot?: boolean;
+  sort?: 'price_asc' | 'price_desc' | 'view_desc';
+  page?: number;
+  limit?: number;
 }
 
-// Utils
+// ✅ Hàm format tiền
 export const formatCurrency = (amount: number): string => {
   return amount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
 };
 
-// API: Lấy sản phẩm có lọc, phân trang, sắp xếp
-export const fetchFilteredProducts = async (params: ProductQueryParams): Promise<ProductListResponse> => {
-  try {
-    const response = await axios.get(API_URL, {
-      params,
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    });
-
-    // Nếu backend chỉ trả về mảng
-    if (Array.isArray(response.data)) {
-      return {
-        products: response.data,
-        total: response.data.length,
-        totalPages: 1,
-      };
+// ✅ Hàm build query (giống brand/category API)
+const buildQueryParams = (filters: Record<string, any>): URLSearchParams => {
+  const params = new URLSearchParams();
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      params.append(key, value.toString());
     }
+  });
+  return params;
+};
 
+// ✅ Lấy danh sách sản phẩm với filter & pagination
+export const fetchAllProducts = async (
+  filters: ProductQueryParams = {}
+): Promise<ProductListResponse> => {
+  try {
+    const params = buildQueryParams(filters);
+    const response = await axios.get(`/products?${params.toString()}`);
     return response.data;
-  } catch (error: any) {
-    console.error('Lỗi khi fetch sản phẩm:', error);
+  } catch (error) {
+    console.error('Lỗi khi fetch danh sách sản phẩm:', error);
     throw new Error('Không thể tải danh sách sản phẩm');
   }
 };
 
-// API: Lấy chi tiết sản phẩm
-export const fetchProductDetail = async (id: string): Promise<Product> => {
+// ✅ Lấy 1 sản phẩm theo ID
+export const getProductById = async (id: string): Promise<Product> => {
   try {
-    const response = await axios.get(`${API_URL}/${id}`);
+    const response = await axios.get(`/products/${id}`);
     return response.data;
-  } catch (error: any) {
-    console.error('Lỗi khi lấy chi tiết sản phẩm:', error);
-    throw new Error('Không thể lấy chi tiết sản phẩm');
+  } catch (error) {
+    console.error('Lỗi khi fetch chi tiết sản phẩm:', error);
+    throw new Error('Không thể tải chi tiết sản phẩm');
   }
 };
 
-// API: Tạo sản phẩm
-export const createProduct = async (productData: FormData): Promise<Product> => {
+// ✅ Tạo mới sản phẩm (dùng FormData)
+export const createProduct = async (data: FormData): Promise<Product> => {
   try {
-    const response = await axios.post(API_URL, productData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
+    const response = await axios.post('/products', data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
-  } catch (error: any) {
+  } catch (error) {
     console.error('Lỗi khi tạo sản phẩm:', error);
     throw new Error('Không thể tạo sản phẩm');
   }
 };
 
-// API: Cập nhật sản phẩm
-export const updateProduct = async (id: string, productData: FormData): Promise<Product> => {
+// ✅ Cập nhật sản phẩm
+export const updateProduct = async (id: string, data: FormData): Promise<Product> => {
   try {
-    const response = await axios.put(`${API_URL}/${id}`, productData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
+    const response = await axios.put(`/products/${id}`, data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
-  } catch (error: any) {
+  } catch (error) {
     console.error('Lỗi khi cập nhật sản phẩm:', error);
     throw new Error('Không thể cập nhật sản phẩm');
   }
 };
 
-// API: Xoá sản phẩm
-export const deleteProduct = async (id: string): Promise<{ message: string }> => {
+// ✅ Xóa sản phẩm
+export const deleteProduct = async (id: string): Promise<void> => {
   try {
-    const response = await axios.delete(`${API_URL}/${id}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    });
-    return response.data;
-  } catch (error: any) {
-    console.error('Lỗi khi xoá sản phẩm:', error);
+    await axios.delete(`/products/${id}`);
+  } catch (error) {
+    console.error('Lỗi khi xóa sản phẩm:', error);
     throw new Error('Không thể xoá sản phẩm');
   }
 };

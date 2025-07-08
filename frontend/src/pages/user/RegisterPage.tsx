@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '@/styles/pages/user/register.scss';
 import { registerUser } from '@/api/user/userAPI';
-import { Eye, EyeOff } from 'lucide-react';
+// import { Eye, EyeOff } from 'lucide-react';
 
 
 const RegisterPage: React.FC = () => {
