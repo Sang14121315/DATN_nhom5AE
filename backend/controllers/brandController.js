@@ -4,14 +4,24 @@ const Joi = require('joi');
 const brandSchema = Joi.object({
   slug: Joi.string().required(),
   name: Joi.string().required(),
-  logo_url: Joi.string().allow('')
+  logo_url: Joi.string().allow(''),
+  parent: Joi.string().allow(null, ''),
 });
 
+// ✅ Lấy danh sách brand có hỗ trợ filter
 exports.getBrands = async (req, res) => {
   try {
-    const { name } = req.query;
+    const { name, parent, startDate, endDate } = req.query;
     const filters = {};
+
     if (name) filters.name = new RegExp(name, 'i');
+    if (parent) filters.parent = parent === 'null' ? null : parent;
+
+    if (startDate || endDate) {
+      filters.created_at = {};
+      if (startDate) filters.created_at.$gte = new Date(startDate + 'T00:00:00.000Z');
+      if (endDate) filters.created_at.$lte = new Date(endDate + 'T23:59:59.999Z');
+    }
 
     const brands = await BrandService.getAll(filters);
     res.json(brands);
@@ -45,7 +55,10 @@ exports.createBrand = async (req, res) => {
     const { error } = brandSchema.validate(req.body);
     if (error) return res.status(400).json({ message: error.details[0].message });
 
-    const brand = await BrandService.create({ ...req.body, logo_url: req.file ? `/uploads/${req.file.filename}` : '' });
+    const brand = await BrandService.create({
+      ...req.body,
+      logo_url: req.file ? `/uploads/brands/${req.file.filename}` : ''
+    });
     res.status(201).json(brand);
   } catch (error) {
     res.status(500).json({ message: error.message || 'Error creating brand' });
@@ -57,7 +70,10 @@ exports.updateBrand = async (req, res) => {
     const { error } = brandSchema.validate(req.body);
     if (error) return res.status(400).json({ message: error.details[0].message });
 
-    const brand = await BrandService.update(req.params.id, { ...req.body, logo_url: req.file ? `/uploads/${req.file.filename}` : req.body.logo_url });
+    const brand = await BrandService.update(req.params.id, {
+      ...req.body,
+      logo_url: req.file ? `/uploads/brands/${req.file.filename}` : req.body.logo_url
+    });
     res.json(brand);
   } catch (error) {
     res.status(500).json({ message: error.message || 'Error updating brand' });

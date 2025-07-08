@@ -1,3 +1,5 @@
+@use "sass:color";
+@use "sass:map";
 @use "../variables" as *;
 
 // Container layout
@@ -20,6 +22,7 @@
   &__search {
     align-items: center;
     gap: 0;
+
     input {
       width: 70%;
       padding: 8px 12px;
@@ -31,7 +34,7 @@
     button {
       padding: 8px 12px;
       border: none;
-      background: darken($primary-color, 10%);
+      background: color.adjust($primary-color, $lightness: -10%);
       color: white;
       border-radius: 0 4px 4px 0;
       cursor: pointer;
@@ -105,7 +108,7 @@
 .nav-item {
   position: relative;
   color: white;
-  font-weight: map-get($font-weight, sm);
+  font-weight: map.get($font-weight, sm);
   text-decoration: none;
   padding: $padding-xs $padding-sm;
   cursor: pointer;
@@ -137,7 +140,7 @@
   gap: 24px;
   font-size: 14px;
   color: white;
-  font-weight: map-get($font-weight, sm);
+  font-weight: map.get($font-weight, sm);
   margin-right: 16px;
   white-space: nowrap;
 }

@@ -86,11 +86,15 @@ router.put('/brands/:id', upload.single('logo'), brandController.updateBrand);
 router.delete('/brands/:id', brandController.deleteBrand);
 
 // Coupons
+
+router.get('/coupons',  couponController.getCoupons);
+router.get('/coupons/:id',  couponController.getCouponById);
+router.post('/coupons', couponController.createCoupon);
+router.put('/coupons/:id',  couponController.updateCoupon);
+router.delete('/coupons/:id',  couponController.deleteCoupon);
 router.get('/coupons', auth, couponController.getCoupons);
 router.get('/coupons/:id', auth, couponController.getCouponById);
-router.post('/coupons', auth, adminAuth, couponController.createCoupon);
-router.put('/coupons/:id', auth, adminAuth, couponController.updateCoupon);
-router.delete('/coupons/:id', auth, adminAuth, couponController.deleteCoupon);
+
 // Orders
 router.get('/orders', auth, orderController.getOrders);
 router.get('/orders/:id', auth, orderController.getOrderById);
@@ -109,5 +113,10 @@ router.delete('/notifications/:id', auth, notificationController.deleteNotificat
 router.get('/messages', auth, messageController.getConversation);
 router.post('/messages', auth, messageController.sendMessage);
 router.get('/admins', auth, messageController.getAdmins);
+
+// Momo payment
+
+router.post('/momo/create', orderController.createMomoOrder);
+router.post('/momo/webhook', orderController.momoWebhook);
 
 module.exports = router;

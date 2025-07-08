@@ -48,3 +48,9 @@ export const deleteOrderAPI = async (id: string) => {
   const res = await axios.delete(`${API_URL}/orders/${id}`, { withCredentials: true });
   return res.data;
 };
+
+// 🔄 Cập nhật trạng thái đơn hàng (bất kỳ)
+export const updateOrderStatus = async (id: string, status: string) => {
+  const res = await axios.put(`${API_URL}/orders/${id}`, { status }, withCredentialsConfig);
+  return res.data;
+};

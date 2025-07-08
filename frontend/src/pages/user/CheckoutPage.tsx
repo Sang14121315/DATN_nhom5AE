@@ -5,6 +5,7 @@ import { getProvinces, getDistrictsByProvinceCode, getWardsByDistrictCode } from
 import { fetchCoupons } from "@/api/couponAPI";
 import "@/styles/pages/user/checkoutPage.scss";
 import { useNavigate } from "react-router-dom";
+import { createMomoOrder } from '@/api/momoAPI';
 
 const CheckoutPage: React.FC = () => {
   const { cartItems, clearCart } = useCart();
@@ -136,18 +137,27 @@ const CheckoutPage: React.FC = () => {
       }))
     };
 
-    // Chỉ thêm coupon nếu schema backend cho phép
-    // payload.coupon = coupon?.code;
-
     try {
-      console.log("📦 Payload gửi đi:", payload);
-      await addOrder(payload);
-      await clearCart();
-      setShowSuccess(true);
-      setShowError(false);
+      if (paymentMethod === 'bank') {
+        // Gọi API tạo đơn hàng Momo
+        const res = await createMomoOrder(payload);
+        if (res && res.payUrl) {
+          window.location.href = res.payUrl;
+          return;
+        } else {
+          alert('Không tạo được link thanh toán Momo');
+          return;
+        }
+      } else {
+        // COD logic cũ
+        await addOrder(payload);
+        await clearCart();
+        setShowSuccess(true);
+        setShowError(false);
+      }
     } catch (error: any) {
-      console.error("❌ Lỗi khi đặt hàng:", error?.response?.data || error.message);
-      alert(error?.response?.data?.message || "Đặt hàng thất bại");
+      console.error('❌ Lỗi khi đặt hàng:', error?.response?.data || error.message);
+      alert(error?.response?.data?.message || 'Đặt hàng thất bại');
       setShowSuccess(false);
       setShowError(true);
     }
@@ -211,16 +221,6 @@ const CheckoutPage: React.FC = () => {
             <span>🏦 Chuyển khoản qua ngân hàng</span>
           </label>
 
-          {paymentMethod === "bank" && (
-            <div className="qr-container">
-              <p>Vui lòng quét mã để thanh toán:</p>
-              <img
-                src={`https://img.vietqr.io/image/tpbank-25520122005-pr_only.png?amount=${total}&addInfo=5AE&accountName=HUYNHTHANHSANG`}
-                alt="QR chuyển khoản"
-                className="qr-image"
-              />
-            </div>
-          )}
         </div>
 
         <div className="checkout-section order-summary">
