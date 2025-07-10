@@ -9,7 +9,12 @@ export default instance;
 
 instance.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
+  console.log('Axios Interceptor - Token:', token);
+  console.log('Axios Interceptor - URL:', config.url);
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+    console.log('Axios Interceptor - Headers:', config.headers);
+  }
   return config;
 });
 

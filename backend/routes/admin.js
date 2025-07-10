@@ -4,6 +4,7 @@ const userController = require('../controllers/userController');
 const productController = require('../controllers/productController');
 const orderController = require('../controllers/orderController');
 const adminController = require('../controllers/adminController');
+const brandController = require('../controllers/brandController');
 const auth = require('../middleware/auth');
 const upload = require('../middleware/upload');
 const adminAuth = require('../middleware/adminAuth');
@@ -51,7 +52,7 @@ router.get('/contacts', auth, adminAuth, contactController.getContacts);
 router.put('/contacts/:id', auth, adminAuth, contactController.updateContact);
 
 // Dashboard
-router.get('/dashboard',  adminController.getDashboardData);
+router.get('/dashboard', auth, adminAuth, adminController.getDashboardData);
 
 // Categories
 router.get('/categories', auth, adminAuth,  categoryController.getCategories); 
@@ -60,5 +61,12 @@ router.get('/categories/:id', auth, adminAuth,  categoryController.getCategoryBy
 router.post('/categories',auth, adminAuth,  categoryController.createCategory); 
 router.put('/categories/:id',auth, adminAuth, categoryController.updateCategory); 
 router.delete('/categories/:id',auth, adminAuth,  categoryController.deleteCategory);
+
+// Brands
+router.get('/brands', auth, adminAuth, brandController.getBrands);
+router.get('/brands/:id', auth, adminAuth, brandController.getBrandById);
+router.post('/brands', auth, adminAuth, upload.single('logoFile'), brandController.createBrand);
+router.put('/brands/:id', auth, adminAuth, upload.single('logoFile'), brandController.updateBrand);
+router.delete('/brands/:id', auth, adminAuth, brandController.deleteBrand);
 
 module.exports = router;

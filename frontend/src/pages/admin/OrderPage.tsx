@@ -197,7 +197,7 @@ const AdminOrderPage: React.FC = () => {
                     >
                       <option value="pending">Chờ xử lý</option>
                       <option value="shipping">Đang giao</option>
-                      <option value="completed">Hoàn thành</option>
+                      <option value="completed">Đã giao hàng</option>
                       <option value="canceled">Đã hủy</option>
                     </select>
                   </td>

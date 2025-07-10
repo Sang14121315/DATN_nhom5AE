@@ -4,6 +4,7 @@ const Joi = require('joi');
 const brandSchema = Joi.object({
   slug: Joi.string().required(),
   name: Joi.string().required(),
+  logo_data: Joi.string().allow(''),
   logo_url: Joi.string().allow(''),
   parent: Joi.string().allow(null, ''),
 });
@@ -39,25 +40,25 @@ exports.getBrandById = async (req, res) => {
   }
 };
 
-exports.uploadBrandImage = (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ message: "No file uploaded" });
-  }
-
-  const filename = req.file.filename;
-  const filePath = `/uploads/brands/${filename}`;
-
-  res.status(200).json({ filename, url: filePath });
-};
-
 exports.createBrand = async (req, res) => {
   try {
     const { error } = brandSchema.validate(req.body);
     if (error) return res.status(400).json({ message: error.details[0].message });
 
+    let logoData = '';
+    
+    // Nếu có file upload, chuyển đổi thành base64
+    if (req.file) {
+      const buffer = req.file.buffer;
+      const base64 = buffer.toString('base64');
+      const mimeType = req.file.mimetype;
+      logoData = `data:${mimeType};base64,${base64}`;
+    }
+
     const brand = await BrandService.create({
       ...req.body,
-      logo_url: req.file ? `/uploads/brands/${req.file.filename}` : ''
+      logo_data: logoData,
+      logo_url: req.body.logo_url || ''
     });
     res.status(201).json(brand);
   } catch (error) {
@@ -70,9 +71,19 @@ exports.updateBrand = async (req, res) => {
     const { error } = brandSchema.validate(req.body);
     if (error) return res.status(400).json({ message: error.details[0].message });
 
+    let logoData = req.body.logo_data || '';
+    
+    // Nếu có file upload mới, chuyển đổi thành base64
+    if (req.file) {
+      const buffer = req.file.buffer;
+      const base64 = buffer.toString('base64');
+      const mimeType = req.file.mimetype;
+      logoData = `data:${mimeType};base64,${base64}`;
+    }
+
     const brand = await BrandService.update(req.params.id, {
       ...req.body,
-      logo_url: req.file ? `/uploads/brands/${req.file.filename}` : req.body.logo_url
+      logo_data: logoData
     });
     res.json(brand);
   } catch (error) {
