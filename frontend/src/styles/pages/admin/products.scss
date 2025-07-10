@@ -8,37 +8,60 @@
   }
 
   .filters {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  gap: 12px;
 
-    button,
-    input {
+  .filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    flex: 1;
+
+    select,
+    input,
+    button {
       padding: 8px 12px;
       border: 1px solid #ccc;
       border-radius: 6px;
       background-color: white;
       font-size: 14px;
-      cursor: pointer;
       transition: all 0.2s ease;
+    }
+
+    select {
+      min-width: 140px;
+    }
+
+    input {
+      flex: 1;
+      max-width: 200px;
     }
 
     button:hover {
       background-color: #f0f0f0;
     }
+  }
 
-    input {
-      flex: 1;
-      max-width: 240px;
-    }
+  .add-button {
+    white-space: nowrap;
+    background-color: #e0f7f3;
+    color: #00a693;
+    border: 1px solid #00a693;
+    font-weight: bold;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
 
-    .add-button {
-      background-color: #e0f7f3;
-      color: #00a693;
-      border: 1px solid #00a693;
-      font-weight: bold;
+    &:hover {
+      background-color: #d4f5ef;
     }
+  }
+
   }
 
   table {

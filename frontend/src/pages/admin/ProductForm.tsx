@@ -1,214 +1,220 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-   getProductById as fetchProductDetail,
-  formatCurrency,
+  getProductById,
   updateProduct,
+  createProduct,
   deleteProduct,
-  Product,
 } from '@/api/productsAPI';
-import { fetchAllCategories, Category } from '@/api/categoryAPI';
-import { fetchAllBrands, Brand } from '@/api/brandAPI';
-import { fetchProductTypes, ProductType } from '@/api/productTypeAPI';
+import { fetchAllCategories } from '@/api/categoryAPI';
+import { fetchAllBrands } from '@/api/brandAPI';
+import { fetchProductTypes } from '@/api/productTypeAPI';
 import '@/styles/pages/admin/productDetail.scss';
 
-const ProductDetailPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+const ProductForm: React.FC = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
-  const [product, setProduct] = useState<Product | null>(null);
-  const [formData, setFormData] = useState<any>({});
+  const isEditMode = Boolean(id);
+
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [brands, setBrands] = useState<Brand[]>([]);
-  const [productTypes, setProductTypes] = useState<ProductType[]>([]);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  const [categories, setCategories] = useState<any[]>([]);
+  const [brands, setBrands] = useState<any[]>([]);
+  const [types, setTypes] = useState<any[]>([]);
+
+  const [product, setProduct] = useState<any>({
+    name: '',
+    description: '',
+    price: 0,
+    stock: 0,
+    category_id: '',
+    brand_id: '',
+    product_type_id: '',
+    sale: false,
+    created_at: '',
+    status: 'Đã duyệt',
+  });
 
   useEffect(() => {
-    const loadProduct = async () => {
-      if (id) {
-        const data = await fetchProductDetail(id);
-        setProduct(data);
-        setFormData({
-          name: data.name,
-          description: data.description,
-          price: data.price,
-          stock: data.stock,
-          category_id: data.category_id?._id,
-          brand_id: data.brand_id?._id,
-          product_type_id: data.product_type_id?._id,
-          sale: data.sale || false,
-        });
-      }
+    const fetchData = async () => {
+      const [cats, brs, tys] = await Promise.all([
+        fetchAllCategories({}),
+        fetchAllBrands({}),
+        fetchProductTypes(),
+      ]);
+      setCategories(cats);
+      setBrands(brs);
+      setTypes(tys);
     };
-    loadProduct();
 
-    // Load danh mục, thương hiệu, loại
-    const loadOptions = async () => {
-      try {
-        const [cat, br, type] = await Promise.all([
-          fetchAllCategories({}),
-          fetchAllBrands({}),
-          fetchProductTypes()
-        ]);
-        setCategories(cat);
-        setBrands(br);
-        setProductTypes(type);
-      } catch (err) {
-        console.error('Lỗi khi tải danh sách phụ:', err);
-      }
-    };
-    loadOptions();
+    fetchData();
+
+    if (isEditMode && id) {
+      getProductById(id).then((res) => {
+        setProduct({
+          name: res.name || '',
+          description: res.description || '',
+          price: res.price || 0,
+          stock: res.stock || 0,
+          category_id: res.category_id?._id || '',
+          brand_id: res.brand_id?._id || '',
+          product_type_id: res.product_type_id?._id || '',
+          sale: res.sale || false,
+          created_at: res.created_at || '',
+          status: 'Đã duyệt',
+        });
+        setImagePreview(res.img_url || null);
+      });
+    }
   }, [id]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
+  const handleInputChange = (e: React.ChangeEvent<any>) => {
+    const { name, value } = e.target;
+    setProduct({ ...product, [name]: value });
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) {
-      setImageFile(e.target.files[0]);
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
     }
   };
 
   const handleSubmit = async () => {
-    if (!id) return;
-    const updatedData = new FormData();
-    Object.keys(formData).forEach(key => {
-      updatedData.append(key, formData[key]);
+    const formData = new FormData();
+    Object.entries(product).forEach(([key, value]) => {
+      formData.append(key, value as string);
     });
-    if (imageFile) updatedData.append('image', imageFile);
+    if (imageFile) formData.append('image', imageFile);
 
     try {
-      await updateProduct(id, updatedData);
-      alert('Đã lưu thay đổi');
-      setIsEditing(false);
+      if (isEditMode && id) {
+        await updateProduct(id, formData);
+        alert('Cập nhật sản phẩm thành công!');
+      } else {
+        await createProduct(formData);
+        alert('Thêm sản phẩm mới thành công!');
+        navigate('/admin/products');
+      }
     } catch (error) {
-      console.error('Lỗi khi cập nhật:', error);
-      alert('Không thể lưu');
+      console.error(error);
+      alert('Thao tác thất bại!');
     }
   };
 
   const handleDelete = async () => {
-    if (!id) return;
-    if (!window.confirm('Bạn có chắc muốn xoá sản phẩm này?')) return;
+    if (!isEditMode || !id) return;
+    if (!window.confirm('Bạn chắc chắn muốn xoá sản phẩm?')) return;
     try {
       await deleteProduct(id);
-      alert('Đã xoá sản phẩm');
       navigate('/admin/products');
-    } catch (err) {
-      console.error(err);
-      alert('Xoá thất bại');
+    } catch (error) {
+      console.error(error);
+      alert('Xoá thất bại!');
     }
   };
-
-  if (!product) return <div>Đang tải sản phẩm...</div>;
 
   return (
     <div className="container">
       <h2>Chi tiết sản phẩm</h2>
-
       <div className="left">
         <label>Tên sản phẩm</label>
-        <input name="name" value={formData.name || ''} onChange={handleChange} readOnly={!isEditing} />
+        <input name="name" value={product.name} onChange={handleInputChange} />
 
         <label>Mô tả</label>
-        <textarea name="description" value={formData.description || ''} onChange={handleChange} readOnly={!isEditing} />
+        <textarea name="description" value={product.description} onChange={handleInputChange} />
 
         <div className="two-columns">
           <div>
-            <label>Danh mục</label>
-            {isEditing ? (
-              <select name="category_id" value={formData.category_id || ''} onChange={handleChange}>
-                <option value="">— Chọn danh mục —</option>
-                {categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
-              </select>
-            ) : (
-              <input value={product.category_id?.name || ''} readOnly />
-            )}
+            <label>Category</label>
+            <select name="category_id" value={product.category_id} onChange={handleInputChange}>
+              <option value="">-- chọn --</option>
+              {categories.map((cat) => (
+                <option key={cat._id} value={cat._id}>{cat.name}</option>
+              ))}
+            </select>
           </div>
           <div>
             <label>Thương hiệu</label>
-            {isEditing ? (
-              <select name="brand_id" value={formData.brand_id || ''} onChange={handleChange}>
-                <option value="">— Chọn thương hiệu —</option>
-                {brands.map(b => <option key={b._id} value={b._id}>{b.name}</option>)}
-              </select>
-            ) : (
-              <input value={product.brand_id?.name || ''} readOnly />
-            )}
+            <select name="brand_id" value={product.brand_id} onChange={handleInputChange}>
+              <option value="">-- chọn --</option>
+              {brands.map((b) => (
+                <option key={b._id} value={b._id}>{b.name}</option>
+              ))}
+            </select>
           </div>
         </div>
 
         <div className="two-columns">
           <div>
+            <label>Ngày</label>
+            <input value={new Date(product.created_at).toLocaleDateString('vi-VN')} disabled />
+          </div>
+          <div>
             <label>Loại</label>
-            {isEditing ? (
-              <select name="product_type_id" value={formData.product_type_id || ''} onChange={handleChange}>
-                <option value="">— Chọn loại sản phẩm —</option>
-                {productTypes.map(t => <option key={t._id} value={t._id}>{t.name}</option>)}
-              </select>
-            ) : (
-              <input value={product.product_type_id?.name || ''} readOnly />
-            )}
+            <select name="product_type_id" value={product.product_type_id} onChange={handleInputChange}>
+              <option value="">-- chọn --</option>
+              {types.map((t) => (
+                <option key={t._id} value={t._id}>{t.name}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="two-columns">
+          <div>
+            <label>Giá gốc</label>
+            <input type="number" name="price" value={product.price} onChange={handleInputChange} />
           </div>
           <div>
             <label>Giảm giá</label>
-            <input type="checkbox" name="sale" checked={formData.sale} onChange={handleChange} disabled={!isEditing} />
+            <input type="text" value={product.sale ? 'Có' : '0'} readOnly />
           </div>
         </div>
 
         <div className="two-columns">
           <div>
-            <label>Giá</label>
-            <input name="price" value={formData.price || ''} onChange={handleChange} readOnly={!isEditing} />
+            <label>Số lượng</label>
+            <input type="number" name="stock" value={product.stock} onChange={handleInputChange} />
           </div>
           <div>
-            <label>Số lượng</label>
-            <input name="stock" value={formData.stock || ''} onChange={handleChange} readOnly={!isEditing} />
+            <label>Tình trạng</label>
+            <input type="text" value={product.status} readOnly />
           </div>
         </div>
 
         <div className="buttons">
-          {!isEditing ? (
-            <>
-              <button className="update" onClick={() => setIsEditing(true)}>CHỈNH SỬA</button>
-              <button className="delete" onClick={handleDelete}>XOÁ</button>
-              <button className="back" onClick={() => navigate(-1)}>QUAY LẠI</button>
-            </>
-          ) : (
-            <>
-              <button className="update" onClick={handleSubmit}>LƯU</button>
-              <button className="back" onClick={() => setIsEditing(false)}>HUỶ</button>
-            </>
-          )}
+          <button className="update" onClick={handleSubmit}>CẬP NHẬT</button>
+          {isEditMode && <button className="delete" onClick={handleDelete}>XÓA</button>}
+          <button className="back" onClick={() => navigate(-1)}>QUAY LẠI</button>
         </div>
       </div>
 
       <div className="right">
         <div className="upload-box">
-          <p>Ảnh sản phẩm</p>
-          {isEditing && <input type="file" onChange={handleFileChange} />}
+          <p>Ảnh, video.....</p>
+          <label>
+            <input type="file" accept="image/*" onChange={handleImageChange} hidden />
+            <button>Thêm ảnh</button>
+          </label>
         </div>
 
-        {product.img_url && (
-          <div className="upload-preview">
+        <div className="upload-preview">
+          {imagePreview && (
             <div className="upload-item">
               <div className="upload-thumb">
-                <img src={product.img_url} alt="Ảnh sản phẩm" style={{ width: 40, height: 40 }} />
+                <img src={imagePreview} alt="preview" />
               </div>
-              <div className="progress-bar"><div style={{ width: '100%' }} /></div>
+              <div className="progress-bar"><div style={{ width: '100%' }}></div></div>
               <span className="checkmark">✔</span>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
 };
 
-export default ProductDetailPage;
+export default ProductForm;

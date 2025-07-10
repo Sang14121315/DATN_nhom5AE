@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 import { useOrders } from "@/context/OrderContext";
-import { getProvinces, getDistrictsByProvinceCode, getWardsByDistrictCode } from "vn-provinces";
+// import { getProvinces, getDistrictsByProvinceCode, getWardsByDistrictCode } from "vn-provinces";
 import { fetchCoupons } from "@/api/couponAPI";
 import "@/styles/pages/user/checkoutPage.scss";
 import { useNavigate } from "react-router-dom";
