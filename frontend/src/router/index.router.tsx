@@ -14,7 +14,9 @@ import CategoryTablePage from "@/pages/admin/CategoryTable";
 import CategoryFormPage from "@/pages/admin/CategoryForm";
 import BrandTablePage from "@/pages/admin/BrandTable";
 import BrandFormPage from "@/pages/admin/BrandForm";
+import OrderPage from "@/pages/admin/OrderPage";
 import CouponAdmin from "@/pages/admin/AdminCouponPage";
+import CouponForm from "@/pages/admin/CouponForm";
 
 // User Pages
 import HomePage from "@/pages/user/home";
@@ -36,14 +38,12 @@ const MainRouter = () => {
       {/* Admin Layout */}
       <Route path="/admin" element={<AdminLayout />}>
         <Route path="dashboard" element={<DashboardPage />} />
-
         <Route path="products" element={<ProductsPage />} />
-        <Route path="/admin/products/:id" element={<ProductDetailPage />} />
         <Route path="products/create" element={<AddProductPage />} />
+        <Route path="products/:id" element={<ProductDetailPage />} />
         <Route path="products/:id/form" element={<ProductDetailPage />} />
-
-        
         <Route path="orders/:id" element={<AdminOrderDetailPage />} />
+        <Route path="order" element={<OrderPage />} />
         <Route path="category" element={<CategoryTablePage />} />
         <Route path="category/create" element={<CategoryFormPage />} />
         <Route path="category/:id/form" element={<CategoryFormPage />} />
@@ -51,6 +51,8 @@ const MainRouter = () => {
         <Route path="brand/create" element={<BrandFormPage />} />
         <Route path="brand/:id/form" element={<BrandFormPage />} />
         <Route path="coupons" element={<CouponAdmin />} />
+        <Route path="coupons/create" element={<CouponForm />} />
+        <Route path="coupons/:id/edit" element={<CouponForm />} />
       </Route>
 
       {/* User Layout */}

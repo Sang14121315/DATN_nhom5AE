@@ -4,6 +4,7 @@ import { FaBell, FaChevronDown } from 'react-icons/fa';
 import { getNotificationsByUser, deleteAllNotifications, Notification } from '../../api/notificationAPI';
 import { io } from 'socket.io-client';
 import '@/styles/components/admin/header.scss';
+import { useNavigate } from 'react-router-dom';
 
 const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:5000');
 
@@ -12,6 +13,7 @@ const Header: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const userId = localStorage.getItem('user_id') || '';
+  const navigate = useNavigate();
 
   const fetchNotifications = useCallback(async () => {
     if (!userId) return;
@@ -74,6 +76,11 @@ const Header: React.FC = () => {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate('/login');
+  };
+
   return (
     <header className="admin-header">
       <div className="right-section">
@@ -114,7 +121,7 @@ const Header: React.FC = () => {
           <FaChevronDown className="dropdown-icon" />
           <div className="dropdown-menu">
             <div className="dropdown-item">Quên mật khẩu</div>
-            <div className="dropdown-item">Đăng xuất</div>
+            <div className="dropdown-item" onClick={handleLogout}>Đăng xuất</div>
           </div>
         </div>
       </div>

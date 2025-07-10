@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getOrderById, deleteOrderAPI } from "@/api/orderAPI";
 import "@/styles/pages/admin/orderDetail.scss";
+import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaCalendarAlt, FaMoneyBillWave } from 'react-icons/fa';
 
 const AdminOrderDetailPage: React.FC = () => {
   const { id } = useParams();
@@ -53,53 +54,76 @@ const AdminOrderDetailPage: React.FC = () => {
     payment_method,
     total,
     status,
-    created_at
+    created_at,
+    address,
+    coupon_code,
+    discount_percent,
+    final_total
   } = orderData;
 
   return (
-    <div className="admin-order-detail">
-      <h2>📦 Chi tiết đơn hàng #{_id}</h2>
-
-      <section className="order-section">
-        <h3>👤 Khách hàng</h3>
-        <p><strong>Họ tên:</strong> {customer?.name || "(Không có tên)"}</p>
-        <p><strong>SĐT:</strong> {customer?.phone || "(Không có số)"}</p>
-        <p><strong>Email:</strong> {customer?.email || "(Không có email)"}</p>
-        <p><strong>Địa chỉ:</strong> {customer?.address || "(Không có địa chỉ)"}</p>
-      </section>
-
-      <section className="order-section">
-        <h3>🛒 Sản phẩm</h3>
-        {items?.length > 0 ? (
-          items.map((item: any, idx: number) => (
-            <div key={idx} className="product-row">
-              <img
-                src={item.img_url || "/no-image.png"}
-                alt={item.name}
-                onError={(e) => (e.currentTarget.src = "/no-image.png")}
-              />
-              <div>
-                <p><strong>{item.name}</strong></p>
-                <p>Số lượng: {item.quantity}</p>
-                <p>Giá: {formatMoney(item.price)}</p>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p>Không có sản phẩm nào</p>
-        )}
-      </section>
-
-      <section className="order-section">
-        <h3>💳 Thanh toán</h3>
-        <p><strong>Hình thức:</strong> {payment_method === 'cod' ? "COD - khi nhận hàng" : "Chuyển khoản ngân hàng"}</p>
-        <p><strong>Tổng tiền:</strong> {formatMoney(total)}</p>
-        <p><strong>Trạng thái:</strong> <span className={`status-label ${status}`}>{status}</span></p>
-      </section>
-
-      <div className="action-buttons">
-        <button className="back-btn" onClick={() => navigate("/admin/order")}>Quay lại</button>
-        <button className="delete-btn" onClick={handleDelete}>🗑 Xoá đơn hàng</button>
+    <div className="admin-order-detail order-detail-flex">
+      <div className="order-detail-left">
+        <div className="order-card">
+          <div className="order-card-row">
+            <span className="order-id">Đơn hàng #{_id}</span>
+            <span className="order-status done">Đã duyệt</span>
+          </div>
+          <div className="order-info-row"><FaCalendarAlt /> <span>Ngày</span> <b>{created_at ? new Date(created_at).toLocaleDateString('vi-VN') : ''}</b></div>
+          <div className="order-info-row"><FaMoneyBillWave /> <span>Thanh toán</span> <b>{payment_method === 'cod' ? 'Tiền mặt' : 'Chuyển khoản'}</b></div>
+        </div>
+        <div className="order-card">
+          <div className="order-card-title">Khách hàng</div>
+          <div className="order-info-row"><FaUser /> <span>Tên khách hàng</span> <b>{customer?.name || '(Không có tên)'}</b></div>
+          <div className="order-info-row"><FaEnvelope /> <span>Email</span> <b>{customer?.email || '(Không có email)'}</b></div>
+          <div className="order-info-row"><FaPhone /> <span>Điện thoại</span> <b>{customer?.phone || '(Không có số)'}</b></div>
+          <div className="order-info-row"><FaMapMarkerAlt /> <span>{customer?.address || address || '(Không có địa chỉ)'}</span></div>
+        </div>
+      </div>
+      <div className="order-detail-right">
+        <div className="order-product-table">
+          <table>
+            <thead>
+              <tr>
+                <th style={{textAlign: 'left'}}>Sản phẩm</th>
+                <th style={{textAlign: 'center'}}>Mã giảm giá</th>
+                <th style={{textAlign: 'center'}}>Số lượng</th>
+                <th style={{textAlign: 'right'}}>Giá</th>
+                <th style={{textAlign: 'right'}}>Tổng tiền</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items?.map((item: any, idx: number) => (
+                <tr key={idx}>
+                  <td className="product-info">
+                    <img src={item.img_url || '/no-image.png'} alt={item.name} onError={e => (e.currentTarget.src = '/no-image.png')} />
+                    <span>{item.name}</span>
+                  </td>
+                  <td className="coupon-code" style={{textAlign: 'center'}}>
+                    {coupon_code ? <a>{coupon_code}</a> : <span className="coupon-dash">-</span>}
+                  </td>
+                  <td style={{ textAlign: "center" }}>{item.quantity}</td>
+                  <td className="product-price" style={{textAlign: 'right'}}>{formatMoney(item.price)}</td>
+                  <td className="product-total" style={{textAlign: 'right'}}>{formatMoney(item.price * item.quantity)}</td>
+                </tr>
+              ))}
+              <tr>
+                <td colSpan={3}></td>
+                <td style={{textAlign: 'right'}}>Giảm giá (%)</td>
+                <td style={{ textAlign: "right" }}>{discount_percent ? discount_percent + '%' : '-'}</td>
+              </tr>
+              <tr>
+                <td colSpan={3}></td>
+                <td style={{textAlign: 'right'}}><b>Tổng</b></td>
+                <td className="order-total-value" style={{textAlign: 'right'}}>{formatMoney(final_total || total)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div className="order-detail-actions">
+          <button className="delete-btn" onClick={handleDelete}>XOÁ ĐƠN HÀNG</button>
+          <button className="back-btn" onClick={() => navigate('/admin/order')}>QUAY LẠI</button>
+        </div>
       </div>
     </div>
   );

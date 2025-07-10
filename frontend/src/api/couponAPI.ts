@@ -9,7 +9,7 @@ export const fetchCoupons = async () => {
 };
 
 export const getCouponById = async (id: string) => {
-  const res = await axios.get(`${API_URL}/coupons/${id}`, { withCredentials: true });
+  const res = await axios.get(`${API_URL}/coupons/${id}`);
   return res.data;
 };
 
