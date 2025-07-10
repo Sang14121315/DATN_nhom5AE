@@ -1,157 +1,210 @@
-// import React, { useState, useEffect } from 'react';
-// import { getProducts, deleteProduct } from '../../api/productAPI';
-// import { Table, Button, Space, Modal, message, Pagination, Tag } from 'antd';
-// import { EditOutlined, DeleteOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
-// import ProductForm from './ProductForm';
-// import { formatPrice } from '../../utils/format';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import '@/styles/pages/admin/products.scss';
+import {
+  Product,
+  fetchFilteredProducts,
+  ProductQueryParams,
+  ProductListResponse
+} from '../../api/productsAPI';
+import { formatCurrency } from '@/api/productsAPI';
+import { fetchAllBrands } from '@/api/brandAPI';
+import { fetchAllCategories } from '@/api/categoryAPI';
+import { fetchAllProductTypes } from '@/api/productTypeAPI'; // ✅ nhớ tạo API nếu chưa có
 
-// const ProductTable: React.FC = () => {
-//   const [data, setData] = useState<any[]>([]);
-//   const [pagination, setPagination] = useState({
-//     current: 1,
-//     pageSize: 10,
-//     total: 0
-//   });
-//   const [loading, setLoading] = useState(false);
-//   const [modalVisible, setModalVisible] = useState(false);
-//   const [selectedProduct, setSelectedProduct] = useState<any>(null);
+const ProductsPage: React.FC = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState<'price' | 'view' | 'created_at'>('created_at');
+  const [order, setOrder] = useState<'asc' | 'desc'>('desc');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-//   const fetchData = async () => {
-//     setLoading(true);
-//     try {
-//       const result = await getProducts(pagination.current, pagination.pageSize);
-//       setData(result.data);
-//       setPagination({
-//         ...pagination,
-//         total: result.pagination.total
-//       });
-//     } catch (error) {
-//       message.error('Error fetching products');
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
+  const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [types, setTypes] = useState([]);
 
-//   useEffect(() => {
-//     fetchData();
-//   }, [pagination.current, pagination.pageSize]);
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedBrand, setSelectedBrand] = useState('');
+  const [selectedType, setSelectedType] = useState('');
 
-//   const handleDelete = (id: string) => {
-//     Modal.confirm({
-//       title: 'Confirm Delete',
-//       content: 'Are you sure you want to delete this product?',
-//       onOk: async () => {
-//         try {
-//           await deleteProduct(id);
-//           message.success('Product deleted successfully');
-//           fetchData();
-//         } catch (error) {
-//           message.error('Error deleting product');
-//         }
-//       }
-//     });
-//   };
+  const navigate = useNavigate();
 
-//   const columns = [
-//     {
-//       title: 'Product Name',
-//       dataIndex: 'name',
-//       key: 'name'
-//     },
-//     {
-//       title: 'Price',
-//       dataIndex: 'price',
-//       key: 'price',
-//       render: (price: number) => formatPrice(price)
-//     },
-//     {
-//       title: 'Stock',
-//       dataIndex: 'stock',
-//       key: 'stock'
-//     },
-//     {
-//       title: 'Category',
-//       dataIndex: ['category_id', 'name'],
-//       key: 'category'
-//     },
-//     {
-//       title: 'Status',
-//       dataIndex: 'status',
-//       key: 'status',
-//       render: (status: string) => (
-//         <Tag color={status === 'Approved' ? 'green' : status === 'Pending' ? 'orange' : 'red'}>
-//           {status}
-//         </Tag>
-//       )
-//     },
-//     {
-//       title: 'Actions',
-//       key: 'actions',
-//       render: (_: any, record: any) => (
-//         <Space size="middle">
-//           <Button 
-//             icon={<EyeOutlined />} 
-//             onClick={() => {
-//               setSelectedProduct(record);
-//               setModalVisible(true);
-//             }}
-//           />
-//           <Button 
-//             icon={<EditOutlined />} 
-//             onClick={() => {
-//               setSelectedProduct(record);
-//               setModalVisible(true);
-//             }}
-//           />
-//           <Button 
-//             icon={<DeleteOutlined />} 
-//             danger 
-//             onClick={() => handleDelete(record._id)}
-//           />
-//         </Space>
-//       )
-//     }
-//   ];
+  const fetchData = async () => {
+    try {
+      setLoading(true);
 
-//   return (
-//     <div className="product-management">
-//       <div style={{ marginBottom: 16 }}>
-//         <Button 
-//           type="primary" 
-//           icon={<PlusOutlined />}
-//           onClick={() => {
-//             setSelectedProduct(null);
-//             setModalVisible(true);
-//           }}
-//         >
-//           Add Product
-//         </Button>
-//       </div>
+      const params: ProductQueryParams = {
+        page: currentPage,
+        limit: 10,
+        search,
+        sortBy,
+        order,
+        category: selectedCategory,
+        brand: selectedBrand,
+        type: selectedType,
+      };
 
-//       <Table
-//         columns={columns}
-//         dataSource={data}
-//         rowKey="_id"
-//         pagination={{
-//           ...pagination,
-//           showSizeChanger: true,
-//           pageSizeOptions: ['10', '20', '50', '100']
-//         }}
-//         loading={loading}
-//         onChange={(pagination) => setPagination(pagination)}
-//       />
+      const data: ProductListResponse = await fetchFilteredProducts(params);
 
-//       <ProductForm
-//         visible={modalVisible}
-//         onCancel={() => setModalVisible(false)}
-//         onSuccess={() => {
-//           setModalVisible(false);
-//           fetchData();
-//         }}
-//         product={selectedProduct}
-//       />
-//     </div>
-//   );
-// };
+      if (!data || !Array.isArray(data.products)) {
+        throw new Error('Dữ liệu không hợp lệ từ API');
+      }
 
-// export default ProductTable;
+      setProducts(data.products);
+      setTotalPages(data.totalPages ?? 1);
+      setTotal(data.total ?? data.products.length);
+    } catch (err) {
+      console.error(err);
+      setError('Không thể tải danh sách sản phẩm');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [currentPage, search, sortBy, order, selectedCategory, selectedBrand, selectedType]);
+
+  useEffect(() => {
+    const fetchFilters = async () => {
+      try {
+        const [cats, brs, tys] = await Promise.all([
+          fetchAllCategories({}),
+          fetchAllBrands({}),
+          fetchAllProductTypes({}),
+        ]);
+        setCategories(cats);
+        setBrands(brs);
+        setTypes(tys);
+      } catch (err) {
+        console.error('Lỗi tải filter:', err);
+      }
+    };
+    fetchFilters();
+  }, []);
+
+  const formatDate = (dateString?: string): string => {
+    if (!dateString) return '—';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('vi-VN').replace(/\//g, '-');
+  };
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) setCurrentPage(page);
+  };
+
+  const handleSortToggle = () => {
+    setOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
+  };
+
+  if (loading) return <div className="products-page">Đang tải danh sách sản phẩm...</div>;
+  if (error) return <div className="products-page error">{error}</div>;
+
+  return (
+    <div className="products-page">
+      <h1>Sản phẩm</h1>
+
+      <div className="filters">
+        <select onChange={e => setSelectedCategory(e.target.value)} value={selectedCategory}>
+          <option value="">Danh mục</option>
+          {categories.map((cat: any) => (
+            <option key={cat._id} value={cat._id}>{cat.name}</option>
+          ))}
+        </select>
+
+        <select onChange={e => setSelectedType(e.target.value)} value={selectedType}>
+          <option value="">Loại</option>
+          {types.map((type: any) => (
+            <option key={type._id} value={type._id}>{type.name}</option>
+          ))}
+        </select>
+
+        <select onChange={e => setSelectedBrand(e.target.value)} value={selectedBrand}>
+          <option value="">Thương hiệu</option>
+          {brands.map((brand: any) => (
+            <option key={brand._id} value={brand._id}>{brand.name}</option>
+          ))}
+        </select>
+
+        <button onClick={handleSortToggle}>⬍ Giá {order === 'asc' ? '↑' : '↓'}</button>
+
+        <input
+          type="text"
+          placeholder="Tìm kiếm..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
+
+        <button className="add-button" onClick={() => navigate('/admin/products/create')}>+ Thêm sản phẩm</button>
+
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Sản phẩm</th>
+            <th>Giá</th>
+            <th>Ngày</th>
+            <th>Số lượng</th>
+            <th>Danh mục</th>
+            <th>Loại</th>
+            <th>Thương hiệu</th>
+            <th>Trạng thái</th>
+            <th>Chức năng</th>
+          </tr>
+        </thead>
+        <tbody>
+          {products.length > 0 ? (
+            products.map(product => (
+              <tr key={product._id}>
+                <td className="product-cell">
+                  <div className="image-placeholder">
+                    {product.img_url && <img src={product.img_url} alt={product.name} />}
+                  </div>
+                  <span>{product.name}</span>
+                </td>
+                <td>{formatCurrency(product.price)}</td>
+                <td>{formatDate(product.created_at)}</td>
+                <td>{product.stock}</td>
+                <td>{(product.category_id as any)?.name || '—'}</td>
+                <td>{(product.product_type_id as any)?.name || '—'}</td>
+                <td>{(product.brand_id as any)?.name || '—'}</td>
+                <td><span className="status approved">Đã duyệt</span></td>
+                <td>
+                <button className="view-btn" onClick={() => navigate(`/admin/products/${product._id}/form`)}>👁️ Xem</button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={9}>Không có sản phẩm</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+
+      <div className="pagination">
+        <span>Hiển thị {products.length} / {total} sản phẩm</span>
+        <div className="pages">
+          <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>&lt;</button>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+            <button
+              key={page}
+              className={page === currentPage ? 'active' : ''}
+              onClick={() => handlePageChange(page)}
+            >
+              {page}
+            </button>
+          ))}
+          <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>&gt;</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ProductsPage;

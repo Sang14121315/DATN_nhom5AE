@@ -8,9 +8,9 @@ export interface Product {
   price: number;
   stock: number;
   img_url?: string;
-  category_id?: { _id: string; name: string };
-  brand_id?: { _id: string; name: string };
-  product_type_id?: { _id: string; name: string };
+  category_id: { _id: string; name: string };
+  brand_id: { _id: string; name: string };
+  product_type_id: { _id: string; name: string };
   sale?: boolean;
   hot?: boolean;
   view?: number;
@@ -28,6 +28,7 @@ export interface ProductQueryParams {
   name?: string;
   category_id?: string;
   brand_id?: string;
+  product_type_id?: string;
   minPrice?: number;
   maxPrice?: number;
   sale?: boolean;
@@ -37,23 +38,31 @@ export interface ProductQueryParams {
   limit?: number;
 }
 
+export const fetchFilteredProducts = async (
+  params: ProductQueryParams
+): Promise<ProductListResponse> => {
+  const response = await axios.get('/products', { params });
+  return response.data;
+};
+
+
 // ✅ Hàm format tiền
 export const formatCurrency = (amount: number): string => {
   return amount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
 };
 
-// ✅ Hàm build query (giống brand/category API)
+// ✅ Hàm build query
 const buildQueryParams = (filters: Record<string, any>): URLSearchParams => {
   const params = new URLSearchParams();
   Object.entries(filters).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
+    if (value !== undefined && value !== null && value !== '') {
       params.append(key, value.toString());
     }
   });
   return params;
 };
 
-// ✅ Lấy danh sách sản phẩm với filter & pagination
+// ✅ Lấy danh sách sản phẩm với filter & phân trang
 export const fetchAllProducts = async (
   filters: ProductQueryParams = {}
 ): Promise<ProductListResponse> => {
@@ -67,7 +76,7 @@ export const fetchAllProducts = async (
   }
 };
 
-// ✅ Lấy 1 sản phẩm theo ID
+// ✅ Lấy chi tiết 1 sản phẩm
 export const getProductById = async (id: string): Promise<Product> => {
   try {
     const response = await axios.get(`/products/${id}`);
@@ -78,7 +87,7 @@ export const getProductById = async (id: string): Promise<Product> => {
   }
 };
 
-// ✅ Tạo mới sản phẩm (dùng FormData)
+// ✅ Tạo mới sản phẩm (FormData gồm cả ảnh)
 export const createProduct = async (data: FormData): Promise<Product> => {
   try {
     const response = await axios.post('/products', data, {
@@ -91,7 +100,7 @@ export const createProduct = async (data: FormData): Promise<Product> => {
   }
 };
 
-// ✅ Cập nhật sản phẩm
+// ✅ Cập nhật sản phẩm (FormData)
 export const updateProduct = async (id: string, data: FormData): Promise<Product> => {
   try {
     const response = await axios.put(`/products/${id}`, data, {
@@ -109,7 +118,7 @@ export const deleteProduct = async (id: string): Promise<void> => {
   try {
     await axios.delete(`/products/${id}`);
   } catch (error) {
-    console.error('Lỗi khi xóa sản phẩm:', error);
+    console.error('Lỗi khi xoá sản phẩm:', error);
     throw new Error('Không thể xoá sản phẩm');
   }
 };

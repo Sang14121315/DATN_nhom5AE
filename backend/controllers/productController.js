@@ -14,15 +14,16 @@ const productSchema = Joi.object({
   hot: Joi.boolean(),
   coupons_id: Joi.string().allow(''),
   brand_id: Joi.string().required(),
-  product_type_id: Joi.string().required()
+  product_type_id: Joi.string().required(),
 });
 
-exports.getProducts = async (req, res) => {
+// ✅ GET: Lấy danh sách sản phẩm có filter + phân trang
+exports.getProducts = async (req, res, next) => {
   try {
     const {
       name, category_id, brand_id,
       minPrice, maxPrice, sale, hot,
-      sort, page = 3, limit = 10
+      sort, page = 1, limit = 10
     } = req.query;
 
     const filters = {};
@@ -39,65 +40,74 @@ exports.getProducts = async (req, res) => {
     const sortOption = sort === 'price_asc' ? { price: 1 }
                      : sort === 'price_desc' ? { price: -1 }
                      : sort === 'view_desc' ? { view: -1 }
-                     : { created_at: -1 }; // default sort
+                     : { created_at: -1 };
 
     const [products, total] = await Promise.all([
       ProductService.getAll(filters, Number(limit), sortOption, skip),
       ProductService.count(filters)
     ]);
 
-    const totalPages = Math.ceil(total / Number(limit));
-    res.json({ products, total, totalPages });
+    res.json({
+      products,
+      total,
+      totalPages: Math.ceil(total / Number(limit))
+    });
 
   } catch (error) {
-    res.status(500).json({ message: error.message || 'Error fetching products' });
+    next(error);
   }
 };
 
-
-exports.getProductById = async (req, res) => {
+// ✅ GET: Lấy chi tiết sản phẩm theo ID
+exports.getProductById = async (req, res, next) => {
   try {
     const product = await ProductService.getById(req.params.id);
     res.json(product);
   } catch (error) {
-    res.status(500).json({ message: error.message || 'Error fetching product' });
+    next(error);
   }
 };
 
-exports.createProduct = async (req, res) => {
+// ✅ POST: Tạo mới sản phẩm
+exports.createProduct = async (req, res, next) => {
   try {
     const { error } = productSchema.validate(req.body);
     if (error) return res.status(400).json({ message: error.details[0].message });
 
-    const product = await ProductService.create({ ...req.body, img_url: req.file ? `/uploads/${req.file.filename}` : '' });
-    res.status(201).json(product);
+    const img_url = req.file ? req.file.filename : '';
+    const newProduct = await ProductService.create({ ...req.body, img_url });
+    res.status(201).json(newProduct);
   } catch (error) {
-    res.status(500).json({ message: error.message || 'Error creating product' });
+    next(error);
   }
 };
 
-exports.updateProduct = async (req, res) => {
+// ✅ PUT: Cập nhật sản phẩm
+exports.updateProduct = async (req, res, next) => {
   try {
     const { error } = productSchema.validate(req.body);
     if (error) return res.status(400).json({ message: error.details[0].message });
 
-    const product = await ProductService.update(req.params.id, { ...req.body, img_url: req.file ? `/uploads/${req.file.filename}` : req.body.img_url });
-    res.json(product);
+    const img_url = req.file ? req.file.filename : req.body.img_url;
+    const updated = await ProductService.update(req.params.id, { ...req.body, img_url });
+    res.json(updated);
   } catch (error) {
-    res.status(500).json({ message: error.message || 'Error updating product' });
+    next(error);
   }
 };
 
-exports.deleteProduct = async (req, res) => {
+// ✅ DELETE: Xóa sản phẩm
+exports.deleteProduct = async (req, res, next) => {
   try {
     await ProductService.delete(req.params.id);
-    res.json({ message: 'Product deleted' });
+    res.json({ message: 'Đã xóa sản phẩm' });
   } catch (error) {
-    res.status(500).json({ message: error.message || 'Error deleting product' });
+    next(error);
   }
 };
 
-exports.searchProducts = async (req, res) => {
+// ✅ GET: Tìm kiếm riêng biệt
+exports.searchProducts = async (req, res, next) => {
   try {
     const { query, minPrice, maxPrice, sort } = req.query;
     const filters = {};
@@ -106,19 +116,10 @@ exports.searchProducts = async (req, res) => {
     if (minPrice) filters.price.$gte = Number(minPrice);
     if (maxPrice) filters.price.$lte = Number(maxPrice);
 
-    console.log("Filters:", filters);
-
-    let queryObj = ProductService.getAll(filters);
-
-    if (sort === 'price_asc') queryObj = queryObj.sort({ price: 1 });
-    else if (sort === 'price_desc') queryObj = queryObj.sort({ price: -1 });
-
-    const products = await queryObj;
-    console.log("Found:", products.length, "products");
-
+    const sortOption = sort === 'price_asc' ? { price: 1 } : sort === 'price_desc' ? { price: -1 } : {};
+    const products = await ProductService.getAll(filters, 0, sortOption);
     res.json(products);
   } catch (error) {
-    console.error("Search error:", error);
-    res.status(500).json({ message: error.message || 'Error searching products' });
+    next(error);
   }
 };

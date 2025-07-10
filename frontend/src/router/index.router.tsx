@@ -6,8 +6,8 @@ import AuthLayout from "@/layouts/auth.layout";
 
 // Admin Pages
 import DashboardPage from "@/pages/admin/Dashboard";
-import ProductsPage from "@/pages/admin/products";
-import ProductDetailPage from "@/pages/admin/ProductDetailPage";
+import ProductsPage from "@/pages/admin/ProductTable";
+import ProductDetailPage from "@/pages/admin/ProductForm";
 import AddProductPage from "@/pages/admin/AddProductPage";
 import AdminOrderDetailPage from "@/pages/admin/AdminOrderDetailPage";
 import CategoryTablePage from "@/pages/admin/CategoryTable";
@@ -36,11 +36,13 @@ const MainRouter = () => {
       {/* Admin Layout */}
       <Route path="/admin" element={<AdminLayout />}>
         <Route path="dashboard" element={<DashboardPage />} />
+
         <Route path="products" element={<ProductsPage />} />
-        <Route path="products/add" element={<AddProductPage />} />
-        <Route path="products/:id" element={<ProductDetailPage />} />
-        <Route path="products/edit/:id" element={<ProductDetailPage />} />
-        {/* <Route path="orders" element={<OrdersPage />} /> */}
+        <Route path="/admin/products/:id" element={<ProductDetailPage />} />
+        <Route path="products/create" element={<AddProductPage />} />
+        <Route path="products/:id/form" element={<ProductDetailPage />} />
+
+        
         <Route path="orders/:id" element={<AdminOrderDetailPage />} />
         <Route path="category" element={<CategoryTablePage />} />
         <Route path="category/create" element={<CategoryFormPage />} />
