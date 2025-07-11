@@ -6,6 +6,7 @@ const contactSchema = new mongoose.Schema({
   name: { type: String, required: true }, // Họ và tên
   email: { type: String, required: true }, // Nhập Email
   phone: { type: String, required: true }, // Nhập sdt
+  reply: { type: String, default: '' },
   user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
   message_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Message', default: null },
   status: { type: String, enum: ['pending', 'replied', 'closed'], default: 'pending' },
