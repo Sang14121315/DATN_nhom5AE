@@ -8,8 +8,12 @@ import BrandFormPage from "@/pages/admin/BrandForm";
 import Orderfrom from "@/pages/admin/OrderPage";
 import AdminOrderDetailPage from "@/pages/admin/AdminOrderDetailPage";
 import CouponAdmin from "@/pages/admin/AdminCouponPage"
+
 import AdminUserPage from "@/pages/admin/AdminUserPage";
 import AdminContactPage from "@/pages/admin/AdminContactPage";
+
+import CouponForm from "@/pages/admin/CouponForm";
+
 // import user
 import AuthLayout from "@/layouts/auth.layout";
 import AboutPage from "@/pages/user/about";
@@ -42,8 +46,12 @@ const MainRouter = () => {
         <Route path="order" element={<Orderfrom />} />
         <Route path="orders/:id" element={<AdminOrderDetailPage/>} />
         <Route path="coupons" element={<CouponAdmin/>} />
+
         <Route path="users" element={<AdminUserPage />} />
         <Route path="feedback" element={<AdminContactPage />} />
+
+        <Route path="coupons/create" element={<CouponForm />} />
+        <Route path="coupons/:id/edit" element={<CouponForm />} />
       </Route>
       {/* User layout */}
       <Route path="/" element={<AuthLayout />}>

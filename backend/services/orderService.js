@@ -7,6 +7,10 @@ class OrderService {
     return await Order.find(filters).sort(sort).populate('user_id');
   }
 
+  static async count(filters = {}) {
+    return await Order.countDocuments(filters);
+  }
+
   static async getById(id) {
     const order = await Order.findById(id).populate('user_id');
     if (!order) throw new Error('Order not found');
