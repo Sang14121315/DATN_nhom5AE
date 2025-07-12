@@ -116,6 +116,21 @@ const CheckoutPage: React.FC = () => {
       return;
     }
 
+    // Debug: Kiểm tra token trước khi đặt hàng
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+    console.log('🔍 Checkout - Token before order:', token);
+    console.log('🔍 Checkout - User before order:', user);
+    console.log('🔍 Checkout - Token length:', token?.length);
+    console.log('🔍 Checkout - Token starts with:', token?.substring(0, 20));
+    console.log('🔍 Checkout - All localStorage keys:', Object.keys(localStorage));
+
+    // Kiểm tra xem token có hợp lệ không
+    if (!token) {
+      alert('Bạn chưa đăng nhập. Vui lòng đăng nhập lại.');
+      return;
+    }
+
     const payload: any = {
       payment_method: paymentMethod,
       total,
@@ -137,10 +152,14 @@ const CheckoutPage: React.FC = () => {
       }))
     };
 
+    console.log('🔍 Checkout - Payload:', payload);
+
     try {
       if (paymentMethod === 'bank') {
+        console.log('🔍 Checkout - Creating MoMo order...');
         // Gọi API tạo đơn hàng Momo
         const res = await createMomoOrder(payload);
+        console.log('🔍 Checkout - MoMo response:', res);
         if (res && res.payUrl) {
           window.location.href = res.payUrl;
           return;
@@ -149,6 +168,7 @@ const CheckoutPage: React.FC = () => {
           return;
         }
       } else {
+        console.log('🔍 Checkout - Creating COD order...');
         // COD logic cũ
         await addOrder(payload);
         await clearCart();
@@ -156,7 +176,8 @@ const CheckoutPage: React.FC = () => {
         setShowError(false);
       }
     } catch (error: any) {
-      console.error('❌ Lỗi khi đặt hàng:', error?.response?.data || error.message);
+      console.error('❌ Checkout - Error when placing order:', error?.response?.data || error.message);
+      console.error('❌ Checkout - Full error object:', error);
       alert(error?.response?.data?.message || 'Đặt hàng thất bại');
       setShowSuccess(false);
       setShowError(true);

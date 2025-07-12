@@ -28,7 +28,7 @@ import CheckoutPage from "@/pages/user/CheckoutPage";
 import SearchResultPage from "@/pages/user/searchResult";
 import OrderTrackingPage from "@/pages/user/OrderTrackingPage";
 import ContactPage from "@/pages/user/ContactPage";
-
+import MomoCallbackPage from "@/pages/user/MomoCallbackPage";
 
 
 const MainRouter = () => {
@@ -69,6 +69,7 @@ const MainRouter = () => {
         <Route path="checkout" element={<CheckoutPage />} />
         <Route path="orders" element={<OrderTrackingPage />} />
         <Route path="contact" element={<ContactPage />} />
+        <Route path="momo-callback" element={<MomoCallbackPage />} />
       </Route>
     </Routes>
   );

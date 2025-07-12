@@ -115,7 +115,7 @@ router.get('/admins', auth, messageController.getAdmins);
 
 // Momo payment
 
-router.post('/momo/create', orderController.createMomoOrder);
+router.post('/momo/create', auth, orderController.createMomoOrder);
 router.post('/momo/webhook', orderController.momoWebhook);
 
 // User management (admin)
