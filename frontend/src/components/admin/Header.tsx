@@ -1,6 +1,6 @@
 // src/components/admin/Header.tsx
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { FaBell, FaChevronDown } from 'react-icons/fa';
+import { FaBell, FaChevronDown, FaSignOutAlt, FaKey } from 'react-icons/fa';
 import { getNotificationsByUser, deleteAllNotifications, Notification } from '../../api/notificationAPI';
 import { io } from 'socket.io-client';
 import '@/styles/components/admin/header.scss';
@@ -9,7 +9,8 @@ import { useNavigate } from 'react-router-dom';
 const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:5000');
 
 const Header: React.FC = () => {
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false); // notification
+  const [dropdownOpen, setDropdownOpen] = useState(false); // admin
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const userId = localStorage.getItem('user_id') || '';
@@ -68,7 +69,14 @@ const Header: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleToggleDropdown = () => setShowDropdown(!showDropdown);
+  const handleToggleDropdown = () => {
+    setDropdownOpen((v) => !v);
+    setShowDropdown(false); // Đóng notification khi mở admin
+  };
+  const handleToggleNotification = () => {
+    setShowDropdown((v) => !v);
+    setDropdownOpen(false); // Đóng admin khi mở notification
+  };
 
   const handleDeleteAll = async () => {
     if (!userId) return;
@@ -91,14 +99,23 @@ const Header: React.FC = () => {
   };
 
   const handleLogout = () => {
+
+    localStorage.removeItem('user_id');
+    window.location.href = '/login';
+  };
+
+  const handleChangePassword = () => {
+    window.location.href = '/forgotPassword';
+
     localStorage.clear();
     navigate('/login');
+
   };
 
   return (
     <header className="admin-header">
       <div className="right-section">
-        <div className="icon-button" onClick={handleToggleDropdown}>
+        <div className="icon-button" onClick={handleToggleNotification}>
           <FaBell />
           {notifications.some(n => !n.read) && <span className="notification-badge"></span>}
         </div>
@@ -130,12 +147,26 @@ const Header: React.FC = () => {
           </div>
         )}
 
+
         <div className="admin-dropdown">
           <span className="admin-text">{adminName}</span>
+
+        <div className={`admin-dropdown${dropdownOpen ? ' open' : ''}`} onClick={handleToggleDropdown} ref={dropdownRef}>
+          <span className="admin-text">ADMIN</span>
+
           <FaChevronDown className="dropdown-icon" />
           <div className="dropdown-menu">
+
+            <div className="dropdown-item" onClick={e => { e.stopPropagation(); handleChangePassword(); }}>
+              <FaKey style={{ marginRight: 8 }} /> Đổi mật khẩu
+            </div>
+            <div className="dropdown-item" onClick={e => { e.stopPropagation(); handleLogout(); }}>
+              <FaSignOutAlt style={{ marginRight: 8 }} /> Đăng xuất
+            </div>
+
             <div className="dropdown-item">Quên mật khẩu</div>
             <div className="dropdown-item" onClick={handleLogout}>Đăng xuất</div>
+
           </div>
         </div>
       </div>

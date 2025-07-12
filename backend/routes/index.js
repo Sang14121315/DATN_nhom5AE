@@ -24,6 +24,7 @@ router.get('/search', auth, productController.searchProducts);
 // Contact
 router.post('/contact', contactController.createContact);
 
+
 // Auth
 router.post('/register', userController.register);
 router.post('/login', userController.login);
@@ -116,5 +117,20 @@ router.get('/admins', auth, messageController.getAdmins);
 
 router.post('/momo/create', orderController.createMomoOrder);
 router.post('/momo/webhook', orderController.momoWebhook);
+
+// User management (admin)
+router.get('/users', userController.getUsers); // Lấy tất cả user
+router.get('/users/:id', userController.getUserById); // Lấy chi tiết user
+router.put('/users/:id', userController.updateUser); // Cập nhật user
+router.delete('/users/:id', userController.deleteUser); // Xóa user
+router.patch('/users/:id/block', userController.blockUser); // Khóa/mở khóa user
+
+// Contact management (admin)
+router.get('/contacts', contactController.getContacts); // Lấy danh sách liên hệ
+router.patch('/contacts/:id/status', contactController.updateContactStatus); // Cập nhật trạng thái liên hệ
+router.patch('/contacts/:id/open', contactController.openContact); // Mở lại liên hệ
+router.delete('/contacts/:id', contactController.deleteContact); // Xóa liên hệ
+router.get('/contacts/:id', contactController.getContactById); // Lấy chi tiết liên hệ
+router.post('/contacts/:id/reply', contactController.replyContact); // Trả lời phản hồi
 
 module.exports = router;

@@ -26,7 +26,7 @@ const SidebarMenu: React.FC = () => {
     { icon: <FaShoppingCart />, label: "Đơn hàng", path: "/admin/order" },
     { icon: <FaTicketAlt />, label: "Mã giảm giá", path: "/admin/coupons" },
     { icon: <FaUser />, label: "Người dùng", path: "/admin/users" },
-    { icon: <FaCommentDots />, label: "Phản hồi & Thông báo", path: "/admin/feedback" },
+    { icon: <FaCommentDots />, label: "Phản hồi", path: "/admin/feedback" },
   ];
 
   return (

@@ -147,3 +147,16 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ message: error.message || 'Error deleting user' });
   }
 };
+
+exports.blockUser = async (req, res) => {
+  try {
+    const { block } = req.body;
+    if (typeof block !== 'boolean') {
+      return res.status(400).json({ message: 'block must be boolean' });
+    }
+    const user = await UserService.blockUser(req.params.id, block);
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message || 'Error blocking user' });
+  }
+};
