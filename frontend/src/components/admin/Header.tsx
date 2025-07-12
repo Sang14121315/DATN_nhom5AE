@@ -15,6 +15,7 @@ const Header: React.FC = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const userId = localStorage.getItem('user_id') || '';
   const navigate = useNavigate();
+  const [adminName, setAdminName] = useState<string>('ADMIN');
 
   const fetchNotifications = useCallback(async () => {
     if (!userId) return;
@@ -44,6 +45,19 @@ const Header: React.FC = () => {
       fetchNotifications();
     }
   }, [showDropdown, userId, fetchNotifications]);
+
+  useEffect(() => {
+    // Lấy tên admin từ localStorage
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        if (user && user.name) setAdminName(user.name);
+      } catch (e) {
+        setAdminName('ADMIN');
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -133,8 +147,13 @@ const Header: React.FC = () => {
           </div>
         )}
 
+
+        <div className="admin-dropdown">
+          <span className="admin-text">{adminName}</span>
+
         <div className={`admin-dropdown${dropdownOpen ? ' open' : ''}`} onClick={handleToggleDropdown} ref={dropdownRef}>
           <span className="admin-text">ADMIN</span>
+
           <FaChevronDown className="dropdown-icon" />
           <div className="dropdown-menu">
 

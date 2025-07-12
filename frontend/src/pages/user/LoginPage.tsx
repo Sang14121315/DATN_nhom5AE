@@ -18,6 +18,7 @@ const LoginPage: React.FC = () => {
       const res = await loginUser({ email, password });
 
       // ✅ Không cần lưu token nếu backend đã set cookie
+      localStorage.setItem('token', res.token);
       localStorage.setItem('user', JSON.stringify(res.user));
 
       if (res.user.role === 'admin') {

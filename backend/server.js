@@ -19,7 +19,7 @@ app.use(cors({
 }));
 app.use(cookieParser()); // ✅ sau khi app đã khai báo
 app.use(express.json());
-app.use('/uploads', express.static(path.join(__dirname, 'Uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 app.use('/api', require('./routes/index'));

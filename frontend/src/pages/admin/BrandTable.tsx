@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FaEye, FaPlus } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { fetchAllBrands } from '@/api/brandAPI';
-import { Brand } from '@/types';
+import { Brand } from '@/types/Product';
 import '@/styles/pages/admin/brandTable.scss';
 
 const BrandTable: React.FC = () => {
@@ -27,6 +27,30 @@ const BrandTable: React.FC = () => {
   useEffect(() => {
     const loadBrands = async () => {
       try {
+        // Debug: Kiểm tra token
+        const token = localStorage.getItem('token');
+        console.log('Token:', token);
+        
+        // Debug: Kiểm tra user info
+        const userInfo = localStorage.getItem('user');
+        console.log('User Info:', userInfo);
+        
+        // Debug: Parse user info để xem role
+        if (userInfo) {
+          try {
+            const user = JSON.parse(userInfo);
+            console.log('User Role:', user.role);
+            console.log('User Email:', user.email);
+          } catch (e) {
+            console.log('User info không phải JSON format');
+          }
+        }
+        
+        if (!token) {
+          setError('Bạn chưa đăng nhập. Vui lòng đăng nhập trước.');
+          return;
+        }
+        
         // Lấy toàn bộ danh sách để lọc thương hiệu cha
         const allBrands = await fetchAllBrands({});
         const parents = allBrands.filter(
@@ -41,9 +65,20 @@ const BrandTable: React.FC = () => {
         const data = await fetchAllBrands(filters);
         setBrands(data);
         setError(null);
-      } catch (err) {
-        console.error('Lỗi khi tải thương hiệu:', err);
-        setError('Không thể tải danh sách thương hiệu. Vui lòng thử lại.');
+      } catch (err: any) {
+        console.error('Lỗi chi tiết:', err);
+        console.error('Response data:', err.response?.data);
+        console.error('Status:', err.response?.status);
+        
+        if (err.response?.status === 401) {
+          setError('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+          // Có thể redirect về trang login
+          // navigate('/login');
+        } else if (err.response?.status === 403) {
+          setError('Bạn không có quyền truy cập admin. Vui lòng đăng nhập với tài khoản admin.');
+        } else {
+          setError(`Không thể tải danh sách thương hiệu: ${err.response?.data?.message || err.message}`);
+        }
       }
     };
 
@@ -64,10 +99,19 @@ const BrandTable: React.FC = () => {
   );
   const totalPages = Math.ceil(brands.length / itemsPerPage);
 
-  const getLogoUrl = (logo_url?: string): string => {
-    if (!logo_url) return '';
-    if (logo_url.startsWith('http')) return logo_url;
-    return `http://localhost:5000/uploads/brands/${logo_url}`;
+  const getLogoUrl = (brand: Brand): string => {
+    // Ưu tiên hiển thị logo_data (base64) nếu có
+    if (brand.logo_data) {
+      return brand.logo_data;
+    }
+    
+    // Fallback về logo_url nếu không có logo_data
+    if (!brand.logo_url) return '';
+    if (brand.logo_url.startsWith('http')) return brand.logo_url;
+    if (brand.logo_url.startsWith('/uploads/brands/')) {
+      return `http://localhost:5000${brand.logo_url}`;
+    }
+    return `http://localhost:5000/uploads/brands/${brand.logo_url}`;
   };
 
   return (
@@ -150,9 +194,9 @@ const BrandTable: React.FC = () => {
                 </td>
                 <td>{brand.name}</td>
                 <td>
-                  {brand.logo_url ? (
+                  {getLogoUrl(brand) ? (
                     <img
-                      src={getLogoUrl(brand.logo_url)}
+                      src={getLogoUrl(brand)}
                       alt={brand.name}
                       style={{ width: 80, height: 40, objectFit: 'contain' }}
                     />
