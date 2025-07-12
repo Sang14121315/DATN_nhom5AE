@@ -1,4 +1,3 @@
-// src/components/admin/Header.tsx
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { FaBell, FaChevronDown, FaSignOutAlt, FaKey } from 'react-icons/fa';
 import { getNotificationsByUser, deleteAllNotifications, Notification } from '../../api/notificationAPI';
@@ -12,6 +11,7 @@ const Header: React.FC = () => {
   const [showDropdown, setShowDropdown] = useState(false); // notification
   const [dropdownOpen, setDropdownOpen] = useState(false); // admin
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const notificationRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const userId = localStorage.getItem('user_id') || '';
   const navigate = useNavigate();
@@ -47,13 +47,12 @@ const Header: React.FC = () => {
   }, [showDropdown, userId, fetchNotifications]);
 
   useEffect(() => {
-    // Lấy tên admin từ localStorage
     const userStr = localStorage.getItem('user');
     if (userStr) {
       try {
         const user = JSON.parse(userStr);
         if (user && user.name) setAdminName(user.name);
-      } catch (e) {
+      } catch {
         setAdminName('ADMIN');
       }
     }
@@ -61,8 +60,18 @@ const Header: React.FC = () => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target as Node)
+      ) {
         setShowDropdown(false);
+      }
+
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -70,12 +79,13 @@ const Header: React.FC = () => {
   }, []);
 
   const handleToggleDropdown = () => {
-    setDropdownOpen((v) => !v);
-    setShowDropdown(false); // Đóng notification khi mở admin
+    setDropdownOpen((prev) => !prev);
+    setShowDropdown(false); // đóng notification khi mở admin dropdown
   };
+
   const handleToggleNotification = () => {
-    setShowDropdown((v) => !v);
-    setDropdownOpen(false); // Đóng admin khi mở notification
+    setShowDropdown((prev) => !prev);
+    setDropdownOpen(false); // đóng admin khi mở notification
   };
 
   const handleDeleteAll = async () => {
@@ -99,31 +109,29 @@ const Header: React.FC = () => {
   };
 
   const handleLogout = () => {
-
     localStorage.removeItem('user_id');
-    window.location.href = '/login';
+    localStorage.removeItem('user');
+    navigate('/login');
   };
 
   const handleChangePassword = () => {
-    window.location.href = '/forgotPassword';
-
     localStorage.clear();
-    navigate('/login');
-
+    navigate('/forgotPassword');
   };
 
   return (
     <header className="admin-header">
       <div className="right-section">
+        {/* Nút chuông thông báo */}
         <div className="icon-button" onClick={handleToggleNotification}>
           <FaBell />
           {notifications.some(n => !n.read) && <span className="notification-badge"></span>}
         </div>
 
+        {/* Dropdown Thông báo */}
         {showDropdown && (
-          <div className="notification-dropdown" ref={dropdownRef}>
+          <div className="notification-dropdown" ref={notificationRef}>
             <h4>Thông báo</h4>
-
             <ul className="notification-list">
               {notifications.length === 0 ? (
                 <li>Không có thông báo nào</li>
@@ -137,7 +145,6 @@ const Header: React.FC = () => {
                 ))
               )}
             </ul>
-
             {notifications.length > 0 && (
               <div className="notification-actions">
                 <button onClick={handleDeleteAll}>Xóa tất cả</button>
@@ -147,27 +154,25 @@ const Header: React.FC = () => {
           </div>
         )}
 
-
-        <div className="admin-dropdown">
+        {/* Dropdown Admin */}
+        <div
+          className={`admin-dropdown${dropdownOpen ? ' open' : ''}`}
+          onClick={handleToggleDropdown}
+          ref={dropdownRef}
+        >
           <span className="admin-text">{adminName}</span>
-
-        <div className={`admin-dropdown${dropdownOpen ? ' open' : ''}`} onClick={handleToggleDropdown} ref={dropdownRef}>
-          <span className="admin-text">ADMIN</span>
-
           <FaChevronDown className="dropdown-icon" />
-          <div className="dropdown-menu">
 
-            <div className="dropdown-item" onClick={e => { e.stopPropagation(); handleChangePassword(); }}>
-              <FaKey style={{ marginRight: 8 }} /> Đổi mật khẩu
+          {dropdownOpen && (
+            <div className="dropdown-menu">
+              <div className="dropdown-item" onClick={(e) => { e.stopPropagation(); handleChangePassword(); }}>
+                <FaKey style={{ marginRight: 8 }} /> Đổi mật khẩu
+              </div>
+              <div className="dropdown-item" onClick={(e) => { e.stopPropagation(); handleLogout(); }}>
+                <FaSignOutAlt style={{ marginRight: 8 }} /> Đăng xuất
+              </div>
             </div>
-            <div className="dropdown-item" onClick={e => { e.stopPropagation(); handleLogout(); }}>
-              <FaSignOutAlt style={{ marginRight: 8 }} /> Đăng xuất
-            </div>
-
-            <div className="dropdown-item">Quên mật khẩu</div>
-            <div className="dropdown-item" onClick={handleLogout}>Đăng xuất</div>
-
-          </div>
+          )}
         </div>
       </div>
     </header>
