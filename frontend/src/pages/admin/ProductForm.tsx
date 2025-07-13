@@ -86,11 +86,11 @@ const ProductForm: React.FC = () => {
   const generateSlug = (text: string) => {
   return text
     .toLowerCase()
-    .normalize('NFD')                // chuẩn hoá chuỗi
-    .replace(/[\u0300-\u036f]/g, '') // xoá dấu tiếng Việt
-    .replace(/[^a-z0-9 ]/g, '')      // xoá ký tự đặc biệt
+    .normalize('NFD')               
+    .replace(/[\u0300-\u036f]/g, '') 
+    .replace(/[^a-z0-9 ]/g, '')      
     .trim()
-    .replace(/\s+/g, '-');           // thay khoảng trắng bằng dấu gạch ngang
+    .replace(/\s+/g, '-');         
 };
 
 
