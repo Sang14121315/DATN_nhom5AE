@@ -4,6 +4,7 @@ export interface DashboardStats {
   totalOrders: number;
   totalDelivered: number;
   totalCanceled: number;
+  totalPending: number;
   totalRevenue: number;
 }
 
@@ -18,19 +19,27 @@ export interface DashboardOrder {
 }
 
 export const fetchDashboardStats = async (): Promise<DashboardStats> => {
-  const token = localStorage.getItem('token'); // Giả định token được lưu trong localStorage
   const response = await axios.get('http://localhost:5000/api/admin/dashboard', {
-    headers: { Authorization: `Bearer ${token}` },
+    withCredentials: true, // Sử dụng cookie thay vì Authorization header
   });
-  return response.data;
+  
+  console.log('Stats response:', response.data);
+  return {
+    totalOrders: response.data.totalOrders,
+    totalDelivered: response.data.totalDelivered,
+    totalCanceled: response.data.totalCanceled,
+    totalPending: response.data.totalPending,
+    totalRevenue: response.data.totalRevenue
+  };
 };
 
 export const fetchRecentOrders = async (): Promise<DashboardOrder[]> => {
-  const token = localStorage.getItem('token');
   const response = await axios.get('http://localhost:5000/api/admin/dashboard', {
-    headers: { Authorization: `Bearer ${token}` },
+    withCredentials: true, // Sử dụng cookie thay vì Authorization header
   });
-  return response.data.orders;
+  
+  console.log('Orders response:', response.data);
+  return response.data.orders || [];
 };
 
 export const formatCurrency = (value: number): string => {

@@ -14,6 +14,10 @@ class OrderDetailService {
   static async createMany(details) {
     return await OrderDetail.insertMany(details);
   }
+
+  static async deleteByOrderId(orderId) {
+    return await OrderDetail.deleteMany({ order_id: orderId });
+  }
 }
 
 module.exports = OrderDetailService;

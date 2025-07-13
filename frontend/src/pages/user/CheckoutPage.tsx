@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 import { useOrders } from "@/context/OrderContext";
-import { getProvinces, getDistrictsByProvinceCode, getWardsByDistrictCode } from "vn-provinces";
+// import { getProvinces, getDistrictsByProvinceCode, getWardsByDistrictCode } from "vn-provinces";
 import { fetchCoupons } from "@/api/couponAPI";
 import "@/styles/pages/user/checkoutPage.scss";
 import { useNavigate } from "react-router-dom";
+import { createMomoOrder } from '@/api/momoAPI';
 
 const CheckoutPage: React.FC = () => {
   const { cartItems, clearCart } = useCart();
@@ -115,6 +116,21 @@ const CheckoutPage: React.FC = () => {
       return;
     }
 
+    // Debug: Kiểm tra token trước khi đặt hàng
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+    console.log('🔍 Checkout - Token before order:', token);
+    console.log('🔍 Checkout - User before order:', user);
+    console.log('🔍 Checkout - Token length:', token?.length);
+    console.log('🔍 Checkout - Token starts with:', token?.substring(0, 20));
+    console.log('🔍 Checkout - All localStorage keys:', Object.keys(localStorage));
+
+    // Kiểm tra xem token có hợp lệ không
+    if (!token) {
+      alert('Bạn chưa đăng nhập. Vui lòng đăng nhập lại.');
+      return;
+    }
+
     const payload: any = {
       payment_method: paymentMethod,
       total,
@@ -136,18 +152,33 @@ const CheckoutPage: React.FC = () => {
       }))
     };
 
-    // Chỉ thêm coupon nếu schema backend cho phép
-    // payload.coupon = coupon?.code;
+    console.log('🔍 Checkout - Payload:', payload);
 
     try {
-      console.log("📦 Payload gửi đi:", payload);
-      await addOrder(payload);
-      await clearCart();
-      setShowSuccess(true);
-      setShowError(false);
+      if (paymentMethod === 'bank') {
+        console.log('🔍 Checkout - Creating MoMo order...');
+        // Gọi API tạo đơn hàng Momo
+        const res = await createMomoOrder(payload);
+        console.log('🔍 Checkout - MoMo response:', res);
+        if (res && res.payUrl) {
+          window.location.href = res.payUrl;
+          return;
+        } else {
+          alert('Không tạo được link thanh toán Momo');
+          return;
+        }
+      } else {
+        console.log('🔍 Checkout - Creating COD order...');
+        // COD logic cũ
+        await addOrder(payload);
+        await clearCart();
+        setShowSuccess(true);
+        setShowError(false);
+      }
     } catch (error: any) {
-      console.error("❌ Lỗi khi đặt hàng:", error?.response?.data || error.message);
-      alert(error?.response?.data?.message || "Đặt hàng thất bại");
+      console.error('❌ Checkout - Error when placing order:', error?.response?.data || error.message);
+      console.error('❌ Checkout - Full error object:', error);
+      alert(error?.response?.data?.message || 'Đặt hàng thất bại');
       setShowSuccess(false);
       setShowError(true);
     }
@@ -211,16 +242,6 @@ const CheckoutPage: React.FC = () => {
             <span>🏦 Chuyển khoản qua ngân hàng</span>
           </label>
 
-          {paymentMethod === "bank" && (
-            <div className="qr-container">
-              <p>Vui lòng quét mã để thanh toán:</p>
-              <img
-                src={`https://img.vietqr.io/image/tpbank-25520122005-pr_only.png?amount=${total}&addInfo=5AE&accountName=HUYNHTHANHSANG`}
-                alt="QR chuyển khoản"
-                className="qr-image"
-              />
-            </div>
-          )}
         </div>
 
         <div className="checkout-section order-summary">

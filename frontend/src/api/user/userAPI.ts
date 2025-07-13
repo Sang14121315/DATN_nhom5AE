@@ -1,4 +1,4 @@
-import axios from '../axios'; // đường dẫn tới file axios.ts
+import axiosInstance from '../axios'; // đường dẫn tới file axios.ts
 
 
 // Định nghĩa kiểu dữ liệu User
@@ -10,11 +10,10 @@ export interface User {
   phone?: string;
   address?: string;
   role: 'user' | 'admin';
+  isBlocked?: boolean;
   created_at?: string;
   updated_at?: string;
 }
-
-const BASE_URL = 'http://localhost:5000/api';
 
 // -------------------------
 // API: Đăng ký người dùng
@@ -26,9 +25,7 @@ export const registerUser = async (userData: {
   phone?: string;
   address?: string;
 }): Promise<User> => {
-  const response = await axios.post(`${BASE_URL}/register`, userData, {
-    withCredentials: true, // gửi cookie (token)
-  });
+  const response = await axiosInstance.post(`/register`, userData);
   return response.data;
 };
 
@@ -39,9 +36,7 @@ export const loginUser = async (credentials: {
   email: string;
   password: string;
 }): Promise<{ token: string; user: User }> => {
-  const response = await axios.post(`${BASE_URL}/login`, credentials, {
-    withCredentials: true, // gửi cookie (token)
-  });
+  const response = await axiosInstance.post(`/login`, credentials);
   return response.data;
 };
 
@@ -49,7 +44,7 @@ export const loginUser = async (credentials: {
 // API: Quên mật khẩu
 // -------------------------
 export const forgotPassword = async (email: string): Promise<{ message: string }> => {
-  const response = await axios.post(`${BASE_URL}/forgot-password`, { email });
+  const response = await axiosInstance.post(`/forgot-password`, { email });
   return response.data;
 };
 
@@ -57,7 +52,7 @@ export const forgotPassword = async (email: string): Promise<{ message: string }
 // API: Đặt lại mật khẩu
 // -------------------------
 export const resetPassword = async (token: string, newPassword: string): Promise<{ message: string }> => {
-  const response = await axios.post(`${BASE_URL}/reset-password`, {
+  const response = await axiosInstance.post(`/reset-password`, {
     token,
     newPassword,
   });
@@ -68,9 +63,7 @@ export const resetPassword = async (token: string, newPassword: string): Promise
 // API: Lấy tất cả người dùng (admin)
 // -------------------------
 export const fetchAllUsers = async (): Promise<User[]> => {
-  const response = await axios.get(`${BASE_URL}/users`, {
-    withCredentials: true,
-  });
+  const response = await axiosInstance.get(`/users`);
   return response.data;
 };
 
@@ -78,9 +71,7 @@ export const fetchAllUsers = async (): Promise<User[]> => {
 // API: Lấy chi tiết người dùng theo ID
 // -------------------------
 export const fetchUserById = async (userId: string): Promise<User> => {
-  const response = await axios.get(`${BASE_URL}/users/${userId}`, {
-    withCredentials: true,
-  });
+  const response = await axiosInstance.get(`/users/${userId}`);
   return response.data;
 };
 
@@ -91,9 +82,7 @@ export const updateUser = async (
   userId: string,
   updatedData: Partial<Omit<User, '_id' | 'created_at' | 'updated_at' | 'role'>>
 ): Promise<User> => {
-  const response = await axios.put(`${BASE_URL}/users/${userId}`, updatedData, {
-    withCredentials: true,
-  });
+  const response = await axiosInstance.put(`/users/${userId}`, updatedData);
   return response.data;
 };
 
@@ -101,8 +90,14 @@ export const updateUser = async (
 // API: Xóa người dùng
 // -------------------------
 export const deleteUser = async (userId: string): Promise<{ message: string }> => {
-  const response = await axios.delete(`${BASE_URL}/users/${userId}`, {
-    withCredentials: true,
-  });
+  const response = await axiosInstance.delete(`/users/${userId}`);
+  return response.data;
+};
+
+// -------------------------
+// API: Khóa/mở khóa người dùng (admin)
+// -------------------------
+export const blockUser = async (userId: string, block: boolean): Promise<User> => {
+  const response = await axiosInstance.patch(`/users/${userId}/block`, { block });
   return response.data;
 };

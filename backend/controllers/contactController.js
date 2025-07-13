@@ -1,5 +1,6 @@
 const ContactService = require('../services/ContactService');
 const Joi = require('joi');
+const UserService = require('../services/userService');
 
 const contactSchema = Joi.object({
   title: Joi.string().min(2).required().label('Tiêu đề'),
@@ -14,6 +15,9 @@ exports.createContact = async (req, res) => {
   try {
     const { error } = contactSchema.validate(req.body);
     if (error) return res.status(400).json({ message: error.details[0].message });
+
+    // Nếu không có user_id thì xóa khỏi req.body để tránh lỗi
+    if (!req.body.user_id) delete req.body.user_id;
 
     const contact = await ContactService.create(req.body);
 
@@ -74,5 +78,63 @@ exports.updateContact = async (req, res) => {
     res.json(contact);
   } catch (error) {
     res.status(500).json({ message: error.message || 'Lỗi khi cập nhật tin nhắn liên hệ' });
+  }
+};
+
+exports.updateContactStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    if (!['pending', 'replied', 'closed'].includes(status)) {
+      return res.status(400).json({ message: 'Trạng thái không hợp lệ' });
+    }
+    const contact = await ContactService.update(req.params.id, { status });
+    if (!contact) {
+      return res.status(404).json({ message: 'Không tìm thấy liên hệ' });
+    }
+    res.json(contact);
+  } catch (error) {
+    res.status(500).json({ message: error.message || 'Lỗi khi cập nhật trạng thái liên hệ' });
+  }
+};
+
+exports.getContactById = async (req, res) => {
+  try {
+    const contact = await ContactService.getById(req.params.id);
+    if (!contact) return res.status(404).json({ message: 'Không tìm thấy liên hệ' });
+    res.json(contact);
+  } catch (error) {
+    res.status(500).json({ message: error.message || 'Lỗi khi lấy chi tiết liên hệ' });
+  }
+};
+
+exports.replyContact = async (req, res) => {
+  try {
+    const { reply } = req.body;
+    if (!reply || reply.length < 2) return res.status(400).json({ message: 'Nội dung phản hồi không hợp lệ' });
+    const contact = await ContactService.reply(req.params.id, reply);
+    if (!contact) return res.status(404).json({ message: 'Không tìm thấy liên hệ' });
+    res.json({ message: 'Đã gửi phản hồi cho khách hàng', contact });
+  } catch (error) {
+    res.status(500).json({ message: error.message || 'Lỗi khi gửi phản hồi' });
+  }
+};
+
+exports.openContact = async (req, res) => {
+  try {
+    const contact = await ContactService.update(req.params.id, { status: 'pending' });
+    if (!contact) return res.status(404).json({ message: 'Không tìm thấy liên hệ' });
+    res.json(contact);
+  } catch (error) {
+    res.status(500).json({ message: error.message || 'Lỗi khi mở lại liên hệ' });
+  }
+};
+
+exports.deleteContact = async (req, res) => {
+  try {
+    const contact = await ContactService.delete(req.params.id);
+    if (!contact) return res.status(404).json({ message: 'Không tìm thấy liên hệ' });
+    res.json({ message: 'Đã xóa liên hệ' });
+  } catch (error) {
+    res.status(500).json({ message: error.message || 'Lỗi khi xóa liên hệ' });
   }
 };

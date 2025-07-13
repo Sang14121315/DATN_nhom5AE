@@ -20,7 +20,7 @@ class MessageService {
     // Tạo notification cho người nhận
     await NotificationService.create({
       user_id: data.receiver_id,
-      content: `Bạn có tin nhắn mới từ ${data.sender_id.name || 'người dùng'}`,
+      content: `Bạn có tin nhắn mới từ ${data.sender_id && data.sender_id.name ? data.sender_id.name : 'người dùng ẩn danh'}`,
       type: 'user_feedback',
       related_id: message._id,
       related_model: 'Message',
