@@ -28,6 +28,8 @@ interface CartContextType {
   increaseQuantity: (id: string) => Promise<void>;
   decreaseQuantity: (id: string) => Promise<void>;
   clearCart: () => Promise<void>;
+  forceClearCart: () => void;
+  reloadCart: () => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -116,6 +118,28 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const reloadCart = async () => {
+    console.log('🔄 Reloading cart from server...');
+    try {
+      await loadCart();
+      console.log('✅ Cart reloaded successfully');
+    } catch (error) {
+      console.error('❌ Error reloading cart:', error);
+    }
+  };
+
+  const forceClearCart = () => {
+    console.log('🛒 Force clearing cart...');
+    console.log('🛒 Cart items before clear:', cartItems);
+    setCartItems([]);
+    console.log('✅ Cart cleared immediately');
+    
+    // Cũng gọi API để xóa trong database
+    clearCartAPI().catch(error => {
+      console.error('❌ Error clearing cart in database:', error);
+    });
+  };
+
   const openCart = () => setIsSidebarOpen(true);
   const closeCart = () => setIsSidebarOpen(false);
 
@@ -133,6 +157,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         increaseQuantity,
         decreaseQuantity,
         clearCart,
+        forceClearCart,
+        reloadCart,
       }}
     >
       {children}

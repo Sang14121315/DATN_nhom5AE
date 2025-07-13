@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { createMomoOrder } from '@/api/momoAPI';
 
 const CheckoutPage: React.FC = () => {
-  const { cartItems, clearCart } = useCart();
+  const { cartItems, clearCart, forceClearCart, reloadCart } = useCart();
   const { addOrder } = useOrders();
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const [showSuccess, setShowSuccess] = useState(false);
@@ -161,7 +161,19 @@ const CheckoutPage: React.FC = () => {
         const res = await createMomoOrder(payload);
         console.log('🔍 Checkout - MoMo response:', res);
         if (res && res.payUrl) {
-          window.location.href = res.payUrl;
+          // Xóa giỏ hàng ngay khi tạo đơn hàng MoMo thành công
+          console.log('✅ Checkout - MoMo order created, clearing cart...');
+          console.log('✅ Checkout - Cart items before clear:', cartItems);
+          forceClearCart();
+          console.log('✅ Checkout - Cart cleared, reloading cart...');
+          await reloadCart();
+          console.log('✅ Checkout - Cart reloaded, redirecting to MoMo...');
+          
+          // Đợi một chút để đảm bảo giỏ hàng được xóa
+          setTimeout(() => {
+            // Redirect đến trang thanh toán MoMo
+            window.location.href = res.payUrl;
+          }, 100);
           return;
         } else {
           alert('Không tạo được link thanh toán Momo');
@@ -171,7 +183,7 @@ const CheckoutPage: React.FC = () => {
         console.log('🔍 Checkout - Creating COD order...');
         // COD logic cũ
         await addOrder(payload);
-        await clearCart();
+        forceClearCart();
         setShowSuccess(true);
         setShowError(false);
       }

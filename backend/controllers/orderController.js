@@ -220,12 +220,27 @@ module.exports = {
 
       await OrderDetailService.createMany(detailDocs);
 
+      // Xóa giỏ hàng ngay khi tạo đơn hàng thành công
+      console.log('🛒 Creating MoMo order - Clearing cart for user:', userId);
+      try {
+        await CartService.clearCart(userId);
+        console.log('✅ Cart cleared successfully when creating MoMo order');
+      } catch (cartError) {
+        console.error('❌ Error clearing cart when creating MoMo order:', cartError);
+      }
+
       // Tạo link thanh toán Momo với orderId thực
       const orderId = order._id.toString();
       const redirectUrl = process.env.MOMO_REDIRECT_URL || 'http://localhost:5173/momo-callback';
       const ipnUrl = process.env.MOMO_IPN_URL || 'http://localhost:5000/api/momo/webhook';
       
+      console.log('🔗 MoMo - Redirect URL:', redirectUrl);
+      console.log('🔗 MoMo - IPN URL:', ipnUrl);
+      console.log('🔗 MoMo - Order ID:', orderId);
+      
       const momoRes = await createMomoPayment(orderId, total, redirectUrl, ipnUrl);
+      
+      console.log('🔗 MoMo - Response:', momoRes);
       
       if (momoRes && momoRes.payUrl) {
         res.json({ 
@@ -248,11 +263,16 @@ module.exports = {
 
   momoWebhook: async (req, res) => {
     try {
+      console.log('📞 MoMo webhook - Request received');
+      console.log('📞 MoMo webhook - Headers:', req.headers);
+      console.log('📞 MoMo webhook - Body:', req.body);
+      
       const { orderId, resultCode, message } = req.body;
       console.log('📞 MoMo webhook received:', { orderId, resultCode, message });
       
       if (resultCode === 0) {
         // Thanh toán thành công
+        console.log('✅ MoMo webhook - Payment successful, processing...');
         try {
           // Cập nhật trạng thái đơn hàng thành 'paid'
           const updatedOrder = await OrderService.update(orderId, { 
@@ -260,9 +280,18 @@ module.exports = {
             updated_at: new Date()
           });
           
+          console.log('✅ MoMo webhook - Order updated:', updatedOrder);
+          
           if (updatedOrder) {
             // Xóa giỏ hàng của user
-            await CartService.clearCart(updatedOrder.user_id);
+            console.log('🛒 MoMo webhook - Clearing cart for user:', updatedOrder.user_id);
+            try {
+              await CartService.clearCart(updatedOrder.user_id);
+              console.log('✅ MoMo webhook - Cart cleared successfully');
+            } catch (cartError) {
+              console.error('❌ MoMo webhook - Error clearing cart:', cartError);
+              // Tiếp tục xử lý ngay cả khi xóa giỏ hàng thất bại
+            }
             
             // Gửi thông báo realtime
             const io = req.app.get('io');
@@ -306,6 +335,7 @@ module.exports = {
         }
       }
       
+      console.log('📞 MoMo webhook - Sending OK response');
       res.status(200).send('OK');
     } catch (err) {
       console.error('❌ Webhook error:', err);
