@@ -1,6 +1,8 @@
 import { Routes, Route } from "react-router-dom";
 import AdminLayout from "@/layouts/admin.layout";
 import DashboardPage from "@/pages/admin/Dashboard";
+import ProductTypeTablePage from "@/pages/admin/ProductTypeTable";
+import ProductTypeFormPage from "@/pages/admin/ProductTypeForm";
 import CategoryTablePage from "@/pages/admin/CategoryTable";
 import CategoryFormPage from "@/pages/admin/CategoryForm";
 import BrandTablePage from "@/pages/admin/BrandTable";
@@ -40,6 +42,9 @@ const MainRouter = () => {
       {/* Admin layout */}
       <Route path="/admin" element={<AdminLayout />}>
         <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="product-types" element={<ProductTypeTablePage />} />
+        <Route path="product-types/create" element={<ProductTypeFormPage />} />
+        <Route path="product-types/:id/form" element={<ProductTypeFormPage />} />
         <Route path="category" element={<CategoryTablePage />} />
         <Route path="category/create" element={<CategoryFormPage />} />
         <Route path="category/:id/form" element={<CategoryFormPage />} />
