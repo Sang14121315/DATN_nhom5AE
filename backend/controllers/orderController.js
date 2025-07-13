@@ -184,39 +184,131 @@ module.exports = {
 
   createMomoOrder: async (req, res) => {
     try {
-      // Nhận thông tin đơn hàng từ client
-      const { total, customer, city, district, ward, payment_method, items } = req.body;
-      // Tạo đơn hàng (giống createOrder, có thể tái sử dụng logic)
-      // ... (tùy bạn muốn lưu trước hay sau khi thanh toán)
-      // Ví dụ tạo orderId tạm thời:
-      const orderId = `MOMO_${Date.now()}`;
-      // Tạo link thanh toán Momo
-      const redirectUrl = process.env.MOMO_REDIRECT_URL || 'http://localhost:5173/orders';
+      const { error } = orderSchema.validate(req.body);
+      if (error) return res.status(400).json({ message: error.details[0].message });
+
+      const userId = req.user?.id;
+      if (!userId) return res.status(401).json({ message: 'Bạn chưa đăng nhập' });
+
+      const { customer, payment_method, items, total, ward, district, city } = req.body;
+      const fullAddress = `${customer.address}, ${ward}, ${district}, ${city}`;
+
+      // Tạo đơn hàng thực sự trong database
+      const order = await OrderService.create({
+        user_id: userId,
+        payment_method,
+        total,
+        status: 'pending',
+        customer: {
+          ...customer,
+          address: fullAddress
+        },
+        ward,
+        district,
+        city
+      });
+
+      // Tạo order details
+      const detailDocs = items.map(item => ({
+        order_id: order._id,
+        product_id: item.product_id,
+        quantity: item.quantity,
+        price: item.price,
+        name: item.name,
+        img_url: item.img_url || '',
+      }));
+
+      await OrderDetailService.createMany(detailDocs);
+
+      // Tạo link thanh toán Momo với orderId thực
+      const orderId = order._id.toString();
+      const redirectUrl = process.env.MOMO_REDIRECT_URL || 'http://localhost:5173/momo-callback';
       const ipnUrl = process.env.MOMO_IPN_URL || 'http://localhost:5000/api/momo/webhook';
+      
       const momoRes = await createMomoPayment(orderId, total, redirectUrl, ipnUrl);
+      
       if (momoRes && momoRes.payUrl) {
-        res.json({ payUrl: momoRes.payUrl, orderId });
+        res.json({ 
+          payUrl: momoRes.payUrl, 
+          orderId: orderId,
+          order: order,
+          orderDetails: detailDocs 
+        });
       } else {
-        res.status(500).json({ message: 'Không tạo được link thanh toán Momo' });
+        // Nếu tạo link thanh toán thất bại, xóa đơn hàng đã tạo
+        await OrderService.delete(order._id);
+        await OrderDetailService.deleteByOrderId(order._id);
+        res.status(500).json({ message: 'Không tạo được link thanh toán MoMo' });
       }
     } catch (err) {
+      console.error('❌ Lỗi tạo đơn hàng Momo:', err);
       res.status(500).json({ message: err.message || 'Lỗi tạo đơn hàng Momo' });
     }
   },
 
   momoWebhook: async (req, res) => {
     try {
-      const { orderId, resultCode } = req.body;
+      const { orderId, resultCode, message } = req.body;
+      console.log('📞 MoMo webhook received:', { orderId, resultCode, message });
+      
       if (resultCode === 0) {
         // Thanh toán thành công
-        // Tìm đơn hàng theo orderId và cập nhật trạng thái
-        // TODO: Nếu orderId là tạm thời, cần map sang đơn hàng thật
-        // Ví dụ:
-        // await OrderService.updateByOrderId(orderId, { status: 'paid' });
-        console.log('Momo thanh toán thành công cho order:', orderId);
+        try {
+          // Cập nhật trạng thái đơn hàng thành 'paid'
+          const updatedOrder = await OrderService.update(orderId, { 
+            status: 'paid',
+            updated_at: new Date()
+          });
+          
+          if (updatedOrder) {
+            // Xóa giỏ hàng của user
+            await CartService.clearCart(updatedOrder.user_id);
+            
+            // Gửi thông báo realtime
+            const io = req.app.get('io');
+            if (io) {
+              io.to(updatedOrder.user_id.toString()).emit('new-notification', {
+                user_id: updatedOrder.user_id,
+                content: `Đơn hàng #${orderId} đã được thanh toán thành công!`,
+                type: 'payment_success',
+                related_id: orderId,
+                related_model: 'Order',
+                related_action: 'view_order'
+              });
+
+              io.to('admin').emit('order-updated', {
+                order_id: orderId,
+                user_id: updatedOrder.user_id,
+                status: 'paid',
+                updated_at: new Date()
+              });
+            }
+            
+            console.log('✅ MoMo payment successful for order:', orderId);
+          } else {
+            console.error('❌ Không tìm thấy đơn hàng:', orderId);
+          }
+        } catch (error) {
+          console.error('❌ Lỗi xử lý webhook MoMo:', error);
+        }
+      } else {
+        // Thanh toán thất bại
+        console.log('❌ MoMo payment failed for order:', orderId, 'with code:', resultCode);
+        
+        // Có thể cập nhật trạng thái đơn hàng thành 'failed' nếu muốn
+        try {
+          await OrderService.update(orderId, { 
+            status: 'failed',
+            updated_at: new Date()
+          });
+        } catch (error) {
+          console.error('❌ Lỗi cập nhật trạng thái đơn hàng thất bại:', error);
+        }
       }
+      
       res.status(200).send('OK');
     } catch (err) {
+      console.error('❌ Webhook error:', err);
       res.status(500).send('Webhook error');
     }
   }

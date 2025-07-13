@@ -58,6 +58,30 @@ class ContactService {
   static async update(id, data) {
     return await Contact.findByIdAndUpdate(id, data, { new: true });
   }
+
+  static async getById(id) {
+    return await Contact.findById(id);
+  }
+
+  static async reply(id, reply) {
+    const contact = await Contact.findById(id);
+    if (!contact) return null;
+    contact.reply = reply;
+    contact.status = 'replied';
+    contact.updated_at = new Date();
+    await contact.save();
+    // Gửi email cho khách
+    if (contact.email) {
+      // Gửi email bằng nodemailer hoặc service khác
+      // (giả lập, bạn có thể tích hợp thực tế)
+      // await sendEmail(contact.email, 'Phản hồi từ 5AnhEmPC', reply);
+    }
+    return contact;
+  }
+
+  static async delete(id) {
+    return await Contact.findByIdAndDelete(id);
+  }
 }
 
 module.exports = ContactService;

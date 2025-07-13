@@ -14,12 +14,12 @@ import CategoryTablePage from "@/pages/admin/CategoryTable";
 import CategoryFormPage from "@/pages/admin/CategoryForm";
 import BrandTablePage from "@/pages/admin/BrandTable";
 import BrandFormPage from "@/pages/admin/BrandForm";
-import OrderPage from "@/pages/admin/OrderPage";
-import CouponAdmin from "@/pages/admin/AdminCouponPage";
+import Orderfrom from "@/pages/admin/OrderPage";
+import AdminOrderDetailPage from "@/pages/admin/AdminOrderDetailPage";
+import CouponAdmin from "@/pages/admin/AdminCouponPage"
 import CouponForm from "@/pages/admin/CouponForm";
-
-// User Pages
-import HomePage from "@/pages/user/home";
+// import user
+import AuthLayout from "@/layouts/auth.layout";
 import AboutPage from "@/pages/user/about";
 import ProductlistPage from "@/pages/user/productList";
 import ProductdetailPage from "@/pages/user/productDetail";
@@ -31,6 +31,7 @@ import CheckoutPage from "@/pages/user/CheckoutPage";
 import SearchResultPage from "@/pages/user/searchResult";
 import OrderTrackingPage from "@/pages/user/OrderTrackingPage";
 import ContactPage from "@/pages/user/ContactPage";
+
 
 const MainRouter = () => {
   return (
@@ -50,7 +51,9 @@ const MainRouter = () => {
         <Route path="brand" element={<BrandTablePage />} />
         <Route path="brand/create" element={<BrandFormPage />} />
         <Route path="brand/:id/form" element={<BrandFormPage />} />
-        <Route path="coupons" element={<CouponAdmin />} />
+        <Route path="order" element={<Orderfrom />} />
+        <Route path="orders/:id" element={<AdminOrderDetailPage/>} />
+        <Route path="coupons" element={<CouponAdmin/>} />
         <Route path="coupons/create" element={<CouponForm />} />
         <Route path="coupons/:id/edit" element={<CouponForm />} />
       </Route>
@@ -71,6 +74,7 @@ const MainRouter = () => {
         <Route path="checkout" element={<CheckoutPage />} />
         <Route path="orders" element={<OrderTrackingPage />} />
         <Route path="contact" element={<ContactPage />} />
+        <Route path="momo-callback" element={<MomoCallbackPage />} />
       </Route>
     </Routes>
   );

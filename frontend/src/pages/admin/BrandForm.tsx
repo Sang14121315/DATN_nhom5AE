@@ -17,11 +17,13 @@ const BrandForm: React.FC = () => {
   const [brand, setBrand] = useState({
     name: "",
     slug: "",
+    logo_data: "",
     logo_url: "",
     created_at: "", // chỉ hiển thị, không gửi lên backend
   });
 
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (isEditMode) {
@@ -29,15 +31,18 @@ const BrandForm: React.FC = () => {
         setBrand({
           name: res.name || "",
           slug: res.slug || "",
+          logo_data: res.logo_data || "",
           logo_url: res.logo_url || "",
           created_at: res.created_at?.split("T")[0] || "",
         });
 
-        // Nếu là đường dẫn ảnh bên ngoài (http/https) thì dùng trực tiếp
-        if (res.logo_url?.startsWith("http")) {
+        // Ưu tiên hiển thị logo_data (base64) nếu có
+        if (res.logo_data) {
+          setLogoPreview(res.logo_data);
+        } else if (res.logo_url?.startsWith("http")) {
           setLogoPreview(res.logo_url);
         } else if (res.logo_url) {
-          setLogoPreview(`http://localhost:5000/uploads/brands/${res.logo_url}`);
+          setLogoPreview(`http://localhost:5000${res.logo_url}`);
         } else {
           setLogoPreview(null);
         }
@@ -52,36 +57,20 @@ const BrandForm: React.FC = () => {
     setBrand((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  const file = e.target.files?.[0];
-  if (file) {
-    const preview = URL.createObjectURL(file);
-    setLogoPreview(preview);
-
-    const formData = new FormData();
-    formData.append("image", file);
-
-    try {
-      const res = await axios.post("http://localhost:5000/api/upload/brand", formData);
-      const { filename } = res.data;
-      setBrand((prev) => ({
-        ...prev,
-        logo_url: filename,
-      }));
-      setLogoPreview(`http://localhost:5000/uploads/brands/${filename}`);
-    } catch (err) {
-      console.error("Lỗi upload ảnh:", err);
-      alert("Upload ảnh thất bại!");
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setLogoFile(file);
+      const preview = URL.createObjectURL(file);
+      setLogoPreview(preview);
     }
-  }
-};
-
+  };
 
   const handleSave = async () => {
     const payload: any = {
       name: brand.name,
       slug: brand.slug || brand.name.toLowerCase().replace(/\s+/g, "-"),
-      logo_url: brand.logo_url || "",
+      logoFile: logoFile || undefined,
     };
 
     try {
@@ -89,7 +78,7 @@ const BrandForm: React.FC = () => {
         await updateBrand(id as string, payload);
         alert("Cập nhật thành công!");
       } else {
-        await createBrand(payload); // Không cần gửi created_at
+        await createBrand(payload);
         alert("Thêm mới thành công!");
         navigate("/admin/brand");
       }
