@@ -13,9 +13,7 @@ const contactController = require('../controllers/contactController');
 const productTypeController = require('../controllers/productTypeController');
 const cartController = require('../controllers/cartController');
 const auth = require('../middleware/auth');
-const adminAuth = require('../middleware/adminAuth');
 const upload = require('../middleware/upload');
-
 
 // Home
 router.get('/home', homeController.getHomeData);

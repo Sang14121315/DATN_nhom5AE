@@ -1,15 +1,6 @@
 import { Routes, Route } from "react-router-dom";
-
-// Layouts
 import AdminLayout from "@/layouts/admin.layout";
-import AuthLayout from "@/layouts/auth.layout";
-
-// Admin Pages
 import DashboardPage from "@/pages/admin/Dashboard";
-import ProductsPage from "@/pages/admin/ProductTable";
-import ProductDetailPage from "@/pages/admin/ProductForm";
-import AddProductPage from "@/pages/admin/AddProductPage";
-import AdminOrderDetailPage from "@/pages/admin/AdminOrderDetailPage";
 import CategoryTablePage from "@/pages/admin/CategoryTable";
 import CategoryFormPage from "@/pages/admin/CategoryForm";
 import BrandTablePage from "@/pages/admin/BrandTable";
@@ -17,12 +8,18 @@ import BrandFormPage from "@/pages/admin/BrandForm";
 import Orderfrom from "@/pages/admin/OrderPage";
 import AdminOrderDetailPage from "@/pages/admin/AdminOrderDetailPage";
 import CouponAdmin from "@/pages/admin/AdminCouponPage"
+
+import AdminUserPage from "@/pages/admin/AdminUserPage";
+import AdminContactPage from "@/pages/admin/AdminContactPage";
+
 import CouponForm from "@/pages/admin/CouponForm";
+
 // import user
 import AuthLayout from "@/layouts/auth.layout";
 import AboutPage from "@/pages/user/about";
 import ProductlistPage from "@/pages/user/productList";
 import ProductdetailPage from "@/pages/user/productDetail";
+import HomePage from "@/pages/user/home";
 import LoginPage from "@/pages/user/LoginPage";
 import RegisterPage from "@/pages/user/RegisterPage";
 import ForgotPasswordPage from "@/pages/user/ForgotPasswordPage";
@@ -31,20 +28,15 @@ import CheckoutPage from "@/pages/user/CheckoutPage";
 import SearchResultPage from "@/pages/user/searchResult";
 import OrderTrackingPage from "@/pages/user/OrderTrackingPage";
 import ContactPage from "@/pages/user/ContactPage";
+import MomoCallbackPage from "@/pages/user/MomoCallbackPage";
 
 
 const MainRouter = () => {
   return (
     <Routes>
-      {/* Admin Layout */}
+      {/* Admin layout */}
       <Route path="/admin" element={<AdminLayout />}>
         <Route path="dashboard" element={<DashboardPage />} />
-        <Route path="products" element={<ProductsPage />} />
-        <Route path="products/create" element={<AddProductPage />} />
-        <Route path="products/:id" element={<ProductDetailPage />} />
-        <Route path="products/:id/form" element={<ProductDetailPage />} />
-        <Route path="orders/:id" element={<AdminOrderDetailPage />} />
-        <Route path="order" element={<OrderPage />} />
         <Route path="category" element={<CategoryTablePage />} />
         <Route path="category/create" element={<CategoryFormPage />} />
         <Route path="category/:id/form" element={<CategoryFormPage />} />
@@ -54,11 +46,14 @@ const MainRouter = () => {
         <Route path="order" element={<Orderfrom />} />
         <Route path="orders/:id" element={<AdminOrderDetailPage/>} />
         <Route path="coupons" element={<CouponAdmin/>} />
+
+        <Route path="users" element={<AdminUserPage />} />
+        <Route path="feedback" element={<AdminContactPage />} />
+
         <Route path="coupons/create" element={<CouponForm />} />
         <Route path="coupons/:id/edit" element={<CouponForm />} />
       </Route>
-
-      {/* User Layout */}
+      {/* User layout */}
       <Route path="/" element={<AuthLayout />}>
         <Route index element={<HomePage />} />
         <Route path="home" element={<HomePage />} />
@@ -66,8 +61,8 @@ const MainRouter = () => {
         <Route path="about" element={<AboutPage />} />
         <Route path="productlist" element={<ProductlistPage />} />
         <Route path="productdetail" element={<ProductdetailPage />} />
-        <Route path="product/:id" element={<ProductdetailPage />} />
         <Route path="login" element={<LoginPage />} />
+        <Route path="product/:id" element={<ProductdetailPage />} />
         <Route path="register" element={<RegisterPage />} />
         <Route path="forgot-password" element={<ForgotPasswordPage />} />
         <Route path="cart" element={<CartPage />} />

@@ -32,7 +32,7 @@ const validateData = (data, res) => {
 };
 
 // ✅ GET: Lấy danh sách sản phẩm có filter + phân trang
-exports.getProducts = async (req, res, next) => {
+const getProducts = async (req, res, next) => {
   try {
     const {
       name, category_id, brand_id,
@@ -74,7 +74,7 @@ exports.getProducts = async (req, res, next) => {
 };
 
 // ✅ GET: Lấy chi tiết sản phẩm theo ID
-exports.getProductById = async (req, res, next) => {
+const getProductById = async (req, res, next) => {
   try {
     const product = await ProductService.getById(req.params.id);
     res.json(product);
@@ -84,7 +84,7 @@ exports.getProductById = async (req, res, next) => {
 };
 
 // ✅ POST: Tạo mới sản phẩm
-exports.createProduct = async (req, res, next) => {
+const createProduct = async (req, res, next) => {
   try {
     const rawData = {
       ...req.body,
@@ -108,7 +108,7 @@ exports.createProduct = async (req, res, next) => {
 };
 
 // ✅ PUT: Cập nhật sản phẩm
-exports.updateProduct = async (req, res, next) => {
+const updateProduct = async (req, res, next) => {
   try {
     const rawData = {
       ...req.body,
@@ -132,7 +132,7 @@ exports.updateProduct = async (req, res, next) => {
 };
 
 // ✅ DELETE: Xóa sản phẩm
-exports.deleteProduct = async (req, res, next) => {
+const deleteProduct = async (req, res, next) => {
   try {
     await ProductService.delete(req.params.id);
     res.json({ message: 'Đã xóa sản phẩm' });
@@ -142,7 +142,7 @@ exports.deleteProduct = async (req, res, next) => {
 };
 
 // ✅ GET: Tìm kiếm đơn giản (không phân trang)
-exports.searchProducts = async (req, res, next) => {
+const searchProducts = async (req, res, next) => {
   try {
     const { query, minPrice, maxPrice, sort } = req.query;
 
@@ -162,4 +162,14 @@ exports.searchProducts = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+// ✅ Export các controller sử dụng module.exports
+module.exports = {
+  getProducts,
+  getProductById,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  searchProducts,
 };
