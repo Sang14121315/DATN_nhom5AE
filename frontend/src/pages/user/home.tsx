@@ -107,7 +107,7 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {categories.map((category) => (
+      {categories.slice(0, 2).map((category) => (
         <section key={category._id} id="qc-gh">
           <div className="wrapper">
             <h2>{category.name}</h2>

@@ -1,157 +1,189 @@
-// import React, { useState, useEffect } from 'react';
-// import { getProducts, deleteProduct } from '../../api/productAPI';
-// import { Table, Button, Space, Modal, message, Pagination, Tag } from 'antd';
-// import { EditOutlined, DeleteOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
-// import ProductForm from './ProductForm';
-// import { formatPrice } from '../../utils/format';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import '@/styles/pages/admin/products.scss';
 
-// const ProductTable: React.FC = () => {
-//   const [data, setData] = useState<any[]>([]);
-//   const [pagination, setPagination] = useState({
-//     current: 1,
-//     pageSize: 10,
-//     total: 0
-//   });
-//   const [loading, setLoading] = useState(false);
-//   const [modalVisible, setModalVisible] = useState(false);
-//   const [selectedProduct, setSelectedProduct] = useState<any>(null);
+import { Product, fetchAllProducts, ProductQueryParams } from '@/api/productsAPI';
+import { fetchAllCategories } from '@/api/categoryAPI';
+import { fetchAllBrands } from '@/api/brandAPI';
+import { fetchAllProductTypes } from '@/api/productTypeAPI';
+import { formatCurrency } from '@/api/productsAPI';
 
-//   const fetchData = async () => {
-//     setLoading(true);
-//     try {
-//       const result = await getProducts(pagination.current, pagination.pageSize);
-//       setData(result.data);
-//       setPagination({
-//         ...pagination,
-//         total: result.pagination.total
-//       });
-//     } catch (error) {
-//       message.error('Error fetching products');
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
+const ProductTable: React.FC = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [types, setTypes] = useState([]);
+  const [filters, setFilters] = useState<ProductQueryParams>({});
+  const [search, setSearch] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
-//   useEffect(() => {
-//     fetchData();
-//   }, [pagination.current, pagination.pageSize]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const navigate = useNavigate();
 
-//   const handleDelete = (id: string) => {
-//     Modal.confirm({
-//       title: 'Confirm Delete',
-//       content: 'Are you sure you want to delete this product?',
-//       onOk: async () => {
-//         try {
-//           await deleteProduct(id);
-//           message.success('Product deleted successfully');
-//           fetchData();
-//         } catch (error) {
-//           message.error('Error deleting product');
-//         }
-//       }
-//     });
-//   };
+  const loadProducts = async () => {
+    try {
+      const data = await fetchAllProducts({ ...filters, name: search });
+      setProducts(data.products);
+      setError(null);
+    } catch (err) {
+      console.error('Lỗi tải sản phẩm:', err);
+      setError('Không thể tải sản phẩm. Vui lòng thử lại.');
+    }
+  };
 
-//   const columns = [
-//     {
-//       title: 'Product Name',
-//       dataIndex: 'name',
-//       key: 'name'
-//     },
-//     {
-//       title: 'Price',
-//       dataIndex: 'price',
-//       key: 'price',
-//       render: (price: number) => formatPrice(price)
-//     },
-//     {
-//       title: 'Stock',
-//       dataIndex: 'stock',
-//       key: 'stock'
-//     },
-//     {
-//       title: 'Category',
-//       dataIndex: ['category_id', 'name'],
-//       key: 'category'
-//     },
-//     {
-//       title: 'Status',
-//       dataIndex: 'status',
-//       key: 'status',
-//       render: (status: string) => (
-//         <Tag color={status === 'Approved' ? 'green' : status === 'Pending' ? 'orange' : 'red'}>
-//           {status}
-//         </Tag>
-//       )
-//     },
-//     {
-//       title: 'Actions',
-//       key: 'actions',
-//       render: (_: any, record: any) => (
-//         <Space size="middle">
-//           <Button 
-//             icon={<EyeOutlined />} 
-//             onClick={() => {
-//               setSelectedProduct(record);
-//               setModalVisible(true);
-//             }}
-//           />
-//           <Button 
-//             icon={<EditOutlined />} 
-//             onClick={() => {
-//               setSelectedProduct(record);
-//               setModalVisible(true);
-//             }}
-//           />
-//           <Button 
-//             icon={<DeleteOutlined />} 
-//             danger 
-//             onClick={() => handleDelete(record._id)}
-//           />
-//         </Space>
-//       )
-//     }
-//   ];
+  const loadFilters = async () => {
+    try {
+      const [cats, brs, tys] = await Promise.all([
+        fetchAllCategories({}),
+        fetchAllBrands({}),
+        fetchAllProductTypes({})
+      ]);
+      setCategories(cats);
+      setBrands(brs);
+      setTypes(tys);
+    } catch (err) {
+      console.error('Lỗi tải bộ lọc:', err);
+    }
+  };
 
-//   return (
-//     <div className="product-management">
-//       <div style={{ marginBottom: 16 }}>
-//         <Button 
-//           type="primary" 
-//           icon={<PlusOutlined />}
-//           onClick={() => {
-//             setSelectedProduct(null);
-//             setModalVisible(true);
-//           }}
-//         >
-//           Add Product
-//         </Button>
-//       </div>
+  useEffect(() => {
+    loadFilters();
+  }, []);
 
-//       <Table
-//         columns={columns}
-//         dataSource={data}
-//         rowKey="_id"
-//         pagination={{
-//           ...pagination,
-//           showSizeChanger: true,
-//           pageSizeOptions: ['10', '20', '50', '100']
-//         }}
-//         loading={loading}
-//         onChange={(pagination) => setPagination(pagination)}
-//       />
+  useEffect(() => {
+    loadProducts();
+  }, [filters, search]);
 
-//       <ProductForm
-//         visible={modalVisible}
-//         onCancel={() => setModalVisible(false)}
-//         onSuccess={() => {
-//           setModalVisible(false);
-//           fetchData();
-//         }}
-//         product={selectedProduct}
-//       />
-//     </div>
-//   );
-// };
+  const handleFilterChange = (name: keyof ProductQueryParams, value: string) => {
+    setFilters(prev => ({ ...prev, [name]: value || undefined }));
+    setCurrentPage(1);
+  };
 
-// export default ProductTable;
+  const handleSortByPrice = () => {
+    setFilters(prev => ({
+      ...prev,
+      sortBy: 'price',
+      order: prev.order === 'asc' ? 'desc' : 'asc',
+    }));
+    setCurrentPage(1);
+  };
+
+  const paginated = products.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+  const totalPages = Math.ceil(products.length / itemsPerPage);
+
+  return (
+    <div className="products-page">
+      <h1>Sản phẩm</h1>
+
+<div className="filters">
+  <div className="filter-group">
+    <select onChange={e => handleFilterChange('category_id', e.target.value)}>
+      <option value="">📂 Danh mục</option>
+      {categories.map((cat: any) => (
+        <option key={cat._id} value={cat._id}>{cat.name}</option>
+      ))}
+    </select>
+
+    <select onChange={e => handleFilterChange('product_type_id', e.target.value)}>
+      <option value="">📄 Loại</option>
+      {types.map((type: any) => (
+        <option key={type._id} value={type._id}>{type.name}</option>
+      ))}
+    </select>
+
+    <select onChange={e => handleFilterChange('brand_id', e.target.value)}>
+      <option value="">🔁 Thương hiệu</option>
+      {brands.map((brand: any) => (
+        <option key={brand._id} value={brand._id}>{brand.name}</option>
+      ))}
+    </select>
+
+    
+
+    <input
+      type="text"
+      placeholder="Tìm kiếm..."
+      value={search}
+      onChange={e => {
+        setSearch(e.target.value);
+        setCurrentPage(1);
+      }}
+    />
+  </div>
+
+  <button className="add-button" onClick={() => navigate('/admin/products/create')}>
+    ＋ Thêm sản phẩm
+  </button>
+</div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Sản phẩm</th>
+            <th>Giá</th>
+            <th>Ngày</th>
+            <th>Số lượng</th>
+            <th>Danh mục</th>
+            <th>Loại</th>
+            <th>Thương hiệu</th>
+            <th>Trạng thái</th>
+            <th>Chức năng</th>
+          </tr>
+        </thead>
+        <tbody>
+          {paginated.length > 0 ? (
+            paginated.map((product) => (
+              <tr key={product._id}>
+                <td className="product-cell">
+                  <div className="image-placeholder">
+                    {product.img_url && (
+                      <img src={product.img_url} alt={product.name} />
+                    )}
+                  </div>
+                  <span>{product.name}</span>
+                </td>
+                <td>{formatCurrency(product.price)}</td>
+                <td>{product.created_at ? new Date(product.created_at).toLocaleDateString('vi-VN') : '—'}</td>
+                <td>{product.stock}</td>
+                <td>{(product.category_id as any)?.name || '—'}</td>
+                <td>{(product.product_type_id as any)?.name || '—'}</td>
+                <td>{(product.brand_id as any)?.name || '—'}</td>
+                <td><span className="status approved">Đã duyệt</span></td>
+                <td>
+                  <button className="view-btn" onClick={() => navigate(`/admin/products/${product._id}/form`)}>
+                    👁️ Xem
+                  </button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr><td colSpan={9}>Không có sản phẩm.</td></tr>
+          )}
+        </tbody>
+      </table>
+
+      <div className="pagination">
+        <span>Hiển thị {paginated.length} / {products.length} sản phẩm</span>
+        <div className="pages">
+          <button onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}>&lt;</button>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i}
+              className={currentPage === i + 1 ? 'active' : ''}
+              onClick={() => setCurrentPage(i + 1)}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}>&gt;</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ProductTable;

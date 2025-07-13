@@ -8,6 +8,9 @@ import BrandFormPage from "@/pages/admin/BrandForm";
 import Orderfrom from "@/pages/admin/OrderPage";
 import AdminOrderDetailPage from "@/pages/admin/AdminOrderDetailPage";
 import CouponAdmin from "@/pages/admin/AdminCouponPage"
+import ProductTablePage from "@/pages/admin/ProductTable";
+import ProductFormPage from "@/pages/admin/ProductForm";
+
 
 import AdminUserPage from "@/pages/admin/AdminUserPage";
 import AdminContactPage from "@/pages/admin/AdminContactPage";
@@ -46,6 +49,10 @@ const MainRouter = () => {
         <Route path="order" element={<Orderfrom />} />
         <Route path="orders/:id" element={<AdminOrderDetailPage/>} />
         <Route path="coupons" element={<CouponAdmin/>} />
+        <Route path="products" element={<ProductTablePage />} />
+        <Route path="products/create" element={<ProductFormPage />} />
+        <Route path="products/:id/form" element={<ProductFormPage />} />
+
 
         <Route path="users" element={<AdminUserPage />} />
         <Route path="feedback" element={<AdminContactPage />} />
