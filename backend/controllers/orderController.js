@@ -1,10 +1,10 @@
-// orderController.js
 const OrderService = require('../services/orderService');
 const OrderDetailService = require('../services/OrderDetailService');
 const CartService = require('../services/CartService');
 const UserService = require('../services/UserService');
 const Joi = require('joi');
-const { createMomoPayment } = require('../services/orderService');
+
+const createMomoPayment = OrderService.createMomoPayment;
 
 const orderSchema = Joi.object({
   payment_method: Joi.string().valid('cod', 'bank').default('cod'),
@@ -29,6 +29,7 @@ const orderSchema = Joi.object({
   total: Joi.number().required()
 });
 
+// Lấy danh sách đơn hàng
 exports.getOrders = async (req, res) => {
   try {
     const { status, minTotal, maxTotal, sort = 'created_at', order = 'desc' } = req.query;
@@ -68,6 +69,7 @@ exports.getOrders = async (req, res) => {
   }
 };
 
+// Lấy chi tiết đơn hàng
 exports.getOrderById = async (req, res) => {
   try {
     const order = await OrderService.getById(req.params.id);
@@ -96,6 +98,7 @@ exports.getOrderById = async (req, res) => {
   }
 };
 
+// Tạo đơn hàng mới
 exports.createOrder = async (req, res) => {
   try {
     const { error } = orderSchema.validate(req.body);
@@ -160,6 +163,7 @@ exports.createOrder = async (req, res) => {
   }
 };
 
+// Cập nhật đơn hàng
 exports.updateOrder = async (req, res) => {
   try {
     const order = await OrderService.getById(req.params.id);
@@ -176,6 +180,7 @@ exports.updateOrder = async (req, res) => {
   }
 };
 
+// Xoá đơn hàng
 exports.deleteOrder = async (req, res) => {
   try {
     await OrderService.delete(req.params.id);
@@ -183,4 +188,22 @@ exports.deleteOrder = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message || 'Lỗi khi xóa đơn hàng' });
   }
+};
+
+// ✅ Tạo đơn thanh toán MoMo
+exports.createMomoOrder = async (req, res) => {
+  try {
+    const paymentUrl = await createMomoPayment(req.body);
+    res.status(200).json({ payUrl: paymentUrl });
+  } catch (error) {
+    console.error("❌ Lỗi tạo thanh toán MoMo:", error);
+    res.status(500).json({ message: error.message || 'Lỗi tạo thanh toán MoMo' });
+  }
+};
+
+// ✅ Xử lý webhook MoMo (trả 200 OK)
+exports.momoWebhook = async (req, res) => {
+  console.log("📩 Webhook MoMo nhận:", req.body);
+  // TODO: xác minh chữ ký & cập nhật đơn hàng
+  res.status(200).send('Webhook received');
 };

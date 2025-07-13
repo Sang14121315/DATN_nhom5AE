@@ -6,6 +6,7 @@ const categoryController = require('../controllers/categoryController');
 const brandController = require('../controllers/brandController');
 const couponController = require('../controllers/couponController');
 const orderController = require('../controllers/orderController');
+console.log('🧪 orderController keys:', Object.keys(orderController));
 const notificationController = require('../controllers/notificationController');
 const messageController = require('../controllers/messageController');
 const homeController = require('../controllers/homeController');
