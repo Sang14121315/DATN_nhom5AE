@@ -9,11 +9,12 @@ export interface ProductType {
 }
 
 export const fetchAllProductTypes = async (
-  params: Record<string, any> = {}
+  params: Record<string, string | number | boolean> = {}
 ): Promise<ProductType[]> => {
   try {
     const res = await axiosInstance.get('/product-types', { params });
-    return res.data.data || [];
+    console.log('Product types response:', res.data);
+    return res.data || [];
   } catch (err) {
     console.error('Lỗi lấy danh sách loại sản phẩm:', err);
     return [];
@@ -22,17 +23,17 @@ export const fetchAllProductTypes = async (
 
 export const getProductTypeById = async (id: string): Promise<ProductType> => {
   const res = await axiosInstance.get(`/product-types/${id}`);
-  return res.data.data;
+  return res.data;
 };
 
 export const createProductType = async (data: Partial<ProductType>) => {
   const res = await axiosInstance.post('/product-types', data);
-  return res.data.data;
+  return res.data;
 };
 
 export const updateProductType = async (id: string, data: Partial<ProductType>) => {
   const res = await axiosInstance.put(`/product-types/${id}`, data);
-  return res.data.data;
+  return res.data;
 };
 
 export const deleteProductType = async (id: string) => {

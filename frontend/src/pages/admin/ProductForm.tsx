@@ -5,11 +5,38 @@ import {
   updateProduct,
   createProduct,
   deleteProduct,
+  Product,
 } from '@/api/productsAPI';
-import { fetchAllCategories } from '@/api/categoryAPI';
+import { fetchAllCategories, Category } from '@/api/categoryAPI';
 import { fetchAllBrands } from '@/api/brandAPI';
 import { fetchProductTypes } from '@/api/productTypeAPI';
 import '@/styles/pages/admin/productDetail.scss';
+
+// Define interfaces for local use
+interface Brand {
+  _id: string;
+  name: string;
+}
+
+interface ProductType {
+  _id: string;
+  name: string;
+}
+
+interface ProductFormData {
+  name: string;
+  slug: string;
+  description: string;
+  price: number;
+  stock: number;
+  category_id: string;
+  brand_id: string;
+  product_type_id: string;
+  sale: boolean;
+  created_at: string;
+  status: string;
+  img_url?: string;
+}
 
 const ProductForm: React.FC = () => {
   const { id } = useParams();
@@ -18,12 +45,13 @@ const ProductForm: React.FC = () => {
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const [categories, setCategories] = useState<any[]>([]);
-  const [brands, setBrands] = useState<any[]>([]);
-  const [types, setTypes] = useState<any[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [types, setTypes] = useState<ProductType[]>([]);
 
-  const [product, setProduct] = useState<any>({
+  const [product, setProduct] = useState<ProductFormData>({
     name: '',
     slug:'',
     description: '',
@@ -39,62 +67,90 @@ const ProductForm: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const [cats, brs, tys] = await Promise.all([
-        fetchAllCategories({}),
-        fetchAllBrands({}),
-        fetchProductTypes(),
-      ]);
-      setCategories(cats);
-      setBrands(brs);
-      setTypes(tys);
+      setLoading(true);
+      try {
+        console.log('Fetching categories, brands, types...');
+        const [cats, brs, tys] = await Promise.all([
+          fetchAllCategories({}),
+          fetchAllBrands({}),
+          fetchProductTypes(),
+        ]);
+        console.log('Categories:', cats);
+        console.log('Brands:', brs);
+        console.log('Types:', tys);
+        setCategories(cats);
+        setBrands(brs);
+        setTypes(tys);
+      } catch (error) {
+        console.error('Lỗi khi load dữ liệu:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchData();
 
     if (isEditMode && id) {
-      getProductById(id).then((res) => {
-        setProduct({
-          name: res.name || '',
-          description: res.description || '',
-          price: res.price || 0,
-          stock: res.stock || 0,
-          category_id: res.category_id?._id || '',
-          brand_id: res.brand_id?._id || '',
-          product_type_id: res.product_type_id?._id || '',
-          sale: res.sale || false,
-          created_at: res.created_at || '',
-          status: 'Đã duyệt',
+      console.log('Loading product with ID:', id);
+      setLoading(true);
+      getProductById(id)
+        .then((res: Product) => {
+          console.log('Product data received:', res);
+          setProduct({
+            name: res.name || '',
+            slug: res.slug || '',
+            description: res.description || '',
+            price: res.price || 0,
+            stock: res.stock || 0,
+            category_id: res.category_id && typeof res.category_id === 'object' ? res.category_id._id : (res.category_id || ''),
+            brand_id: res.brand_id && typeof res.brand_id === 'object' ? res.brand_id._id : (res.brand_id || ''),
+            product_type_id: res.product_type_id && typeof res.product_type_id === 'object' ? res.product_type_id._id : (res.product_type_id || ''),
+            sale: res.sale || false,
+            created_at: res.created_at || '',
+            status: 'Đã duyệt',
+          });
+          setImagePreview(res.img_url || null);
+        })
+        .catch((error) => {
+          console.error('Lỗi khi load sản phẩm:', error);
+          alert('Không thể load thông tin sản phẩm');
+        })
+        .finally(() => {
+          setLoading(false);
         });
-        setImagePreview(res.img_url || null);
-      });
     }
   }, [id]);
 
-  const handleInputChange = (e: React.ChangeEvent<any>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setProduct({ ...product, [name]: value });
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    console.log('File selected:', file);
     if (file) {
       setImageFile(file);
-      setImagePreview(URL.createObjectURL(file));
+      const previewUrl = URL.createObjectURL(file);
+      console.log('Preview URL:', previewUrl);
+      setImagePreview(previewUrl);
+    } else {
+      console.log('No file selected');
     }
   };
 
   const generateSlug = (text: string) => {
   return text
     .toLowerCase()
-    .normalize('NFD')               
+    .normalize('NFD')                
     .replace(/[\u0300-\u036f]/g, '') 
     .replace(/[^a-z0-9 ]/g, '')      
     .trim()
     .replace(/\s+/g, '-');         
 };
 
-
   const handleSubmit = async () => {
+  // Kiểm tra ảnh: bắt buộc khi tạo mới, tùy chọn khi sửa
   if (!isEditMode && !imageFile) {
     alert('Vui lòng chọn ảnh sản phẩm!');
     return;
@@ -105,42 +161,69 @@ const ProductForm: React.FC = () => {
     product.slug = generateSlug(product.name);
   }
 
+  console.log('Product data before sending:', product);
+  console.log('Image file:', imageFile);
+  console.log('Image preview:', imagePreview);
+
   const formData = new FormData();
+  
+  // Chỉ gửi các field có giá trị và cần thiết cho update
   Object.entries(product).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
-      if (
-        key === 'category_id' ||
-        key === 'brand_id' ||
-        key === 'product_type_id'
-      ) {
-        formData.append(key, String(value));
+    console.log(`Processing ${key}: ${value} (type: ${typeof value})`);
+    
+    // Bỏ qua các field không cần thiết cho update
+    if (key === 'created_at' || key === 'status') {
+      console.log(`Skipping ${key} (not needed for update)`);
+      return;
+    }
+    
+    if (value !== undefined && value !== null && value !== '') {
+      if (key === 'category_id' || key === 'brand_id' || key === 'product_type_id') {
+        // Chỉ gửi nếu có giá trị thực sự
+        if (value && value.trim() !== '') {
+          formData.append(key, String(value));
+          console.log(`Adding ${key}: ${value}`);
+        } else {
+          console.log(`Skipping empty ${key}: ${value}`);
+        }
       } else if (typeof value !== 'object') {
         formData.append(key, String(value));
+        console.log(`Adding ${key}: ${value}`);
       }
+    } else {
+      console.log(`Skipping null/undefined/empty ${key}: ${value}`);
     }
   });
 
+  // Gửi ảnh nếu có file mới được chọn
   if (imageFile) {
     formData.append('image', imageFile);
+    console.log('Adding image file:', imageFile.name);
   }
 
-  console.log('FormData gửi đi:');
-  for (let pair of formData.entries()) {
+  console.log('FormData entries:');
+  for (const pair of formData.entries()) {
     console.log(`${pair[0]}: ${pair[1]}`);
   }
 
   try {
     if (isEditMode && id) {
+      console.log('Sending update request for product ID:', id);
       await updateProduct(id, formData);
       alert('Cập nhật sản phẩm thành công!');
     } else {
+      console.log('Sending create request');
       await createProduct(formData);
       alert('Thêm sản phẩm mới thành công!');
       navigate('/admin/products');
     }
-  } catch (error: any) {
-    if (error.response?.data?.message) {
-      alert(`Lỗi: ${error.response.data.message}`);
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } } };
+    console.error('Full error object:', error);
+    console.error('Error response:', err.response);
+    console.error('Error data:', err.response?.data);
+    if (err.response?.data?.message) {
+      alert(`Lỗi: ${err.response.data.message}`);
     } else {
       alert('Thao tác thất bại!');
     }
@@ -164,6 +247,7 @@ const ProductForm: React.FC = () => {
     
     <div className="container">
       <h2>Chi tiết sản phẩm</h2>
+      {loading && <div style={{ textAlign: 'center', padding: '20px' }}>Đang tải...</div>}
       <div className="left">
         <label>Tên sản phẩm</label>
         <input name="name" value={product.name} onChange={handleInputChange} />
@@ -195,7 +279,7 @@ const ProductForm: React.FC = () => {
         <div className="two-columns">
           <div>
             <label>Ngày</label>
-            <input value={new Date(product.created_at).toLocaleDateString('vi-VN')} disabled />
+            <input value={product.created_at ? new Date(product.created_at).toLocaleDateString('vi-VN') : 'N/A'} disabled />
           </div>
           <div>
             <label>Loại</label>
@@ -239,22 +323,75 @@ const ProductForm: React.FC = () => {
 
       <div className="right">
         <div className="upload-box">
-          <p>Ảnh, video.....</p>
-          <label>
-            <input type="file" accept="image/*" onChange={handleImageChange} hidden />
-            <button>Thêm ảnh</button>
+          <p>Ảnh sản phẩm {isEditMode ? '(tùy chọn)' : '(bắt buộc)'}</p>
+          <label htmlFor="image-upload" style={{ cursor: 'pointer' }}>
+            <input 
+              id="image-upload"
+              type="file" 
+              accept="image/*" 
+              onChange={handleImageChange} 
+              style={{ display: 'none' }}
+            />
+            <button type="button" style={{ 
+              padding: '10px 20px', 
+              backgroundColor: imageFile ? '#28a745' : '#007bff', 
+              color: 'white', 
+              border: 'none', 
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}>
+              {imageFile ? 'Thay đổi ảnh' : 'Chọn ảnh'}
+            </button>
           </label>
+          {imageFile && (
+            <p style={{ marginTop: '10px', fontSize: '12px', color: '#666' }}>
+              Đã chọn: {imageFile.name} ({(imageFile.size / 1024).toFixed(1)} KB)
+            </p>
+          )}
+          {isEditMode && !imageFile && imagePreview && (
+            <p style={{ marginTop: '10px', fontSize: '12px', color: '#666' }}>
+              Giữ nguyên ảnh hiện tại
+            </p>
+          )}
         </div>
 
         <div className="upload-preview">
           {imagePreview && (
-            <div className="upload-item">
+            <div className="upload-item" style={{ position: 'relative' }}>
               <div className="upload-thumb">
-                <img src={imagePreview} alt="preview" />
+                <img src={imagePreview} alt="preview" style={{ maxWidth: '100%', height: 'auto' }} />
               </div>
               <div className="progress-bar"><div style={{ width: '100%' }}></div></div>
               <span className="checkmark">✔</span>
+              {isEditMode && imageFile && (
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    setImageFile(null);
+                    setImagePreview(product.img_url || null);
+                  }}
+                  style={{
+                    position: 'absolute',
+                    top: '5px',
+                    right: '5px',
+                    background: 'red',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '50%',
+                    width: '20px',
+                    height: '20px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  ×
+                </button>
+              )}
             </div>
+          )}
+          {isEditMode && !imagePreview && (
+            <p style={{ textAlign: 'center', color: '#666', fontSize: '14px' }}>
+              Chưa có ảnh sản phẩm
+            </p>
           )}
         </div>
       </div>
