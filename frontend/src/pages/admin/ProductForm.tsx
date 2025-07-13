@@ -25,6 +25,7 @@ const ProductForm: React.FC = () => {
 
   const [product, setProduct] = useState<any>({
     name: '',
+    slug:'',
     description: '',
     price: 0,
     stock: 0,
@@ -82,27 +83,70 @@ const ProductForm: React.FC = () => {
     }
   };
 
-  const handleSubmit = async () => {
-    const formData = new FormData();
-    Object.entries(product).forEach(([key, value]) => {
-      formData.append(key, value as string);
-    });
-    if (imageFile) formData.append('image', imageFile);
+  const generateSlug = (text: string) => {
+  return text
+    .toLowerCase()
+    .normalize('NFD')                // chuẩn hoá chuỗi
+    .replace(/[\u0300-\u036f]/g, '') // xoá dấu tiếng Việt
+    .replace(/[^a-z0-9 ]/g, '')      // xoá ký tự đặc biệt
+    .trim()
+    .replace(/\s+/g, '-');           // thay khoảng trắng bằng dấu gạch ngang
+};
 
-    try {
-      if (isEditMode && id) {
-        await updateProduct(id, formData);
-        alert('Cập nhật sản phẩm thành công!');
-      } else {
-        await createProduct(formData);
-        alert('Thêm sản phẩm mới thành công!');
-        navigate('/admin/products');
+
+  const handleSubmit = async () => {
+  if (!isEditMode && !imageFile) {
+    alert('Vui lòng chọn ảnh sản phẩm!');
+    return;
+  }
+
+  // ✅ Tự động sinh slug nếu chưa có
+  if (!product.slug || product.slug.trim() === '') {
+    product.slug = generateSlug(product.name);
+  }
+
+  const formData = new FormData();
+  Object.entries(product).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      if (
+        key === 'category_id' ||
+        key === 'brand_id' ||
+        key === 'product_type_id'
+      ) {
+        formData.append(key, String(value));
+      } else if (typeof value !== 'object') {
+        formData.append(key, String(value));
       }
-    } catch (error) {
-      console.error(error);
+    }
+  });
+
+  if (imageFile) {
+    formData.append('image', imageFile);
+  }
+
+  console.log('FormData gửi đi:');
+  for (let pair of formData.entries()) {
+    console.log(`${pair[0]}: ${pair[1]}`);
+  }
+
+  try {
+    if (isEditMode && id) {
+      await updateProduct(id, formData);
+      alert('Cập nhật sản phẩm thành công!');
+    } else {
+      await createProduct(formData);
+      alert('Thêm sản phẩm mới thành công!');
+      navigate('/admin/products');
+    }
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      alert(`Lỗi: ${error.response.data.message}`);
+    } else {
       alert('Thao tác thất bại!');
     }
-  };
+    console.error('Lỗi khi gửi sản phẩm:', error);
+  }
+};
 
   const handleDelete = async () => {
     if (!isEditMode || !id) return;
@@ -117,6 +161,7 @@ const ProductForm: React.FC = () => {
   };
 
   return (
+    
     <div className="container">
       <h2>Chi tiết sản phẩm</h2>
       <div className="left">

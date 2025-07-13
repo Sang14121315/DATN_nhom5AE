@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from './axios';
 
 export interface Product {
   _id?: string;
@@ -47,8 +47,8 @@ export const fetchAllProducts = async (
 
     const mergedFilters = {
       ...filters,
-      limit: filters.limit ?? 1000, // 👈 mặc định lấy 1000 sản phẩm
-      page: filters.page ?? 1, // có thể không cần nếu phân trang frontend
+      limit: filters.limit ?? 1000,
+      page: filters.page ?? 1, 
     };
 
     Object.entries(mergedFilters).forEach(([key, value]) => {
@@ -90,13 +90,22 @@ export const createProduct = async (data: FormData): Promise<Product> => {
 // ✅ Cập nhật sản phẩm
 export const updateProduct = async (id: string, data: FormData): Promise<Product> => {
   try {
-    const response = await axios.put(`http://localhost:5000/api/products/${id}`, data);
+    const response = await axios.put(
+      `http://localhost:5000/api/products/${id}`,
+      data,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data' // KHÔNG đặt nếu axios tự detect
+        }
+      }
+    );
     return response.data;
-  } catch (error) {
-    console.error('Lỗi khi cập nhật sản phẩm:', error);
-    throw new Error('Không thể cập nhật sản phẩm');
+  } catch (error: any) {
+    console.error('Lỗi khi cập nhật sản phẩm:', error?.response?.data || error);
+    throw new Error(error?.response?.data?.message || 'Không thể cập nhật sản phẩm');
   }
 };
+
 
 // ✅ Xoá sản phẩm
 export const deleteProduct = async (id: string): Promise<void> => {
