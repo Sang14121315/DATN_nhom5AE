@@ -102,9 +102,7 @@ const ProductTable: React.FC = () => {
       ))}
     </select>
 
-    <button onClick={handleSortByPrice}>
-      ⬍ Giá {filters.order === 'asc' ? '↑' : '↓'}
-    </button>
+    
 
     <input
       type="text"

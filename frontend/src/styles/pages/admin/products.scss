@@ -9,60 +9,47 @@
 
   .filters {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
-  gap: 12px;
+  justify-content: space-between;
+  margin-bottom: 20px;
 
   .filter-group {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    flex: 1;
-
-    select,
-    input,
-    button {
-      padding: 8px 12px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      background-color: white;
-      font-size: 14px;
-      transition: all 0.2s ease;
-    }
-
-    select {
-      min-width: 140px;
-    }
-
-    input {
-      flex: 1;
-      max-width: 200px;
-    }
-
-    button:hover {
-      background-color: #f0f0f0;
-    }
+    align-items: center;
+    gap: 12px; // khoảng cách giữa các filter
   }
 
   .add-button {
-    white-space: nowrap;
-    background-color: #e0f7f3;
-    color: #00a693;
-    border: 1px solid #00a693;
-    font-weight: bold;
-    padding: 8px 16px;
+    margin-left: 20px;
+    padding: 8px 18px;
+    border: 1px solid #00b894;
+    background: #fff;
+    color: #00b894;
     border-radius: 6px;
+    font-weight: 600;
     cursor: pointer;
-    transition: 0.2s;
+    transition: background 0.2s, color 0.2s;
+  }
+  .add-button:hover {
+    background: #00b894;
+    color: #fff;
+  }
+}
 
-    &:hover {
-      background-color: #d4f5ef;
+@media (max-width: 900px) {
+  .filters {
+    flex-direction: column;
+    align-items: stretch;
+    .filter-group {
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .add-button {
+      margin: 10px 0 0 0;
+      width: 100%;
     }
   }
-
-  }
+}
 
   table {
     width: 100%;
