@@ -166,11 +166,11 @@ const ProductListPage: React.FC = () => {
 
           <div className="sidebar-banner">
             <img
-              src="/public/assets/about_vertical_sale_banner.png"
+              src="/assets/about_vertical_sale_banner.png"
               alt="Giảm giá sốc"
             />
             <img
-              src="/public/assets/about_vertical_sale2_banner.png"
+              src="/assets/about_vertical_sale2_banner.png"
               alt="Giảm giá sốc"
             />
           </div>

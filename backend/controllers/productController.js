@@ -32,7 +32,7 @@ const updateProductSchema = Joi.object({
   hot: Joi.boolean().optional(),
   coupons_id: Joi.string().allow('').optional(),
   brand_id: Joi.string().optional(),
-  product_type_id: Joi.string().allow('', null, undefined).optional(),
+  product_type_id: Joi.string().allow('', null).optional(),
   created_at: Joi.string().optional(),
   status: Joi.string().optional(),
 }).unknown(true); // Cho phép các field khác
