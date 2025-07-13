@@ -1,6 +1,8 @@
 import { Routes, Route } from "react-router-dom";
 import AdminLayout from "@/layouts/admin.layout";
 import DashboardPage from "@/pages/admin/Dashboard";
+import ProductTypeTablePage from "@/pages/admin/ProductTypeTable";
+import ProductTypeFormPage from "@/pages/admin/ProductTypeForm";
 import CategoryTablePage from "@/pages/admin/CategoryTable";
 import CategoryFormPage from "@/pages/admin/CategoryForm";
 import BrandTablePage from "@/pages/admin/BrandTable";
@@ -8,6 +10,9 @@ import BrandFormPage from "@/pages/admin/BrandForm";
 import Orderfrom from "@/pages/admin/OrderPage";
 import AdminOrderDetailPage from "@/pages/admin/AdminOrderDetailPage";
 import CouponAdmin from "@/pages/admin/AdminCouponPage"
+import ProductTablePage from "@/pages/admin/ProductTable";
+import ProductFormPage from "@/pages/admin/ProductForm";
+
 
 import AdminUserPage from "@/pages/admin/AdminUserPage";
 import AdminContactPage from "@/pages/admin/AdminContactPage";
@@ -37,6 +42,9 @@ const MainRouter = () => {
       {/* Admin layout */}
       <Route path="/admin" element={<AdminLayout />}>
         <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="product-types" element={<ProductTypeTablePage />} />
+        <Route path="product-types/create" element={<ProductTypeFormPage />} />
+        <Route path="product-types/:id/form" element={<ProductTypeFormPage />} />
         <Route path="category" element={<CategoryTablePage />} />
         <Route path="category/create" element={<CategoryFormPage />} />
         <Route path="category/:id/form" element={<CategoryFormPage />} />
@@ -46,6 +54,10 @@ const MainRouter = () => {
         <Route path="order" element={<Orderfrom />} />
         <Route path="orders/:id" element={<AdminOrderDetailPage/>} />
         <Route path="coupons" element={<CouponAdmin/>} />
+        <Route path="products" element={<ProductTablePage />} />
+        <Route path="products/create" element={<ProductFormPage />} />
+        <Route path="products/:id/form" element={<ProductFormPage />} />
+
 
         <Route path="users" element={<AdminUserPage />} />
         <Route path="feedback" element={<AdminContactPage />} />
