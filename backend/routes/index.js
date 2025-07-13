@@ -49,25 +49,13 @@ router.put('/products/:id', auth, upload.single('image'), productController.upda
 router.delete('/products/:id', auth, productController.deleteProduct);
 
 // Product Types
-
-router.get('/product-types/:id', productTypeController.getProductTypeById);
-router.get('/product-types', productTypeController.getProductTypes);
-
-router.get('/product-types', auth, productTypeController.getProductTypes);
-router.get('/product-types/:id', auth, productTypeController.getProductTypeById);
-
 router.get('/product-types', productTypeController.getProductTypes);
 router.get('/product-types/:id', productTypeController.getProductTypeById);
 
-router.get('/product-types/:id', productTypeController.getProductTypeById);
-router.get('/product-types', productTypeController.getProductTypes);
-router.get('/product-types', auth, productTypeController.getProductTypes);
-router.get('/product-types/:id', auth, productTypeController.getProductTypeById);
-router.get('/product-types', productTypeController.getProductTypes);
-router.get('/product-types/:id', productTypeController.getProductTypeById);
-router.post('/product-types', auth, productTypeController.createProductType);
-router.put('/product-types/:id', auth, productTypeController.updateProductType);
-router.delete('/product-types/:id', auth, productTypeController.deleteProductType);
+router.post('/product-types', productTypeController.createProductType);
+router.put('/product-types/:id', productTypeController.updateProductType);
+router.delete('/product-types/:id',  productTypeController.deleteProductType);
+router.post('/upload/product-type', upload.single('image'), productTypeController.uploadProductTypeImage);
 
 // Categories
 router.get('/categories', categoryController.getCategories);
