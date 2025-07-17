@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { FaShoppingCart } from "react-icons/fa";
 import "@/styles/pages/user/productList.scss";
 
@@ -19,6 +19,7 @@ const ProductListPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const navigate = useNavigate();
+  const location = useLocation();
   const itemsPerPage = 12;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedProducts = products.slice(
@@ -52,16 +53,32 @@ const ProductListPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const saved = sessionStorage.getItem("productFilters");
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      setSelectedCategory(parsed.category || "all");
-      setSelectedBrand(parsed.brand || "all");
-      setSelectedPrice(parsed.price || "all");
-      setTimeout(() => window.scrollTo(0, parsed.scroll || 0), 50);
+    const params = new URLSearchParams(location.search);
+    const categoryFromUrl = params.get("category");
+    let initialCategory = "all";
+    let initialBrand = "all";
+    let initialPrice = "all";
+    let initialScroll = 0;
+
+    if (categoryFromUrl) {
+      initialCategory = categoryFromUrl;
+    } else {
+      const saved = sessionStorage.getItem("productFilters");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        initialCategory = parsed.category || "all";
+        initialBrand = parsed.brand || "all";
+        initialPrice = parsed.price || "all";
+        initialScroll = parsed.scroll || 0;
+      }
     }
+
+    setSelectedCategory(initialCategory);
+    setSelectedBrand(initialBrand);
+    setSelectedPrice(initialPrice);
+    if (initialScroll) setTimeout(() => window.scrollTo(0, initialScroll), 50);
     setFiltersInitialized(true);
-  }, []);
+  }, [location.search]);
 
   useEffect(() => {
     if (!filtersInitialized) return;
@@ -84,7 +101,7 @@ const ProductListPage: React.FC = () => {
         }
 
         const productData = await fetchFilteredProducts(filters);
-        setProducts(productData);
+        setProducts(productData.products || []); // Lấy đúng mảng sản phẩm
         setCurrentPage(1);
       } catch (error) {
         console.error("Lỗi khi tải sản phẩm:", error);

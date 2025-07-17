@@ -71,7 +71,7 @@ const MainRouter = () => {
         <Route path="home" element={<HomePage />} />
         <Route path="search" element={<SearchResultPage />} />
         <Route path="about" element={<AboutPage />} />
-        <Route path="productlist" element={<ProductlistPage />} />
+        <Route path="product-list" element={<ProductlistPage />} />
         <Route path="productdetail" element={<ProductdetailPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="product/:id" element={<ProductdetailPage />} />
