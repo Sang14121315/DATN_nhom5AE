@@ -85,6 +85,8 @@ const ProductListPage: React.FC = () => {
 
     const fetchProducts = async () => {
       try {
+        console.log('Fetching products with filters:', { selectedCategory, selectedBrand, selectedPrice });
+        
         const filters: {
           category_id?: string;
           brand_id?: string;
@@ -100,16 +102,33 @@ const ProductListPage: React.FC = () => {
           filters.maxPrice = max;
         }
 
+        console.log('API filters:', filters);
         const productData = await fetchFilteredProducts(filters);
-        setProducts(productData.products || []); // Lấy đúng mảng sản phẩm
+        console.log('ProductList API response:', productData);
+        
+        // Kiểm tra format response
+        if (Array.isArray(productData)) {
+          setProducts(productData);
+        } else if (productData && typeof productData === 'object' && 'products' in productData && Array.isArray((productData as any).products)) {
+          setProducts((productData as any).products);
+        } else {
+          console.log('No products found, setting empty array');
+          setProducts([]);
+        }
         setCurrentPage(1);
       } catch (error) {
         console.error("Lỗi khi tải sản phẩm:", error);
+        setProducts([]);
       }
     };
 
     fetchProducts();
   }, [selectedCategory, selectedBrand, selectedPrice, filtersInitialized]);
+
+  // Error boundary để bắt lỗi render
+  if (!filtersInitialized) {
+    return <div>Đang tải...</div>;
+  }
 
   return (
     <div className="product-page-container">
@@ -212,7 +231,11 @@ const ProductListPage: React.FC = () => {
               paginatedProducts.map((product) => (
                 <div className="product-card" key={product._id}>
                   <img
-                    src={product.img_url}
+                    src={product.img_url && product.img_url.startsWith('http') 
+                      ? product.img_url 
+                      : product.img_url 
+                        ? `http://localhost:5000/uploads/${product.img_url}`
+                        : '/images/no-image.png'}
                     alt={product.name}
                     style={{ cursor: "pointer" }}
                     onClick={() => {

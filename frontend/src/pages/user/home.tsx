@@ -19,6 +19,8 @@ const HomePage: React.FC = () => {
     const fetchData = async () => {
       try {
         const data: HomeDataResponse = await fetchHomeData();
+        console.log('Home data:', data);
+        console.log('Hot products:', data.hotProducts);
         setCategories(data.categories);
         setHotProducts(data.hotProducts);
         setSaleProducts(data.saleProducts);
@@ -34,7 +36,11 @@ const HomePage: React.FC = () => {
   const renderProductItem = (product: Product) => (
     <div key={product._id} className="product-item">
       <img
-        src={product.img_url || '/images/no-image.png'}
+                        src={product.img_url && product.img_url.startsWith('http') 
+                  ? product.img_url 
+                  : product.img_url 
+                    ? `http://localhost:5000/uploads/${product.img_url}`
+                    : '/images/no-image.png'}
         alt={product.name}
         onClick={() => navigate(`/product/${product._id}`)}
         style={{ cursor: 'pointer' }}
@@ -130,7 +136,11 @@ const HomePage: React.FC = () => {
                     .map((p) => (
                       <div key={p._id} className="product-card">
                         <img
-                          src={p.img_url || '/images/no-image.png'}
+                          src={p.img_url && p.img_url.startsWith('http') 
+                            ? p.img_url 
+                            : p.img_url 
+                              ? `http://localhost:5000/uploads/${p.img_url}`
+                              : '/images/no-image.png'}
                           alt={p.name}
                           onClick={() => navigate(`/product/${p._id}`)}
                           style={{ cursor: 'pointer' }}
@@ -158,7 +168,11 @@ const HomePage: React.FC = () => {
           {bestSellerProducts.slice(0, 6).map((p) => (
             <div key={p._id} className="gear-item">
               <img
-                src={p.img_url || '/images/no-image.png'}
+                src={p.img_url && p.img_url.startsWith('http') 
+                  ? p.img_url 
+                  : p.img_url 
+                    ? `http://localhost:5000/uploads/${p.img_url}`
+                    : '/images/no-image.png'}
                 alt={p.name}
                 onClick={() => navigate(`/product/${p._id}`)}
                 style={{ cursor: 'pointer' }}

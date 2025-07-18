@@ -6,7 +6,7 @@ const About5AE: React.FC = () => {
     <div className="about5ae">
       <h1>Giới thiệu về 5AE – Thế giới linh kiện điện tử</h1>
       <img
-        src="public/assets/about_banner_AI.png"
+        src="/assets/about_banner_AI.png"
         alt="banner giới thiệu về chúng tôi"
       />
 

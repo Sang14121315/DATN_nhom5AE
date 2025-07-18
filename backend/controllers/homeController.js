@@ -8,6 +8,9 @@ exports.getHomeData = async (req, res) => {
     const bestSellerProducts = await ProductService.getAll({}, 8, { view: -1 }); // Bán chạy theo view
     const categories = await CategoryService.getAll({}, 6); // Danh mục
 
+    console.log('Home data - hotProducts:', hotProducts.map(p => ({ name: p.name, img_url: p.img_url, brand: p.brand_id })));
+    console.log('Home data - saleProducts:', saleProducts.map(p => ({ name: p.name, img_url: p.img_url, brand: p.brand_id })));
+
     res.json({ saleProducts, hotProducts, bestSellerProducts, categories });
   } catch (error) {
     res.status(500).json({ message: error.message || 'Error fetching home data' });

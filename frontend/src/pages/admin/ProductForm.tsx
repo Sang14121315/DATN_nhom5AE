@@ -43,8 +43,8 @@ const ProductForm: React.FC = () => {
   const navigate = useNavigate();
   const isEditMode = Boolean(id);
 
+  const [imagePreview, setImagePreview] = useState<string>('');
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const [categories, setCategories] = useState<Category[]>([]);
@@ -57,12 +57,14 @@ const ProductForm: React.FC = () => {
     description: '',
     price: 0,
     stock: 0,
+    img_url: '',
     category_id: '',
     brand_id: '',
     product_type_id: '',
     sale: false,
     created_at: '',
     status: 'Đã duyệt',
+    // Thêm dòng này
   });
 
   useEffect(() => {
@@ -102,14 +104,23 @@ const ProductForm: React.FC = () => {
             description: res.description || '',
             price: res.price || 0,
             stock: res.stock || 0,
+            img_url: res.img_url || '',
             category_id: res.category_id && typeof res.category_id === 'object' ? res.category_id._id : (res.category_id || ''),
             brand_id: res.brand_id && typeof res.brand_id === 'object' ? res.brand_id._id : (res.brand_id || ''),
             product_type_id: res.product_type_id && typeof res.product_type_id === 'object' ? res.product_type_id._id : (res.product_type_id || ''),
             sale: res.sale || false,
             created_at: res.created_at || '',
             status: 'Đã duyệt',
+             
           });
-          setImagePreview(res.img_url || null);
+          // 4. Khi load sản phẩm để sửa (edit), nếu có img_url thì set preview
+          if (res.img_url) {
+            console.log('Original img_url from server:', res.img_url);
+            const isFullUrl = res.img_url.startsWith('http');
+            const previewUrl = isFullUrl ? res.img_url : `http://localhost:5000/uploads/${res.img_url}`;
+            console.log('Setting preview URL:', previewUrl);
+            setImagePreview(previewUrl);
+          }
         })
         .catch((error) => {
           console.error('Lỗi khi load sản phẩm:', error);
@@ -126,14 +137,14 @@ const ProductForm: React.FC = () => {
     setProduct({ ...product, [name]: value });
   };
 
+  // 3. Khi chọn file mới
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     console.log('File selected:', file);
     if (file) {
       setImageFile(file);
-      const previewUrl = URL.createObjectURL(file);
-      console.log('Preview URL:', previewUrl);
-      setImagePreview(previewUrl);
+      setImagePreview(URL.createObjectURL(file));
+      console.log('Preview URL:', URL.createObjectURL(file));
     } else {
       console.log('No file selected');
     }
@@ -172,8 +183,8 @@ const ProductForm: React.FC = () => {
     console.log(`Processing ${key}: ${value} (type: ${typeof value})`);
     
     // Bỏ qua các field không cần thiết cho update
-    if (key === 'created_at' || key === 'status') {
-      console.log(`Skipping ${key} (not needed for update)`);
+    if (key === 'created_at' || key === 'status' || key === 'img_url') {
+      console.log(`Skipping ${key} (will be handled separately)`);
       return;
     }
     
@@ -195,10 +206,15 @@ const ProductForm: React.FC = () => {
     }
   });
 
-  // Gửi ảnh nếu có file mới được chọn
+  // 6. Khi submit, nếu có file mới thì gửi file, nếu không thì gửi lại img_url cũ
   if (imageFile) {
     formData.append('image', imageFile);
     console.log('Adding image file:', imageFile.name);
+  } else if (product.img_url && product.img_url.trim() !== '') {
+    formData.append('img_url', product.img_url);
+    console.log('Adding existing image URL:', product.img_url);
+  } else {
+    console.log('No image file or existing URL to send');
   }
 
   console.log('FormData entries:');
@@ -368,7 +384,7 @@ const ProductForm: React.FC = () => {
                   type="button" 
                   onClick={() => {
                     setImageFile(null);
-                    setImagePreview(product.img_url || null);
+                    setImagePreview(product.img_url || '');
                   }}
                   style={{
                     position: 'absolute',

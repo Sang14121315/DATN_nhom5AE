@@ -81,9 +81,10 @@ export const createProduct = async (data: FormData): Promise<Product> => {
   try {
     const response = await axios.post('http://localhost:5000/api/products', data);
     return response.data;
-  } catch (error) {
-    console.error('Lỗi khi tạo sản phẩm:', error);
-    throw new Error('Không thể tạo sản phẩm');
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } } };
+    console.error('Lỗi khi tạo sản phẩm:', err.response?.data || error);
+    throw new Error(err.response?.data?.message || 'Không thể tạo sản phẩm');
   }
 };
 
@@ -100,9 +101,10 @@ export const updateProduct = async (id: string, data: FormData): Promise<Product
       }
     );
     return response.data;
-  } catch (error: any) {
-    console.error('Lỗi khi cập nhật sản phẩm:', error?.response?.data || error);
-    throw new Error(error?.response?.data?.message || 'Không thể cập nhật sản phẩm');
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } } };
+    console.error('Lỗi khi cập nhật sản phẩm:', err.response?.data || error);
+    throw new Error(err.response?.data?.message || 'Không thể cập nhật sản phẩm');
   }
 };
 
@@ -114,6 +116,17 @@ export const deleteProduct = async (id: string): Promise<void> => {
   } catch (error) {
     console.error('Lỗi khi xoá sản phẩm:', error);
     throw new Error('Không thể xoá sản phẩm');
+  }
+};
+
+// ✅ Kiểm tra slug đã tồn tại chưa
+export const checkSlugExists = async (slug: string): Promise<boolean> => {
+  try {
+    const response = await axios.get(`http://localhost:5000/api/products/check-slug/${slug}`);
+    return response.data.exists;
+  } catch (error) {
+    console.error('Lỗi khi kiểm tra slug:', error);
+    return false;
   }
 };
 

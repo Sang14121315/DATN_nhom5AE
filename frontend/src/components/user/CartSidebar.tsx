@@ -45,7 +45,12 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose }) => {
         ) : (
           cartItems.map(item => (
             <div className="cart-item" key={item._id}>
-              <img src={item.img_url} alt={item.name} />
+                              <img 
+                  src={item.img_url && item.img_url.startsWith('http') 
+                    ? item.img_url 
+                    : `http://localhost:5000/uploads/${item.img_url}`} 
+                  alt={item.name} 
+                />
               <div className="item-info">
                 <p>{item.name}</p>
                 <p>{item.price.toLocaleString()} đ</p>

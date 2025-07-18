@@ -3,19 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import '@/styles/pages/admin/products.scss';
 
 import { Product, fetchAllProducts, ProductQueryParams } from '@/api/productsAPI';
-import { fetchAllCategories } from '@/api/categoryAPI';
-import { fetchAllBrands } from '@/api/brandAPI';
-import { fetchAllProductTypes } from '@/api/productTypeAPI';
+import { fetchAllCategories, Category } from '@/api/categoryAPI';
+import { fetchAllBrands, Brand } from '@/api/brandAPI';
+import { fetchAllProductTypes, ProductType } from '@/api/productTypeAPI';
 import { formatCurrency } from '@/api/productsAPI';
 
 const ProductTable: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState([]);
-  const [brands, setBrands] = useState([]);
-  const [types, setTypes] = useState([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [types, setTypes] = useState<ProductType[]>([]);
   const [filters, setFilters] = useState<ProductQueryParams>({});
   const [search, setSearch] = useState('');
-  const [error, setError] = useState<string | null>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -24,6 +23,7 @@ const ProductTable: React.FC = () => {
   const loadProducts = async () => {
     try {
       const data = await fetchAllProducts({ ...filters, name: search });
+      console.log('Admin products data:', data.products.map(p => ({ name: p.name, img_url: p.img_url, brand: p.brand_id })));
       setProducts(data.products);
       setError(null);
     } catch (err) {
@@ -141,7 +141,12 @@ const ProductTable: React.FC = () => {
                 <td className="product-cell">
                   <div className="image-placeholder">
                     {product.img_url && (
-                      <img src={product.img_url} alt={product.name} />
+                      <img 
+                        src={product.img_url.startsWith('http') 
+                          ? product.img_url 
+                          : `http://localhost:5000/uploads/${product.img_url}`} 
+                        alt={product.name} 
+                      />
                     )}
                   </div>
                   <span>{product.name}</span>

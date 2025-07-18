@@ -114,7 +114,12 @@ const Header: React.FC = () => {
                         {formatCurrency(item.price)}
                       </div>
                     </div>
-                    <img src={item.img_url} alt={item.name} />
+                    <img 
+                  src={item.img_url && item.img_url.startsWith('http') 
+                    ? item.img_url 
+                    : `http://localhost:5000/uploads/${item.img_url}`} 
+                  alt={item.name} 
+                />
                   </div>
                 ))}
                 <div className="see-more" onMouseDown={handleGoToList}>

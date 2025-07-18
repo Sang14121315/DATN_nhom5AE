@@ -13,7 +13,7 @@ const productSchema = new mongoose.Schema({
   hot: { type: Boolean, default: false },
   coupons_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Coupon' },
   brand_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Brand', required: true },
-  product_type_id: { type: mongoose.Schema.Types.ObjectId, ref: 'ProductType', required: true },
+  product_type_id: { type: mongoose.Schema.Types.ObjectId, ref: 'ProductType' },
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now }
 });

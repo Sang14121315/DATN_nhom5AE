@@ -15,7 +15,7 @@ const productSchema = Joi.object({
   hot: Joi.boolean().default(false),
   coupons_id: Joi.string().allow(''),
   brand_id: Joi.string().required(),
-  product_type_id: Joi.string().allow('', null),
+  product_type_id: Joi.string().allow('', null).optional(),
 });
 
 // Joi Schema cho update - cho phép các field optional
@@ -138,6 +138,9 @@ exports.getProductById = async (req, res, next) => {
 // ✅ POST: Tạo mới sản phẩm
 exports.createProduct = async (req, res, next) => {
   try {
+    console.log('Create product - Raw body:', req.body);
+    console.log('Create product - Files:', req.file);
+    
     const rawData = {
       ...req.body,
       price: parseNumber(req.body.price),
@@ -147,14 +150,24 @@ exports.createProduct = async (req, res, next) => {
       view: parseNumber(req.body.view) || 0,
     };
 
+    console.log('Create product - Processed data:', rawData);
+
     const data = validateData(rawData, res);
     if (!data) return;
 
+    console.log('Create product - Validated data:', data);
+
     const img_url = req.file ? req.file.filename : '';
-    const newProduct = await ProductService.create({ ...data, img_url });
+    console.log('Create product - Final img_url:', img_url);
+    
+    const finalData = { ...data, img_url };
+    console.log('Create product - Final data to create:', finalData);
+    
+    const newProduct = await ProductService.create(finalData);
 
     res.status(201).json(newProduct);
   } catch (error) {
+    console.error('Create product error:', error);
     next(error);
   }
 };
@@ -184,6 +197,8 @@ exports.updateProduct = async (req, res, next) => {
     console.log('Update product - Validated data:', data);
 
     const img_url = req.file ? req.file.filename : req.body.img_url;
+    console.log('Final img_url value:', img_url);
+    console.log('Final data to update:', { ...data, img_url });
     const updatedProduct = await ProductService.update(req.params.id, { ...data, img_url });
 
     res.json(updatedProduct);

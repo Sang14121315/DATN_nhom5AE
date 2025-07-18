@@ -28,7 +28,9 @@ export interface Product {
 // Lấy danh sách tất cả sản phẩm
 export const fetchAllProducts = async (): Promise<Product[]> => {
   const response = await axios.get('http://localhost:5000/api/products');
-  return response.data;
+  console.log('User API response:', response.data);
+  // Kiểm tra xem response có format products array không
+  return response.data.products || response.data;
 };
 
 // Lấy chi tiết sản phẩm theo ID
